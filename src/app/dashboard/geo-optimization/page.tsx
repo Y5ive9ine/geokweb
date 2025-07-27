@@ -58,6 +58,11 @@ export default function GeoOptimizationPage() {
           <p className="block leading-[normal] whitespace-pre">数据库</p>
         </div>
       </Link>
+      <Link href="/dashboard/geo-optimization/pricing">
+        <div className="absolute font-normal leading-[0] left-[689px] not-italic text-[#999999] text-[20px] text-left text-nowrap top-7 cursor-pointer hover:text-[#333333] transition-colors">
+          <p className="block leading-[normal] whitespace-pre">价格</p>
+        </div>
+      </Link>
 
       {/* GEO标签的下划线（激活状态） */}
       <div className="absolute bg-[#333333] h-1 left-[446px] top-[76px] w-[90px]" />
@@ -142,17 +147,19 @@ export default function GeoOptimizationPage() {
         </div>
       </div>
 
-      <div className="absolute contents left-[88px] top-[506px]">
-        <div className="absolute font-normal leading-[0] left-[120px] not-italic text-[#444444] text-[18px] text-left text-nowrap top-[506px]">
-          <p className="leading-[normal] whitespace-pre">
-            <span>设置  </span>
-            <span>Settings</span>
-          </p>
+      <Link href="/dashboard/settings">
+        <div className="absolute contents left-[88px] top-[506px] cursor-pointer">
+          <div className="absolute font-normal leading-[0] left-[120px] not-italic text-[#444444] text-[18px] text-left text-nowrap top-[506px] hover:text-[#2663ff] transition-colors">
+            <p className="leading-[normal] whitespace-pre">
+              <span>设置  </span>
+              <span>Settings</span>
+            </p>
+          </div>
+          <div className="absolute left-[88px] size-[22px] top-[506px]">
+            <img alt="" className="block max-w-none size-full" src={imgFrame4} />
+          </div>
         </div>
-        <div className="absolute left-[88px] size-[22px] top-[506px]">
-          <img alt="" className="block max-w-none size-full" src={imgFrame4} />
-        </div>
-      </div>
+      </Link>
 
       {/* 用户头像和名称 */}
       <div className="absolute contents left-[1645px] top-5">
@@ -333,12 +340,12 @@ export default function GeoOptimizationPage() {
             <div 
               className="h-80 rounded-[20px] relative overflow-hidden"
               style={{ 
-                backgroundImage: "url('images/Rectangle445.png')",
+                backgroundImage: "url('../images/Rectangle445.png')",
                 backgroundSize: 'cover',
                 backgroundPosition: 'center'
               }}
             >
-              <div className="absolute inset-0 bg-black bg-opacity-20" />
+              {/* <div className="absolute inset-0 bg-black bg-opacity-20" /> */}
               <div className="absolute bottom-0 left-0 right-0 bg-[rgba(38,99,255,0.7)] h-[73px] rounded-bl-[20px] rounded-br-[20px] flex items-center justify-center">
                 <span className="text-white text-[30px] font-semibold">一键生成</span>
               </div>
@@ -348,12 +355,12 @@ export default function GeoOptimizationPage() {
             <div 
               className="h-80 rounded-[20px] relative overflow-hidden"
               style={{ 
-                backgroundImage: "url('images/Rectangle470.png')",
+                backgroundImage: "url('../images/Rectangle470.png')",
                 backgroundSize: 'cover',
                 backgroundPosition: 'center'
               }}
             >
-              <div className="absolute inset-0 bg-black bg-opacity-20" />
+              {/* <div className="absolute inset-0 bg-black bg-opacity-20" /> */}
               <div className="absolute bottom-0 left-0 right-0 bg-[rgba(38,99,255,0.7)] h-[73px] rounded-bl-[20px] rounded-br-[20px] flex items-center justify-center">
                 <span className="text-white text-[30px] font-semibold">一键生成</span>
               </div>

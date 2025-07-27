@@ -43,6 +43,13 @@ export default function DatabasePage() {
         <p className="block leading-[normal] whitespace-pre">数据库</p>
       </div>
 
+      {/* 价格页面链接 */}
+      <Link href="/dashboard/geo-optimization/pricing">
+        <div className="absolute font-normal leading-[0] left-[689px] not-italic text-[#999999] text-[20px] text-left text-nowrap top-7 cursor-pointer hover:text-[#333333] transition-colors">
+          <p className="block leading-[normal] whitespace-pre">价格</p>
+        </div>
+      </Link>
+
       {/* 数据库标签的下划线（激活状态） */}
       <div className="absolute bg-[#333333] h-1 left-[556px] top-[76px] w-[90px]" />
 
@@ -126,17 +133,19 @@ export default function DatabasePage() {
         </div>
       </div>
 
-      <div className="absolute contents left-[88px] top-[506px]">
-        <div className="absolute font-normal leading-[0] left-[120px] not-italic text-[#444444] text-[18px] text-left text-nowrap top-[506px]">
-          <p className="leading-[normal] whitespace-pre">
-            <span>设置  </span>
-            <span>Settings</span>
-          </p>
+      <Link href="/dashboard/settings">
+        <div className="absolute contents left-[88px] top-[506px] cursor-pointer">
+          <div className="absolute font-normal leading-[0] left-[120px] not-italic text-[#444444] text-[18px] text-left text-nowrap top-[506px] hover:text-[#2663ff] transition-colors">
+            <p className="leading-[normal] whitespace-pre">
+              <span>设置  </span>
+              <span>Settings</span>
+            </p>
+          </div>
+          <div className="absolute left-[88px] size-[22px] top-[506px]">
+            <img alt="" className="block max-w-none size-full" src={imgFrame4} />
+          </div>
         </div>
-        <div className="absolute left-[88px] size-[22px] top-[506px]">
-          <img alt="" className="block max-w-none size-full" src={imgFrame4} />
-        </div>
-      </div>
+      </Link>
 
       {/* 用户头像和名称 */}
       <div className="absolute contents left-[1645px] top-5">
