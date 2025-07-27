@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 
 // 图标资源常量 - 从Figma获取
-const img2 = "images/img2.png";
+const img2 = "../images/img2.png";
 const imgEllipse14 = "images/Ellipse14.png";
 const imgEllipse15 = "images/Ellipse15.png";
 const imgEllipse16 = "images/Ellipse16.png";
@@ -38,6 +39,8 @@ const imgEllipse25 = "images/Ellipse25.svg";
 const imgVector = "images/Vector.svg";
 const imgFrame7 = "images/Frame7.svg";
 const imgGroup134 = "images/Group134.svg";
+const imgHomeIcon = "images/home-icon.svg";
+const imgHomeIconWhite = "images/home-icon-white.svg";
 
 export default function DashboardPage() {
   return (
@@ -56,14 +59,18 @@ export default function DashboardPage() {
       <div className="absolute font-bold leading-[0] left-[461px] not-italic text-[#333333] text-[20px] text-left text-nowrap top-7">
         <p className="block leading-[normal] whitespace-pre">可见性</p>
       </div>
-      <div className="absolute font-normal leading-[0] left-[571px] not-italic text-[#666666] text-[20px] text-left text-nowrap top-7">
-        <p className="block leading-[normal] whitespace-pre">提示</p>
-      </div>
-      <div className="absolute font-normal leading-[0] left-[661px] not-italic text-[#666666] text-[20px] text-left text-nowrap top-7">
-        <p className="block leading-[normal] whitespace-pre">引用</p>
-      </div>
+      <Link href="/dashboard/tips">
+        <div className="absolute font-normal leading-[0] left-[571px] not-italic text-[#999999] text-[20px] text-left text-nowrap top-7 cursor-pointer hover:text-[#333333] transition-colors">
+          <p className="block leading-[normal] whitespace-pre">提示</p>
+        </div>
+      </Link>
+      <Link href="/dashboard/references">
+        <div className="absolute font-normal leading-[0] left-[661px] not-italic text-[#999999] text-[20px] text-left text-nowrap top-7 cursor-pointer hover:text-[#333333] transition-colors">
+          <p className="block leading-[normal] whitespace-pre">引用</p>
+        </div>
+      </Link>
 
-      {/* Tab下划线 */}
+      {/* Tab下划线 - 可见性激活状态 */}
       <div className="absolute bg-[#333333] h-1 left-[446px] top-[76px] w-[90px]" />
 
       {/* 顶部搜索图标 */}
@@ -98,7 +105,7 @@ export default function DashboardPage() {
           <p className="block leading-[normal] whitespace-pre">首页  Home Page</p>
         </div>
         <div className="absolute left-[86px] size-6 top-[118px]">
-          <img alt="" className="block max-w-none size-full" src={imgFrame2} />
+          <img alt="" className="block max-w-none size-full" src={imgHomeIconWhite} />
             </div>
           </div>
 
@@ -115,14 +122,16 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="absolute contents left-[88px] top-64">
-        <div className="absolute font-normal leading-[0] left-[120px] not-italic text-[#444444] text-[18px] text-left text-nowrap top-64">
-          <p className="block leading-[normal] whitespace-pre">GEO优化 </p>
+      <Link href="/dashboard/geo-optimization">
+        <div className="absolute contents left-[88px] top-64 cursor-pointer">
+          <div className="absolute font-normal leading-[0] left-[120px] not-italic text-[#444444] text-[18px] text-left text-nowrap top-64 hover:text-[#2663ff] transition-colors">
+            <p className="block leading-[normal] whitespace-pre">GEO优化 </p>
+          </div>
+          <div className="absolute left-[88px] size-[22px] top-64">
+            <img alt="" className="block max-w-none size-full" src={imgFrame5} />
+          </div>
         </div>
-        <div className="absolute left-[88px] size-[22px] top-64">
-          <img alt="" className="block max-w-none size-full" src={imgFrame5} />
-        </div>
-      </div>
+      </Link>
 
       <div className="absolute contents left-[88px] top-[324px]">
         <div className="absolute font-normal leading-[0] left-[120px] not-italic text-[#444444] text-[18px] text-left text-nowrap top-[324px]">

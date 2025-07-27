@@ -42,8 +42,8 @@ export default function RegisterPage() {
     setLoading(true)
     
     try {
-      // 模拟Google注册成功，跳转到仪表板
-      router.push('/dashboard')
+      // 模拟Google注册成功，跳转到引导页面
+      router.push('/auth/register/onboarding')
     } catch (error) {
       console.error('Google register error:', error)
       setError('Google注册初始化失败')

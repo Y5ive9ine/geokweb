@@ -14,13 +14,13 @@ export default function RegisterFormPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // 模拟注册成功，跳转到仪表板
-    router.push('/dashboard')
+    // 模拟注册成功，跳转到引导页面
+    router.push('/auth/register/onboarding')
   }
 
   const handleGoogleLogin = () => {
-    // 模拟Google登录成功，跳转到仪表板
-    router.push('/dashboard')
+    // 模拟Google注册成功，跳转到引导页面
+    router.push('/auth/register/onboarding')
   }
 
   return (
