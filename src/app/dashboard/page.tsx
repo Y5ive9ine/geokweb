@@ -133,14 +133,16 @@ export default function DashboardPage() {
         </div>
       </Link>
 
-      <div className="absolute contents left-[88px] top-[324px]">
-        <div className="absolute font-normal leading-[0] left-[120px] not-italic text-[#444444] text-[18px] text-left text-nowrap top-[324px]">
-          <p className="block leading-[normal] whitespace-pre">AI内容生成</p>
+      <Link href="/dashboard/ai-content-generation">
+        <div className="absolute contents left-[88px] top-[324px] cursor-pointer">
+          <div className="absolute font-normal leading-[0] left-[120px] not-italic text-[#444444] text-[18px] text-left text-nowrap top-[324px] hover:text-[#2663ff] transition-colors">
+            <p className="block leading-[normal] whitespace-pre">AI内容生成</p>
+          </div>
+          <div className="absolute left-[88px] size-[22px] top-[324px]">
+            <img alt="" className="block max-w-none size-full" src={imgFrame6} />
+          </div>
         </div>
-        <div className="absolute left-[88px] size-[22px] top-[324px]">
-          <img alt="" className="block max-w-none size-full" src={imgFrame6} />
-        </div>
-      </div>
+      </Link>
 
       <div className="absolute contents left-[88px] top-[438px]">
         <div className="absolute font-normal leading-[0] left-[120px] not-italic text-[#444444] text-[18px] text-left text-nowrap top-[438px]">

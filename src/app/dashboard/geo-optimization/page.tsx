@@ -34,6 +34,7 @@ const imgEllipse15 = "../images/Ellipse15.png";
 const imgEllipse16 = "../images/Ellipse16.png";
 const imgEllipse17 = "../images/Ellipse17.png";
 const imgEllipse18 = "../images/Ellipse18.png";
+const imgGroup119 = "../images/Group119.png";
 
 export default function GeoOptimizationPage() {
   return (
@@ -52,9 +53,11 @@ export default function GeoOptimizationPage() {
       <div className="absolute font-bold leading-[0] left-[469px] not-italic text-[#333333] text-[20px] text-left text-nowrap top-7">
         <p className="block leading-[normal] whitespace-pre">GEO</p>
       </div>
-      <div className="absolute font-normal leading-[0] left-[571px] not-italic text-[#999999] text-[20px] text-left text-nowrap top-7">
-        <p className="block leading-[normal] whitespace-pre">数据库</p>
-      </div>
+      <Link href="/dashboard/geo-optimization/database">
+        <div className="absolute font-normal leading-[0] left-[571px] not-italic text-[#999999] text-[20px] text-left text-nowrap top-7 cursor-pointer hover:text-[#333333] transition-colors">
+          <p className="block leading-[normal] whitespace-pre">数据库</p>
+        </div>
+      </Link>
 
       {/* GEO标签的下划线（激活状态） */}
       <div className="absolute bg-[#333333] h-1 left-[446px] top-[76px] w-[90px]" />
@@ -119,14 +122,16 @@ export default function GeoOptimizationPage() {
         </div>
       </div>
 
-      <div className="absolute contents left-[88px] top-[324px]">
-        <div className="absolute font-normal leading-[0] left-[120px] not-italic text-[#444444] text-[18px] text-left text-nowrap top-[324px]">
-          <p className="block leading-[normal] whitespace-pre">AI内容生成</p>
+      <Link href="/dashboard/ai-content-generation">
+        <div className="absolute contents left-[88px] top-[324px] cursor-pointer">
+          <div className="absolute font-normal leading-[0] left-[120px] not-italic text-[#444444] text-[18px] text-left text-nowrap top-[324px] hover:text-[#2663ff] transition-colors">
+            <p className="block leading-[normal] whitespace-pre">AI内容生成</p>
+          </div>
+          <div className="absolute left-[88px] size-[22px] top-[324px]">
+            <img alt="" className="block max-w-none size-full" src={imgFrame6} />
+          </div>
         </div>
-        <div className="absolute left-[88px] size-[22px] top-[324px]">
-          <img alt="" className="block max-w-none size-full" src={imgFrame6} />
-        </div>
-      </div>
+      </Link>
 
       <div className="absolute contents left-[88px] top-[438px]">
         <div className="absolute font-normal leading-[0] left-[120px] not-italic text-[#444444] text-[18px] text-left text-nowrap top-[438px]">
@@ -494,38 +499,7 @@ export default function GeoOptimizationPage() {
           
           <div className="grid grid-cols-3 gap-8">
             
-            {/* 品牌搜索率卡片 */}
-            <div className="bg-[#ffffff] h-[326px] rounded-[20px] border border-[#cccccc] relative overflow-hidden">
-              <div className="h-[326px] overflow-clip relative w-full">
-                <div className="absolute font-bold leading-[0] left-[30px] not-italic text-[#333333] text-[24px] text-left text-nowrap top-[30px]">
-                  <p className="block leading-[normal] whitespace-pre">品牌搜索率</p>
-                </div>
-                <div className="absolute font-bold leading-[0] right-[30px] not-italic text-[#999999] text-[12px] text-left text-nowrap top-[37px]">
-                  <p className="block leading-[normal] whitespace-pre">总数据</p>
-                </div>
-                <div className="absolute font-bold leading-[0] left-[30px] not-italic text-[#333333] text-[28px] text-left text-nowrap top-[79px]">
-                  <p className="block leading-[normal] whitespace-pre">159.8%</p>
-                </div>
-                <div className="absolute font-bold leading-[0] left-[30px] not-italic text-[16px] text-[rgba(51,51,51,0.2)] text-left text-nowrap top-[145px]">
-                  <p className="block leading-[normal] whitespace-pre">70%</p>
-                </div>
-                <div className="absolute font-bold leading-[0] left-[30px] not-italic text-[16px] text-[rgba(51,51,51,0.2)] text-left text-nowrap top-52">
-                  <p className="block leading-[normal] whitespace-pre">50%</p>
-                </div>
-
-                {/* 图表 */}
-                <div className="absolute h-[183px] left-0 top-[143px] w-full">
-                  <img alt="" className="block max-w-none w-full h-full object-cover" src={imgVector12} />
-                </div>
-                <div className="absolute h-[156px] left-0 top-[140px] w-full">
-                  <div className="absolute bottom-[-0.321%] left-[-0.087%] right-[-0.087%] top-[-0.321%]">
-                    <img alt="" className="block max-w-none size-full" src={imgVector1} />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 品牌推荐率卡片 */}
+            {/* 品牌推荐率卡片 - 调换到第一位 */}
             <div className="bg-[#ffffff] rounded-[20px] h-[326px] border border-[#cccccc] relative overflow-hidden">
               <div className="overflow-clip relative size-full">
                 <div className="absolute left-[61px] size-[204px] top-[87px]">
@@ -589,98 +563,76 @@ export default function GeoOptimizationPage() {
               </div>
             </div>
 
-            {/* 品牌在AI市场的首推率卡片 */}
+            {/* 品牌被提及率卡片 - 调换到第二位，标题改为品牌被提及率 */}
+            <div className="bg-[#ffffff] h-[326px] rounded-[20px] border border-[#cccccc] relative overflow-hidden">
+              <div className="h-[326px] overflow-clip relative w-full">
+                <div className="absolute font-bold leading-[0] left-[30px] not-italic text-[#333333] text-[24px] text-left text-nowrap top-[30px]">
+                  <p className="block leading-[normal] whitespace-pre">品牌被提及率</p>
+                </div>
+                <div className="absolute font-bold leading-[0] right-[30px] not-italic text-[#999999] text-[12px] text-left text-nowrap top-[37px]">
+                  <p className="block leading-[normal] whitespace-pre">总数据</p>
+                </div>
+                <div className="absolute font-bold leading-[0] left-[30px] not-italic text-[#333333] text-[28px] text-left text-nowrap top-[79px]">
+                  <p className="block leading-[normal] whitespace-pre">71.5%</p>
+                </div>
+                <div className="absolute font-bold leading-[0] left-[30px] not-italic text-[16px] text-[rgba(51,51,51,0.2)] text-left text-nowrap top-[145px]">
+                  <p className="block leading-[normal] whitespace-pre">70%</p>
+                </div>
+                <div className="absolute font-bold leading-[0] left-[30px] not-italic text-[16px] text-[rgba(51,51,51,0.2)] text-left text-nowrap top-52">
+                  <p className="block leading-[normal] whitespace-pre">50%</p>
+                </div>
+
+                {/* 图表 */}
+                <div className="absolute h-[183px] left-0 top-[143px] w-full">
+                  <img alt="" className="block max-w-none w-full h-full object-cover" src={imgVector12} />
+                </div>
+                <div className="absolute h-[156px] left-0 top-[140px] w-full">
+                  <div className="absolute bottom-[-0.321%] left-[-0.087%] right-[-0.087%] top-[-0.321%]">
+                    <img alt="" className="block max-w-none size-full" src={imgVector1} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 引用链接百分比卡片 */}
             <div className="bg-[#ffffff] h-[326px] rounded-[20px] border border-[#cccccc] relative overflow-hidden">
               <div className="h-[326px] overflow-clip relative w-full">
                 <div className="absolute font-bold leading-[0] left-[30px] not-italic text-[#333333] text-[18px] text-left text-nowrap top-[30px]">
-                  <p className="block leading-[normal] whitespace-pre">品牌在AI市场的首推率</p>
+                  <p className="block leading-[normal] whitespace-pre">引用链接百分比</p>
                 </div>
                 <div className="absolute font-light leading-[0] left-[30px] not-italic text-[#666666] text-[14px] text-left text-nowrap top-[60px]">
-                  <p className="block leading-[normal] whitespace-pre">品牌的在各竞争对手产品中分布情况</p>
+                  <p className="block leading-[normal] whitespace-pre">全网链接占引用链接的百分比</p>
                 </div>
 
-                {/* 品牌列表 */}
-                <div className="absolute contents left-[200px] top-[100px]">
-                  {/* Intel */}
-                  <div className="absolute contents left-[200px] top-[100px]">
-                    <div className="absolute font-light h-[27px] leading-[0] left-[228px] not-italic text-[#000000] text-[14px] text-left top-[100px] w-[60px]">
-                      <p className="block leading-[normal]">Intel</p>
-                    </div>
-                    <div className="absolute font-normal h-[21px] leading-[0] right-[20px] not-italic text-[#000000] text-[12px] text-right top-[103px] w-[50px]">
-                      <p className="block leading-[normal]">72.5%</p>
-                    </div>
-                    <div className="absolute bg-[#2663ff] h-[17px] left-[200px] rounded-sm top-[100px] w-[17px] border border-[#cccccc]" />
-                  </div>
+                {/* 圆环图 - 静态图片 */}
+                <div className="absolute left-[50%] translate-x-[-50%] top-[90px] w-[180px] h-[180px] flex items-center justify-center">
+                  <img alt="引用链接百分比圆环图" className="block w-full h-full object-contain" src={imgGroup119} />
+                </div>
 
-                  {/* AMD */}
-                  <div className="absolute contents left-[200px] top-[140px]">
-                    <div className="absolute font-light h-[27px] leading-[0] left-[228px] not-italic text-[#000000] text-[14px] text-left top-[140px] w-[60px]">
-                      <p className="block leading-[normal]">AMD</p>
+                {/* 图例 */}
+                <div className="absolute left-[30px] right-[30px] bottom-[20px]">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-[10px] h-[10px] bg-[#2663ff] rounded-full"></div>
+                        <span className="text-[#333333] text-[12px] font-light">直接引用</span>
+                      </div>
+                      <span className="text-[#333333] text-[12px] font-bold">30%</span>
                     </div>
-                    <div className="absolute font-normal h-[21px] leading-[0] right-[20px] not-italic text-[#000000] text-[12px] text-right top-[143px] w-[50px]">
-                      <p className="block leading-[normal]">15.7%</p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-[10px] h-[10px] bg-[#ffb200] rounded-full"></div>
+                        <span className="text-[#333333] text-[12px] font-light">间接引用</span>
+                      </div>
+                      <span className="text-[#333333] text-[12px] font-bold">40%</span>
                     </div>
-                    <div className="absolute bg-[#ffb200] h-[17px] left-[200px] rounded-sm top-[140px] w-[17px] border border-[#cccccc]" />
-                  </div>
-                  
-                  {/* Apple */}
-                  <div className="absolute contents left-[200px] top-[180px]">
-                    <div className="absolute font-light h-[27px] leading-[0] left-[228px] not-italic text-[#000000] text-[14px] text-left top-[180px] w-[60px]">
-                      <p className="block leading-[normal]">Apple</p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-[10px] h-[10px] bg-[#11ca9c] rounded-full"></div>
+                        <span className="text-[#333333] text-[12px] font-light">相关引用</span>
+                      </div>
+                      <span className="text-[#333333] text-[12px] font-bold">30%</span>
                     </div>
-                    <div className="absolute font-normal h-[21px] leading-[0] right-[20px] not-italic text-[#000000] text-[12px] text-right top-[183px] w-[50px]">
-                      <p className="block leading-[normal]">9.3%</p>
-                    </div>
-                    <div className="absolute bg-[#11ca9c] h-[17px] left-[200px] rounded-sm top-[180px] w-[17px] border border-[#cccccc]" />
-                  </div>
-
-                  {/* Qualcomm */}
-                  <div className="absolute contents left-[200px] top-[220px]">
-                    <div className="absolute font-light h-[27px] leading-[0] left-[228px] not-italic text-[#000000] text-[14px] text-left top-[220px] w-[80px]">
-                      <p className="block leading-[normal]">Qualcomm</p>
-                    </div>
-                    <div className="absolute font-normal h-[21px] leading-[0] right-[20px] not-italic text-[#000000] text-[12px] text-right top-[223px] w-[50px]">
-                      <p className="block leading-[normal]">1.3%</p>
-                    </div>
-                    <div className="absolute bg-[#fa8919] h-[17px] left-[200px] rounded-sm top-[220px] w-[17px] border border-[#cccccc]" />
-                  </div>
-
-                  {/* ARM Holdings */}
-                  <div className="absolute contents left-[200px] top-[260px]">
-                    <div className="absolute font-light h-[27px] leading-[0] left-[228px] not-italic text-[#000000] text-[14px] text-left top-[260px] w-[100px]">
-                      <p className="block leading-[normal]">ARM Holdings</p>
-                    </div>
-                    <div className="absolute font-normal h-[21px] leading-[0] right-[20px] not-italic text-[#000000] text-[12px] text-right top-[263px] w-[50px]">
-                      <p className="block leading-[normal]">1.2%</p>
-                    </div>
-                    <div className="absolute bg-[#ff4d4d] h-[17px] left-[200px] rounded-sm top-[260px] w-[17px] border border-[#cccccc]" />
-                  </div>
-                </div>
-                        
-                {/* 饼图 */}
-                <div className="absolute left-5 size-[180px] top-[120px]">
-                  <div className="absolute bottom-1/2 left-0 right-0 top-0">
-                    <img alt="" className="block max-w-none size-full" height="90" loading="lazy" src={imgEllipse14} width="180" />
-                  </div>
-                </div>
-                <div className="absolute left-5 size-[180px] top-[120px]">
-                  <div className="absolute bottom-1/2 left-[65.773%] right-0 top-[7.469%]">
-                    <img alt="" className="block max-w-none size-full" height="76" loading="lazy" src={imgEllipse15} width="61" />
-                  </div>
-                </div>
-                <div className="absolute left-5 size-[180px] top-[120px]">
-                  <div className="absolute bottom-1/2 left-[77.129%] right-0 top-[28.656%]">
-                    <img alt="" className="block max-w-none size-full" height="38" loading="lazy" src={imgEllipse16} width="41" />
-                  </div>
-                </div>
-                <div className="absolute left-5 size-[180px] top-[120px]">
-                  <div className="absolute bottom-1/2 left-[79.633%] right-0 top-[42.203%]">
-                    <img alt="" className="block max-w-none size-full" height="14" loading="lazy" src={imgEllipse17} width="36" />
-                  </div>
-                </div>
-                <div className="absolute left-5 size-[180px] top-[120px]">
-                  <div className="absolute bottom-1/2 left-[79.911%] right-0 top-[46.15%]">
-                    <img alt="" className="block max-w-none size-full" height="7" loading="lazy" src={imgEllipse18} width="36" />
                   </div>
                 </div>
               </div>
