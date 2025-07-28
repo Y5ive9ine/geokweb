@@ -1,0 +1,95 @@
+version: "3.9"
+
+services:
+  nginx:
+    image: nginx:stable
+    container_name: nginx
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - ./volumes/certbot/conf:/etc/letsencrypt
+      - ./volumes/certbot/www:/var/www/html
+      - ./nginx:/etc/nginx/templates
+      - ./nginx/docker-entrypoint.sh:/docker-entrypoint.sh
+    environment:
+      CERTBOT_DOMAIN: ${CERTBOT_DOMAIN:-geok.deeplumen.cn}
+      NGINX_HTTPS_ENABLED: "true"
+      NGINX_ENABLE_CERTBOT_CHALLENGE: "true"
+      NGINX_SSL_CERT_FILENAME: "fullchain.pem"
+      NGINX_SSL_CERT_KEY_FILENAME: "privkey.pem"
+      NGINX_WORKER_PROCESSES: ${NGINX_WORKER_PROCESSES:-auto}
+      NGINX_KEEPALIVE_TIMEOUT: ${NGINX_KEEPALIVE_TIMEOUT:-65}
+      NGINX_CLIENT_MAX_BODY_SIZE: ${NGINX_CLIENT_MAX_BODY_SIZE:-1m}
+      NGINX_SSL_PORT: ${NGINX_SSL_PORT:-443}
+      NGINX_SSL_PROTOCOLS: ${NGINX_SSL_PROTOCOLS:-TLSv1.2 TLSv1.3}
+      NGINX_PROXY_READ_TIMEOUT: ${NGINX_PROXY_READ_TIMEOUT:-60s}
+      NGINX_PROXY_SEND_TIMEOUT: ${NGINX_PROXY_SEND_TIMEOUT:-60s}
+    entrypoint: /docker-entrypoint.sh
+    depends_on:
+      - geokweb
+      - certbot
+    restart: always
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./volumes/certbot/conf:/etc/letsencrypt
+      - ./volumes/certbot/www:/var/www/html
+      - ./volumes/certbot/logs:/var/log/letsencrypt
+      - ./certbot/update-cert.template.txt:/update-cert.template.txt
+      - ./certbot/docker-entrypoint.sh:/docker-entrypoint.sh
+    environment:
+      CERTBOT_DOMAIN: ${CERTBOT_DOMAIN:-geok.deeplumen.cn}
+      CERTBOT_EMAIL: ${CERTBOT_EMAIL:-example@geok.deeplumen.cn}
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        # Install openssl for self-signed certificate generation
+        apk add --no-cache openssl
+
+        # Check if certificate exists
+        if [ ! -f /etc/letsencrypt/live/$${CERTBOT_DOMAIN:-geok.deeplumen.cn}/fullchain.pem ]; then
+          echo 'Generating self-signed certificate for development...';
+
+          # Create certificate directory
+          mkdir -p /etc/letsencrypt/live/$${CERTBOT_DOMAIN:-geok.deeplumen.cn}
+
+          # Generate private key
+          openssl genrsa -out /etc/letsencrypt/live/$${CERTBOT_DOMAIN:-geok.deeplumen.cn}/privkey.pem 2048
+
+          # Generate self-signed certificate
+          openssl req -new -x509 \
+            -key /etc/letsencrypt/live/$${CERTBOT_DOMAIN:-geok.deeplumen.cn}/privkey.pem \
+            -out /etc/letsencrypt/live/$${CERTBOT_DOMAIN:-geok.deeplumen.cn}/fullchain.pem \
+            -days 365 \
+            -subj "/C=CN/ST=Development/L=Local/O=Dev/CN=$${CERTBOT_DOMAIN:-geok.deeplumen.cn}"
+
+          echo 'Self-signed certificate generated successfully!';
+        fi;
+
+        # Create a ready file to signal nginx
+        touch /etc/letsencrypt/cert-ready
+
+        # Keep container running and periodically check for renewal
+        while true; do
+          echo 'Certificate check - using self-signed certificate';
+          sleep 24h;
+        done
+    healthcheck:
+      test: ["CMD", "test", "-f", "/etc/letsencrypt/cert-ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: always
+
+  geokweb:
+    image: kainyin/geokweb:v1
+    container_name: geokweb-app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped

@@ -14,7 +14,7 @@ import {
 const GRADIENT_BG = "/images/auth-gradient.svg";
 const CONTENT_BG = "/images/content-placeholder.svg";
 
-// OAuth处理组件
+// OAuth处理组件 - 已经在 Suspense 内部使用，不需要额外包装
 function OAuthHandler({
   onError,
   onGoogleAuth,

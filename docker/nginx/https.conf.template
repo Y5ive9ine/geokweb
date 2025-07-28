@@ -1,0 +1,28 @@
+# Please do not directly edit this file. Instead, modify the .env variables related to NGINX configuration.
+
+server {
+    listen ${NGINX_SSL_PORT} ssl;
+    server_name ${CERTBOT_DOMAIN};
+
+    ssl_certificate ${SSL_CERTIFICATE_PATH};
+    ssl_certificate_key ${SSL_CERTIFICATE_KEY_PATH};
+    ssl_protocols ${NGINX_SSL_PROTOCOLS};
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+
+    # API 转发
+    location /api/ {
+        proxy_pass http://47.99.189.222:8012/api/v1/;
+        include /etc/nginx/proxy.conf;
+    }
+
+    # 其他路径转发到 geokweb 容器
+    location / {
+        proxy_pass http://geokweb:3000;
+        include /etc/nginx/proxy.conf;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_cache_bypass $http_upgrade;
+    }
+}

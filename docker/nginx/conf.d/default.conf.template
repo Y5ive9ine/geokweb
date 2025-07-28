@@ -1,0 +1,23 @@
+server {
+    listen 80;
+    server_name ${CERTBOT_DOMAIN};
+
+    ${ACME_CHALLENGE_LOCATION}
+
+    # API 转发
+    location /api/ {
+        proxy_pass http://47.99.189.222:8012/api/v1/;
+        include /etc/nginx/proxy.conf;
+    }
+
+    # 其他路径转发到 geokweb 容器
+    location / {
+        proxy_pass http://geokweb:3000;
+        include /etc/nginx/proxy.conf;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+
+${HTTPS_CONFIG}

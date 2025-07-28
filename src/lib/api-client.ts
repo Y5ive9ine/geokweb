@@ -5,8 +5,17 @@
 
 // 获取API基础URL
 const getApiBaseUrl = () => {
-  // 直接连接到外部后端API
-  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+
+  if (typeof window !== "undefined") {
+    // 浏览器环境，用当前网页地址
+    return `${window.location.protocol}//${window.location.host}`;
+  }
+
+  // SSR 时默认用环境变量，或写死一个公网 API 域名
+  return "https://geok.deeplumen.cn";
 };
 
 // 请求配置接口
