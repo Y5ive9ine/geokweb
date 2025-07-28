@@ -6,7 +6,7 @@ import { SearchIcon, AnalyticsIcon, CheckIcon, FrameIcon, LocationIcon, ActionIc
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       {/* 顶部导航栏 */}
       <Navigation />
 
@@ -109,7 +109,8 @@ export default function HomePage() {
         <div 
           className="bg-white rounded-[20px] p-6 mx-auto"
           style={{
-            width: '1120px',
+            maxWidth: '1120px',
+            width: '100%',
             height: '680px',
             flexShrink: 0,
             boxShadow: '0 0 12px 0 rgba(38, 99, 255, 0.26)'
@@ -550,13 +551,15 @@ export default function HomePage() {
       {/* AI洞察部分 */}
       <section className="relative max-w-7xl mx-auto px-8 py-16">
         {/* 背景模糊效果 */}
-        <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div 
             className="absolute left-0 top-0"
             style={{
-              width: '599px',
-              height: '599px',
-              borderRadius: '599px',
+              width: '40vw',
+              maxWidth: '599px',
+              height: '40vw',
+              maxHeight: '599px',
+              borderRadius: '50%',
               background: 'rgba(38, 74, 255, 0.50)',
               filter: 'blur(250px)'
             }}
@@ -564,8 +567,10 @@ export default function HomePage() {
           <div 
             className="absolute right-0 bottom-0"
             style={{
-              width: '311px',
-              height: '311px',
+              width: '20vw',
+              maxWidth: '311px',
+              height: '20vw',
+              maxHeight: '311px',
               background: 'rgba(17, 202, 156, 0.50)',
               filter: 'blur(250px)'
             }}
@@ -578,8 +583,10 @@ export default function HomePage() {
           <div 
             className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 -z-10"
             style={{
-              width: '452px',
-              height: '452px',
+              width: '30vw',
+              maxWidth: '452px',
+              height: '30vw',
+              maxHeight: '452px',
               opacity: '0.1'
             }}
           >
@@ -710,8 +717,10 @@ export default function HomePage() {
             <div 
               className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 -z-10"
               style={{
-                width: '512.269px',
-                height: '512.269px',
+                width: '35vw',
+                maxWidth: '512.269px',
+                height: '35vw',
+                maxHeight: '512.269px',
                 transform: 'rotate(21.334deg)',
                 flexShrink: 0,
                 aspectRatio: '512.27/512.27',
@@ -758,10 +767,10 @@ export default function HomePage() {
         {/* 用户方案部分 */}
         <div className="relative mt-32">
           {/* 旋转背景图 */}
-          <div className="absolute left-[169px] top-[347px] pointer-events-none">
+          <div className="absolute left-[10%] top-[347px] pointer-events-none hidden lg:block">
             <div className="transform rotate-[352.061deg] opacity-40">
               <div 
-                className="w-[744px] h-[569px] bg-cover bg-center bg-no-repeat"
+                className="w-[40vw] max-w-[744px] h-[30vw] max-h-[569px] bg-cover bg-center bg-no-repeat"
                 style={{
                   backgroundImage: `url('/images/www-okx-placeholder.png')`
                 }}
@@ -770,7 +779,7 @@ export default function HomePage() {
             </div>
 
           {/* 模糊圆形背景 */}
-          <div className="absolute left-[767px] top-[343px] w-[838px] h-[838px] pointer-events-none">
+          <div className="absolute right-0 top-[343px] w-[45vw] max-w-[838px] h-[45vw] max-h-[838px] pointer-events-none hidden lg:block">
             <img src="/images/ellipse-blur.svg" alt="" className="w-full h-full" />
           </div>
 
@@ -786,18 +795,18 @@ export default function HomePage() {
 
           {/* 切换按钮 */}
           <div className="flex justify-center mb-16">
-            <div className="bg-white rounded-[10px] h-[70px] w-[400px] flex items-center px-6 shadow-sm relative">
+            <div className="bg-white rounded-[10px] h-[70px] max-w-[400px] w-full mx-4 flex items-center px-6 shadow-sm relative">
               <span className="font-['PingFang_SC'] text-[18px] text-[#333333] mr-8">每月支付</span>
-              <div className="bg-[#2663FF] rounded-lg h-[52px] w-[184px] flex items-center justify-center">
+              <div className="bg-[#2663FF] rounded-lg h-[52px] max-w-[184px] w-full flex items-center justify-center px-4">
                 <span className="font-['PingFang_SC'] text-[16px] text-white">年付（首月免费）</span>
               </div>
             </div>
           </div>
 
           {/* 价格卡片 */}
-          <div className="flex gap-6 justify-center">
+          <div className="flex flex-wrap gap-6 justify-center">
             {/* 功能增长卡片 */}
-            <div className="relative bg-white rounded-xl w-[360px] shadow-lg flex flex-col">
+            <div className="relative bg-white rounded-xl max-w-[360px] w-full shadow-lg flex flex-col">
               {/* 卡片内容 */}
               <div className="p-5">
                 <div className="flex items-center justify-between mb-8">
@@ -923,7 +932,7 @@ export default function HomePage() {
             </div>
 
             {/* 企业版卡片 */}
-            <div className="relative bg-white rounded-xl w-[330px] shadow-lg flex flex-col">
+            <div className="relative bg-white rounded-xl max-w-[330px] w-full shadow-lg flex flex-col">
               <div className="p-5">
                 <h3 className="font-['PingFang_SC'] text-[18px] text-[#333333] mb-4">企业版</h3>
                 
@@ -1013,8 +1022,8 @@ export default function HomePage() {
                 </div>
 
                 {/* 按钮 */}
-                <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
-                  <Link href="/auth/login" className="border border-[#2663FF] text-[#2663FF] rounded-[10px] h-10 w-[280px] flex items-center justify-center">
+                <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-full px-5">
+                  <Link href="/auth/login" className="border border-[#2663FF] text-[#2663FF] rounded-[10px] h-10 w-full flex items-center justify-center">
                     <span className="font-['PingFang_SC'] text-[16px]">开始使用</span>
                   </Link>
                 </div>
