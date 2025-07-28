@@ -1,7 +1,8 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Link from 'next/link'
+import { useState } from "react";
+import Link from "next/link";
+import { GeoOptimizationTable } from "@/components/geo";
 
 // 图标资源常量
 const img2 = "../images/img2.png";
@@ -81,7 +82,11 @@ export default function GeoOptimizationPage() {
           </p>
         </div>
         <div className="absolute left-[104px] top-[17px] w-[40px] h-[40px]">
-          <img alt="" className="block max-w-none size-full" src={imgGroup134} />
+          <img
+            alt=""
+            className="block max-w-none size-full"
+            src={imgGroup134}
+          />
         </div>
       </div>
 
@@ -96,10 +101,16 @@ export default function GeoOptimizationPage() {
       <Link href="/dashboard">
         <div className="absolute contents left-[86px] top-[118px] cursor-pointer">
           <div className="absolute font-normal leading-[0] left-[120px] not-italic text-[#444444] text-[18px] text-left text-nowrap top-[119px] hover:text-[#2663ff] transition-colors">
-            <p className="block leading-[normal] whitespace-pre">首页  Home Page</p>
+            <p className="block leading-[normal] whitespace-pre">
+              首页 Home Page
+            </p>
           </div>
           <div className="absolute left-[86px] size-6 top-[118px]">
-            <img alt="" className="block max-w-none size-full" src={imgHomeIcon} />
+            <img
+              alt=""
+              className="block max-w-none size-full"
+              src={imgHomeIcon}
+            />
           </div>
         </div>
       </Link>
@@ -108,12 +119,16 @@ export default function GeoOptimizationPage() {
         <div className="absolute contents left-[88px] top-[188px] cursor-pointer">
           <div className="absolute font-normal leading-[0] left-[120px] not-italic text-[#444444] text-[18px] text-left text-nowrap top-[188px] hover:text-[#2663ff] transition-colors">
             <p className="leading-[normal] whitespace-pre">
-              <span>对话  </span>
+              <span>对话 </span>
               <span>Conversations</span>
             </p>
           </div>
           <div className="absolute left-[88px] size-[22px] top-[188px]">
-            <img alt="" className="block max-w-none size-full" src={imgFrame3} />
+            <img
+              alt=""
+              className="block max-w-none size-full"
+              src={imgFrame3}
+            />
           </div>
         </div>
       </Link>
@@ -135,14 +150,18 @@ export default function GeoOptimizationPage() {
             <p className="block leading-[normal] whitespace-pre">AI内容生成</p>
           </div>
           <div className="absolute left-[88px] size-[22px] top-[324px]">
-            <img alt="" className="block max-w-none size-full" src={imgFrame6} />
+            <img
+              alt=""
+              className="block max-w-none size-full"
+              src={imgFrame6}
+            />
           </div>
         </div>
       </Link>
 
       <div className="absolute contents left-[88px] top-[438px]">
         <div className="absolute font-normal leading-[0] left-[120px] not-italic text-[#444444] text-[18px] text-left text-nowrap top-[438px]">
-          <p className="block leading-[normal] whitespace-pre">收件箱  Inbox</p>
+          <p className="block leading-[normal] whitespace-pre">收件箱 Inbox</p>
         </div>
         <div className="absolute left-[88px] size-[22px] top-[438px]">
           <img alt="" className="block max-w-none size-full" src={imgFrame1} />
@@ -153,12 +172,16 @@ export default function GeoOptimizationPage() {
         <div className="absolute contents left-[88px] top-[506px] cursor-pointer">
           <div className="absolute font-normal leading-[0] left-[120px] not-italic text-[#444444] text-[18px] text-left text-nowrap top-[506px] hover:text-[#2663ff] transition-colors">
             <p className="leading-[normal] whitespace-pre">
-              <span>设置  </span>
+              <span>设置 </span>
               <span>Settings</span>
             </p>
           </div>
           <div className="absolute left-[88px] size-[22px] top-[506px]">
-            <img alt="" className="block max-w-none size-full" src={imgFrame4} />
+            <img
+              alt=""
+              className="block max-w-none size-full"
+              src={imgFrame4}
+            />
           </div>
         </div>
       </Link>
@@ -170,7 +193,9 @@ export default function GeoOptimizationPage() {
           style={{ backgroundImage: `url('${img2}')` }}
         />
         <div className="absolute font-normal leading-[0] left-[1698px] not-italic text-[#333333] text-[18px] text-left text-nowrap top-[26px]">
-          <p className="block leading-[30px] whitespace-pre">Ethelbert Williams</p>
+          <p className="block leading-[30px] whitespace-pre">
+            Ethelbert Williams
+          </p>
         </div>
       </div>
 
@@ -183,7 +208,6 @@ export default function GeoOptimizationPage() {
 
       {/* 主要内容区域 */}
       <div className="absolute left-[400px] top-[119px] right-[50px]">
-        
         {/* 改进标题 */}
         <div className="font-bold text-[#333333] text-[32px] mb-8">
           <p>改进</p>
@@ -205,19 +229,20 @@ export default function GeoOptimizationPage() {
                   <div className="bg-[#666666] h-2 w-5 rounded-[20px]" />
                 </div>
               </div>
-              
+
               {/* 高影响力，低努力度 */}
               <div className="text-[#333333] text-[28px] font-medium mb-6">
                 高影响力，低努力度
               </div>
-              
+
               {/* 建议标题和描述 */}
               <div>
                 <h3 className="text-[#333333] text-[24px] font-normal mb-4">
                   以双十一为目标的线上销售策略
                 </h3>
                 <p className="text-[#333333] text-[18px] font-light leading-[1.5] max-w-[480px]">
-                  建议Q3启动以双十一为核心的Deepseek 战略规划，通过系统化的搜索意图设计，确保1-2款主卖单品实现AI搜索平台的全面覆盖&精准触达
+                  建议Q3启动以双十一为核心的Deepseek
+                  战略规划，通过系统化的搜索意图设计，确保1-2款主卖单品实现AI搜索平台的全面覆盖&精准触达
                 </p>
               </div>
             </div>
@@ -235,17 +260,23 @@ export default function GeoOptimizationPage() {
               <div className="space-y-4">
                 <div className="flex items-center">
                   <div className="bg-[#eaeaea] rounded w-5 h-5 mr-3 border-[#666666] border-[0.5px]" />
-                  <span className="text-[#666666] text-[18px] font-light">步骤1: 智能搜索意图建模与分析</span>
+                  <span className="text-[#666666] text-[18px] font-light">
+                    步骤1: 智能搜索意图建模与分析
+                  </span>
                 </div>
                 <div className="flex items-center">
                   <div className="bg-[#eaeaea] rounded w-5 h-5 mr-3 border-[#666666] border-[0.5px]" />
-                  <span className="text-[#666666] text-[18px] font-light">步骤2: DeepLumen LLM系统AI内容生成与优化</span>
+                  <span className="text-[#666666] text-[18px] font-light">
+                    步骤2: DeepLumen LLM系统AI内容生成与优化
+                  </span>
                 </div>
                 <div className="flex items-center">
                   <div className="bg-[#eaeaea] rounded w-5 h-5 mr-3 border-[#666666] border-[0.5px]" />
-                  <span className="text-[#666666] text-[18px] font-light">步骤3: 实时效果追踪与LLM模型迭代</span>
+                  <span className="text-[#666666] text-[18px] font-light">
+                    步骤3: 实时效果追踪与LLM模型迭代
+                  </span>
                 </div>
-                
+
                 <div className="flex space-x-4 mt-6">
                   <button className="bg-[#eaeaea] h-[42px] rounded-[10px] px-6 text-[#333333] text-[18px]">
                     放弃
@@ -260,11 +291,11 @@ export default function GeoOptimizationPage() {
 
           {/* 横向虚线 */}
           <div className="my-6 overflow-hidden">
-            <div 
-              className="w-[576px] h-[2px] bg-repeat-x" 
+            <div
+              className="w-[576px] h-[2px] bg-repeat-x"
               style={{
                 backgroundImage: `url("data:image/svg+xml,%3csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3e%3cdefs%3e%3cpattern id='a' patternUnits='userSpaceOnUse' width='4' height='4'%3e%3cpath d='m0,2 l4,0' stroke='%23999999' stroke-width='1'/%3e%3c/pattern%3e%3c/defs%3e%3crect width='100' height='100' fill='url(%23a)'/%3e%3c/svg%3e")`,
-                backgroundSize: '4px 2px'
+                backgroundSize: "4px 2px",
               }}
             ></div>
           </div>
@@ -284,7 +315,9 @@ export default function GeoOptimizationPage() {
 
         {/* 品牌概述模块 */}
         <div className="mb-8">
-          <h2 className="font-bold text-[#333333] text-[30px] mb-4">品牌概述</h2>
+          <h2 className="font-bold text-[#333333] text-[30px] mb-4">
+            品牌概述
+          </h2>
           <p className="text-[#444444] text-[18px] font-light leading-[1.5] max-w-[1013px]">
             Intel是全球领先的半导体芯片制造商，为计算、数据中心、AI及边缘设备提供核心硬件技术与解决方案。
           </p>
@@ -295,9 +328,16 @@ export default function GeoOptimizationPage() {
           <h2 className="font-bold text-[#333333] text-[30px] mb-4">优势</h2>
           <ul className="text-[#444444] text-[18px] font-light leading-[2] space-y-1 list-disc pl-7">
             <li>技术垄断性：x86架构主导PC/服务器市场，生态壁垒极高。</li>
-            <li>制程与研发投入：每年百亿级研发预算，先进制程（如Intel 4/3）逐步追平台积电。</li>
-            <li>垂直整合能力：从设计到制造全链条可控，IDM模式保障供应链安全。</li>
-            <li>B端市场统治力：数据中心（至强处理器）市占率超70%，企业客户黏性强。</li>
+            <li>
+              制程与研发投入：每年百亿级研发预算，先进制程（如Intel
+              4/3）逐步追平台积电。
+            </li>
+            <li>
+              垂直整合能力：从设计到制造全链条可控，IDM模式保障供应链安全。
+            </li>
+            <li>
+              B端市场统治力：数据中心（至强处理器）市占率超70%，企业客户黏性强。
+            </li>
           </ul>
         </div>
 
@@ -313,7 +353,9 @@ export default function GeoOptimizationPage() {
 
         {/* 主要专业领域模块 */}
         <div className="mb-8">
-          <h2 className="font-bold text-[#333333] text-[30px] mb-4">主要专业领域</h2>
+          <h2 className="font-bold text-[#333333] text-[30px] mb-4">
+            主要专业领域
+          </h2>
           <ul className="text-[#444444] text-[18px] font-light leading-[2] space-y-1 list-disc pl-7">
             <li>高性能计算（HPC）：至强处理器、FPGA（如Altera）。</li>
             <li>人工智能加速：Habana Labs AI芯片、OpenVINO工具包。</li>
@@ -324,9 +366,13 @@ export default function GeoOptimizationPage() {
 
         {/* 常见关联模块 */}
         <div className="mb-8">
-          <h2 className="font-bold text-[#333333] text-[30px] mb-4">常见关联</h2>
+          <h2 className="font-bold text-[#333333] text-[30px] mb-4">
+            常见关联
+          </h2>
           <ul className="text-[#444444] text-[18px] font-light leading-[2] space-y-1 list-disc pl-7">
-            <li>合作伙伴：微软（Wintel联盟）、戴尔/惠普（OEM厂商）、AWS（云服务合作）。</li>
+            <li>
+              合作伙伴：微软（Wintel联盟）、戴尔/惠普（OEM厂商）、AWS（云服务合作）。
+            </li>
             <li>技术标准：USB/Thunderbolt接口、PCIe协议主导者之一。</li>
             <li>地缘风险：中美半导体博弈中受出口管制影响。</li>
             <li>行业趋势：全球芯片短缺推动IDM模式价值重估。</li>
@@ -335,36 +381,42 @@ export default function GeoOptimizationPage() {
 
         {/* LLM内容建议模块 */}
         <div className="mb-12">
-          <h2 className="font-semibold text-[#333333] text-[30px] mb-8">LLM内容建议</h2>
-          
+          <h2 className="font-semibold text-[#333333] text-[30px] mb-8">
+            LLM内容建议
+          </h2>
+
           <div className="grid grid-cols-2 gap-8">
             {/* 左侧卡片 */}
-            <div 
+            <div
               className="h-80 rounded-[20px] relative overflow-hidden"
-              style={{ 
+              style={{
                 backgroundImage: "url('../images/Rectangle445.png')",
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
+                backgroundSize: "cover",
+                backgroundPosition: "center",
               }}
             >
               {/* <div className="absolute inset-0 bg-black bg-opacity-20" /> */}
               <div className="absolute bottom-0 left-0 right-0 bg-[rgba(38,99,255,0.7)] h-[73px] rounded-bl-[20px] rounded-br-[20px] flex items-center justify-center">
-                <span className="text-white text-[30px] font-semibold">一键生成</span>
+                <span className="text-white text-[30px] font-semibold">
+                  一键生成
+                </span>
               </div>
             </div>
 
             {/* 右侧卡片 */}
-            <div 
+            <div
               className="h-80 rounded-[20px] relative overflow-hidden"
-              style={{ 
+              style={{
                 backgroundImage: "url('../images/Rectangle470.png')",
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
+                backgroundSize: "cover",
+                backgroundPosition: "center",
               }}
             >
               {/* <div className="absolute inset-0 bg-black bg-opacity-20" /> */}
               <div className="absolute bottom-0 left-0 right-0 bg-[rgba(38,99,255,0.7)] h-[73px] rounded-bl-[20px] rounded-br-[20px] flex items-center justify-center">
-                <span className="text-white text-[30px] font-semibold">一键生成</span>
+                <span className="text-white text-[30px] font-semibold">
+                  一键生成
+                </span>
               </div>
             </div>
           </div>
@@ -372,8 +424,10 @@ export default function GeoOptimizationPage() {
 
         {/* 竞争对手分析模块 */}
         <div className="mb-12">
-          <h2 className="font-bold text-[#333333] text-[30px] mb-8">竞争对手分析模块</h2>
-          
+          <h2 className="font-bold text-[#333333] text-[30px] mb-8">
+            竞争对手分析模块
+          </h2>
+
           <div className="bg-white rounded-[20px] border border-[#cccccc] overflow-hidden">
             {/* 表格头部 */}
             <div className="bg-[#2663ff] h-20 flex items-center px-8">
@@ -479,24 +533,42 @@ export default function GeoOptimizationPage() {
 
           <div className="space-y-6">
             <div className="flex items-center">
-              <span className="text-[#666666] text-[18px] font-light w-28 mr-4">引用率：</span>
-              <span className="text-[#666666] text-[18px] font-bold mr-6">1%</span>
+              <span className="text-[#666666] text-[18px] font-light w-28 mr-4">
+                引用率：
+              </span>
+              <span className="text-[#666666] text-[18px] font-bold mr-6">
+                1%
+              </span>
               <div className="bg-[rgba(250,137,25,0.2)] rounded-lg px-3 py-1">
-                <span className="text-[#fa8919] text-[12px]">（中等-可以）</span>
+                <span className="text-[#fa8919] text-[12px]">
+                  （中等-可以）
+                </span>
               </div>
             </div>
             <div className="flex items-center">
-              <span className="text-[#666666] text-[18px] font-light w-28 mr-4">报价比率：</span>
-              <span className="text-[#666666] text-[18px] font-bold mr-6">2%</span>
+              <span className="text-[#666666] text-[18px] font-light w-28 mr-4">
+                报价比率：
+              </span>
+              <span className="text-[#666666] text-[18px] font-bold mr-6">
+                2%
+              </span>
               <div className="bg-[rgba(250,137,25,0.2)] rounded-lg px-3 py-1">
-                <span className="text-[#fa8919] text-[12px]">（中等-可以）</span>
+                <span className="text-[#fa8919] text-[12px]">
+                  （中等-可以）
+                </span>
               </div>
             </div>
             <div className="flex items-center">
-              <span className="text-[#666666] text-[18px] font-light w-28 mr-4">统计比率：</span>
-              <span className="text-[#666666] text-[18px] font-bold mr-6">3%</span>
+              <span className="text-[#666666] text-[18px] font-light w-28 mr-4">
+                统计比率：
+              </span>
+              <span className="text-[#666666] text-[18px] font-bold mr-6">
+                3%
+              </span>
               <div className="bg-[rgba(250,137,25,0.2)] rounded-lg px-3 py-1">
-                <span className="text-[#fa8919] text-[12px]">（中等-可以）</span>
+                <span className="text-[#fa8919] text-[12px]">
+                  （中等-可以）
+                </span>
               </div>
             </div>
           </div>
@@ -505,35 +577,54 @@ export default function GeoOptimizationPage() {
         {/* 统计模块 */}
         <div className="mb-12">
           <h2 className="font-bold text-[#333333] text-[30px] mb-8">统计</h2>
-          
+
           <div className="grid grid-cols-3 gap-8">
-            
             {/* 品牌推荐率卡片 - 调换到第一位 */}
             <div className="bg-[#ffffff] rounded-[20px] h-[326px] border border-[#cccccc] relative overflow-hidden">
               <div className="overflow-clip relative size-full">
                 <div className="absolute left-[61px] size-[204px] top-[87px]">
-                  <img alt="" className="block max-w-none size-full" src={imgGroup49} />
+                  <img
+                    alt=""
+                    className="block max-w-none size-full"
+                    src={imgGroup49}
+                  />
                 </div>
 
                 {/* 标签 */}
                 <div className="absolute h-[17px] left-[21px] top-[210px] w-[68px]">
                   <div className="absolute bottom-[-2.223%] left-0 right-[-0.483%] top-[-2.941%]">
-                    <img alt="" className="block max-w-none size-full" src={imgVector7} />
+                    <img
+                      alt=""
+                      className="block max-w-none size-full"
+                      src={imgVector7}
+                    />
                   </div>
                 </div>
                 <div className="absolute h-[16.5px] left-[154px] top-[107px] w-[65px]">
                   <div className="absolute bottom-[-1.795%] left-[-0.622%] right-0 top-[-3.03%]">
-                    <img alt="" className="block max-w-none size-full" src={imgVector8} />
+                    <img
+                      alt=""
+                      className="block max-w-none size-full"
+                      src={imgVector8}
+                    />
                   </div>
                 </div>
                 <div className="absolute h-[9px] left-[238px] top-[179px] w-[64px]">
                   <div className="absolute bottom-[-4.307%] left-[-0.492%] right-0 top-[-5.556%]">
-                    <img alt="" className="block max-w-none size-full" src={imgVector9} />
+                    <img
+                      alt=""
+                      className="block max-w-none size-full"
+                      src={imgVector9}
+                    />
                   </div>
                 </div>
                 <div className="absolute h-[24.5px] left-[194px] top-[253px] w-[72px]">
                   <div className="absolute bottom-[-2.041%] left-[-0.577%] right-0 top-[-1.134%]">
-                    <img alt="" className="block max-w-none size-full" src={imgVector10} />
+                    <img
+                      alt=""
+                      className="block max-w-none size-full"
+                      src={imgVector10}
+                    />
                   </div>
                 </div>
 
@@ -558,16 +649,24 @@ export default function GeoOptimizationPage() {
 
                 {/* 按钮文本 */}
                 <div className="absolute font-light leading-[0] left-[35px] not-italic text-[#ffffff] text-[10px] text-left text-nowrap top-[58px]">
-                  <p className="block leading-[normal] whitespace-pre">当月搜索量</p>
+                  <p className="block leading-[normal] whitespace-pre">
+                    当月搜索量
+                  </p>
                 </div>
                 <div className="absolute font-bold leading-[0] left-5 not-italic text-[#333333] text-[18px] text-left text-nowrap top-[15px]">
-                  <p className="block leading-[normal] whitespace-pre">品牌推荐率</p>
+                  <p className="block leading-[normal] whitespace-pre">
+                    品牌推荐率
+                  </p>
                 </div>
                 <div className="absolute font-light leading-[0] left-[118px] not-italic text-[#333333] text-[10px] text-left text-nowrap top-[58px]">
-                  <p className="block leading-[normal] whitespace-pre">当月流失量</p>
+                  <p className="block leading-[normal] whitespace-pre">
+                    当月流失量
+                  </p>
                 </div>
                 <div className="absolute font-extralight leading-[0] left-64 not-italic text-[#2663ff] text-[10px] text-left text-nowrap top-[19px]">
-                  <p className="block leading-[normal] whitespace-pre">查看详情</p>
+                  <p className="block leading-[normal] whitespace-pre">
+                    查看详情
+                  </p>
                 </div>
               </div>
             </div>
@@ -576,10 +675,14 @@ export default function GeoOptimizationPage() {
             <div className="bg-[#ffffff] h-[326px] rounded-[20px] border border-[#cccccc] relative overflow-hidden">
               <div className="h-[326px] overflow-clip relative w-full">
                 <div className="absolute font-bold leading-[0] left-[30px] not-italic text-[#333333] text-[24px] text-left text-nowrap top-[30px]">
-                  <p className="block leading-[normal] whitespace-pre">品牌被提及率</p>
+                  <p className="block leading-[normal] whitespace-pre">
+                    品牌被提及率
+                  </p>
                 </div>
                 <div className="absolute font-bold leading-[0] right-[30px] not-italic text-[#999999] text-[12px] text-left text-nowrap top-[37px]">
-                  <p className="block leading-[normal] whitespace-pre">总数据</p>
+                  <p className="block leading-[normal] whitespace-pre">
+                    总数据
+                  </p>
                 </div>
                 <div className="absolute font-bold leading-[0] left-[30px] not-italic text-[#333333] text-[28px] text-left text-nowrap top-[79px]">
                   <p className="block leading-[normal] whitespace-pre">71.5%</p>
@@ -593,11 +696,19 @@ export default function GeoOptimizationPage() {
 
                 {/* 图表 */}
                 <div className="absolute h-[183px] left-0 top-[143px] w-full">
-                  <img alt="" className="block max-w-none w-full h-full object-cover" src={imgVector12} />
+                  <img
+                    alt=""
+                    className="block max-w-none w-full h-full object-cover"
+                    src={imgVector12}
+                  />
                 </div>
                 <div className="absolute h-[156px] left-0 top-[140px] w-full">
                   <div className="absolute bottom-[-0.321%] left-[-0.087%] right-[-0.087%] top-[-0.321%]">
-                    <img alt="" className="block max-w-none size-full" src={imgVector1} />
+                    <img
+                      alt=""
+                      className="block max-w-none size-full"
+                      src={imgVector1}
+                    />
                   </div>
                 </div>
               </div>
@@ -607,15 +718,23 @@ export default function GeoOptimizationPage() {
             <div className="bg-[#ffffff] h-[326px] rounded-[20px] border border-[#cccccc] relative overflow-hidden">
               <div className="h-[326px] overflow-clip relative w-full">
                 <div className="absolute font-bold leading-[0] left-[30px] not-italic text-[#333333] text-[18px] text-left text-nowrap top-[30px]">
-                  <p className="block leading-[normal] whitespace-pre">引用链接百分比</p>
+                  <p className="block leading-[normal] whitespace-pre">
+                    引用链接百分比
+                  </p>
                 </div>
                 <div className="absolute font-light leading-[0] left-[30px] not-italic text-[#666666] text-[14px] text-left text-nowrap top-[60px]">
-                  <p className="block leading-[normal] whitespace-pre">全网链接占引用链接的百分比</p>
+                  <p className="block leading-[normal] whitespace-pre">
+                    全网链接占引用链接的百分比
+                  </p>
                 </div>
 
                 {/* 圆环图 - 静态图片 */}
                 <div className="absolute left-[50%] translate-x-[-50%] top-[90px] w-[180px] h-[180px] flex items-center justify-center">
-                  <img alt="引用链接百分比圆环图" className="block w-full h-full object-contain" src={imgGroup119} />
+                  <img
+                    alt="引用链接百分比圆环图"
+                    className="block w-full h-full object-contain"
+                    src={imgGroup119}
+                  />
                 </div>
 
                 {/* 图例 */}
@@ -624,33 +743,43 @@ export default function GeoOptimizationPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <div className="w-[10px] h-[10px] bg-[#2663ff] rounded-full"></div>
-                        <span className="text-[#333333] text-[12px] font-light">直接引用</span>
+                        <span className="text-[#333333] text-[12px] font-light">
+                          直接引用
+                        </span>
                       </div>
-                      <span className="text-[#333333] text-[12px] font-bold">30%</span>
+                      <span className="text-[#333333] text-[12px] font-bold">
+                        30%
+                      </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <div className="w-[10px] h-[10px] bg-[#ffb200] rounded-full"></div>
-                        <span className="text-[#333333] text-[12px] font-light">间接引用</span>
+                        <span className="text-[#333333] text-[12px] font-light">
+                          间接引用
+                        </span>
                       </div>
-                      <span className="text-[#333333] text-[12px] font-bold">40%</span>
+                      <span className="text-[#333333] text-[12px] font-bold">
+                        40%
+                      </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <div className="w-[10px] h-[10px] bg-[#11ca9c] rounded-full"></div>
-                        <span className="text-[#333333] text-[12px] font-light">相关引用</span>
+                        <span className="text-[#333333] text-[12px] font-light">
+                          相关引用
+                        </span>
                       </div>
-                      <span className="text-[#333333] text-[12px] font-bold">30%</span>
+                      <span className="text-[#333333] text-[12px] font-bold">
+                        30%
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
           </div>
         </div>
-
       </div>
     </div>
-  )
-} 
+  );
+}
