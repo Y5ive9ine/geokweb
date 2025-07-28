@@ -35,10 +35,16 @@ RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
 
+# 复制package.json以便standalone server能识别
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+
 # 自动利用输出跟踪来减少镜像大小
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# 确保.next目录权限正确
+RUN chown -R nextjs:nodejs .next
 
 USER nextjs
 
