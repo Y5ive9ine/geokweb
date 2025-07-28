@@ -96,17 +96,19 @@ export default function PricingPage() {
         </div>
       </Link>
 
-      <div className="absolute contents left-[88px] top-[188px]">
-        <div className="absolute font-normal leading-[0] left-[120px] not-italic text-[#444444] text-[18px] text-left text-nowrap top-[188px]">
-          <p className="leading-[normal] whitespace-pre">
-            <span>对话  </span>
-            <span>Conversations</span>
-          </p>
+      <Link href="/dashboard/conversations">
+        <div className="absolute contents left-[88px] top-[188px] cursor-pointer">
+          <div className="absolute font-normal leading-[0] left-[120px] not-italic text-[#444444] text-[18px] text-left text-nowrap top-[188px] hover:text-[#2663ff] transition-colors">
+            <p className="leading-[normal] whitespace-pre">
+              <span>对话  </span>
+              <span>Conversations</span>
+            </p>
+          </div>
+          <div className="absolute left-[88px] size-[22px] top-[188px]">
+            <img alt="" className="block max-w-none size-full" src={imgFrame3} />
+          </div>
         </div>
-        <div className="absolute left-[88px] size-[22px] top-[188px]">
-          <img alt="" className="block max-w-none size-full" src={imgFrame3} />
-        </div>
-      </div>
+      </Link>
 
       {/* GEO优化菜单项 - 激活状态 */}
       <div className="absolute bg-[#2663ff] h-[60px] left-[30px] rounded-[10px] top-[237px] w-[290px]" />
