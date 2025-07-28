@@ -14,8 +14,8 @@ const getApiBaseUrl = () => {
     return `${window.location.protocol}//${window.location.host}`;
   }
 
-  // SSR 时默认用环境变量，或写死一个公网 API 域名
-  return "https://geok.deeplumen.cn";
+  // SSR 时默认用后端API服务器地址
+  return "http://47.99.189.222:8012/api/v1";
 };
 
 // 请求配置接口

@@ -8,7 +8,7 @@ import { LoginResponse, RegisterRequest } from "@/lib/types";
 // 专门的认证API方法
 export const authApi = {
   // 登录
-  login: (credentials: { username: string; password: string }) =>
+  login: (credentials: { email: string; password: string }) =>
     api.post("/api/auth/login", credentials),
 
   // 注册
