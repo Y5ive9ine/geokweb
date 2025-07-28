@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { authUtils } from '@/services/auth'
 
 interface TopNavigationProps {
   activeTab: string
@@ -20,6 +22,18 @@ export function TopNavigation({
   currentPage = 'home' 
 }: TopNavigationProps) {
   const router = useRouter()
+  const [userName, setUserName] = useState<string>('')
+
+  useEffect(() => {
+    // 从localStorage获取用户信息
+    const userInfo = authUtils.getUserInfo()
+    if (userInfo) {
+      const displayName = [userInfo.first_name, userInfo.last_name]
+        .filter(Boolean)
+        .join(' ') || userInfo.username || userInfo.email || '用户'
+      setUserName(displayName)
+    }
+  }, [])
   
   const homeTabs = [
     { id: 'visibility', label: '可见性', href: '/dashboard' },
@@ -36,10 +50,19 @@ export function TopNavigation({
     { id: '授权插件', label: '授权插件', href: '/dashboard/settings' },
   ]
 
+  const geoOptimizationTabs = [
+    { id: 'geo-optimization', label: 'GEO', href: '/dashboard/geo-optimization' },
+    { id: 'database', label: '数据库', href: '/dashboard/geo-optimization/database' },
+    { id: 'pricing', label: '价格', href: '/dashboard/geo-optimization/pricing' },
+  ]
+
   // 判断显示哪种导航
   const showFullNavigation = currentPage === 'home'
   const showSettingsNavigation = currentPage === 'settings'
-  const tabs = showSettingsNavigation ? settingsTabs : homeTabs
+  const showGeoOptimizationNavigation = currentPage === 'geo-optimization'
+  const tabs = showSettingsNavigation ? settingsTabs : 
+               showGeoOptimizationNavigation ? geoOptimizationTabs : 
+               homeTabs
 
   const handleTabClick = (tab: { id: string, href: string }) => {
     setActiveTab(tab.id)
@@ -71,7 +94,7 @@ export function TopNavigation({
         </button>
 
         {/* 条件渲染导航栏 */}
-        {(showFullNavigation || showSettingsNavigation) && (
+        {(showFullNavigation || showSettingsNavigation || showGeoOptimizationNavigation) && (
           <>
             {/* Tab导航 */}
             <nav className="hidden md:flex space-x-6">
@@ -113,7 +136,7 @@ export function TopNavigation({
           className="w-7 h-7 rounded-full bg-cover bg-center"
           style={{ backgroundImage: "url('/images/img2.png')" }}
         />
-        <span className="text-sm text-gray-900">Ethelbert Williams</span>
+        <span className="text-sm text-gray-900">{userName}</span>
       </div>
     </div>
   )
