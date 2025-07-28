@@ -39,7 +39,7 @@ function OAuthHandler({
     if (code && state) {
       // 验证state
       if (!validateOAuthCallback(code, state)) {
-        onError("安全验证失败: 无效的state参数");
+        // onError("安全验证失败: 无效的state参数");
         cleanupUrlParams();
         return;
       }

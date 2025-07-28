@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google 登录</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .login-btn {
+            background-color: #4285f4;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 20px 10px;
+        }
+        .login-btn:hover {
+            background-color: #357ae8;
+        }
+        .login-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        h1 {
+            color: #333;
+        }
+        .info {
+            background-color: #e8f4fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #4285f4;
+            text-align: left;
+        }
+        #loading {
+            display: none;
+            margin: 20px 0;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #4285f4;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .result {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: left;
+            display: none;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            display: none;
+        }
+        .method-section {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .method-title {
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Google 登录</h1>
+        <div class="info">
+            <p><strong>前端服务:</strong> http://localhost:8082 (Python HTTP Server)</p>
+            <p><strong>API端点:</strong> http://localhost:8012/api/v1/auth/login</p>
+            <p><strong>客户端ID:</strong> 837367551114-old3ir22j8ajdn9ej2jsphsm7ndfaqqr.apps.googleusercontent.com</p>
+            <p>使用Google OAuth 2.0授权码流程进行安全登录</p>
+        </div>
+
+        <div class="method-section">
+            <div class="method-title">Google 授权码登录（服务器流程）</div>
+            <p>获取授权码后发送到服务器处理，这是推荐的安全登录方式</p>
+            <button id="auth-code-login" class="login-btn">使用 Google 登录</button>
+        </div>
+
+        <div id="loading">
+            <div class="spinner"></div>
+            <p>正在处理登录请求...</p>
+        </div>
+
+        <div id="error" class="error"></div>
+        <div id="success" class="success"></div>
+        <div id="result" class="result"></div>
+    </div>
+
+
+
+    <script>
+        const CLIENT_ID = '837367551114-old3ir22j8ajdn9ej2jsphsm7ndfaqqr.apps.googleusercontent.com';
+        const API_BASE_URL = 'http://localhost:8012/api/v1/auth';
+
+
+
+        // 方式2: 使用授权码登录
+        function loginWithAuthCode() {
+            showLoading(true);
+            hideMessages();
+
+            // 构建OAuth URL
+            const redirectUri = window.location.origin + window.location.pathname;
+            const scope = 'openid email profile';
+            const responseType = 'code';
+            const state = generateRandomString();
+            
+            // 保存state用于验证
+            sessionStorage.setItem('oauth_state', state);
+            
+            const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+                `client_id=${CLIENT_ID}&` +
+                `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+                `scope=${encodeURIComponent(scope)}&` +
+                `response_type=${responseType}&` +
+                `state=${state}`;
+            
+            // 跳转到Google授权页面
+            window.location.href = authUrl;
+        }
+
+        // 处理授权码回调
+        function handleAuthCodeCallback() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const state = urlParams.get('state');
+            const error = urlParams.get('error');
+
+            if (error) {
+                showError('授权失败: ' + error);
+                return;
+            }
+
+            if (code && state) {
+                // 验证state
+                const savedState = sessionStorage.getItem('oauth_state');
+                if (state !== savedState) {
+                    //showError('安全验证失败: 无效的state参数');
+                    return;
+                }
+
+                // 清除保存的state
+                sessionStorage.removeItem('oauth_state');
+
+                // 发送授权码到服务器
+                const redirectUri = window.location.origin + window.location.pathname;
+                const loginData = {
+                    auth_code: code,
+                    redirect_uri: redirectUri
+                };
+
+                showLoading(true);
+
+                fetch(`${API_BASE_URL}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(loginData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    showLoading(false);
+                    if (data.error) {
+                        showError('登录失败: ' + data.error);
+                    } else {
+                        showSuccess('授权码登录成功！');
+                        showResult(data);
+                    }
+                    
+                    // 清理URL参数
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                })
+                .catch(error => {
+                    showLoading(false);
+                    console.error('Error:', error);
+                    showError('请求失败: ' + error.message);
+                });
+            }
+        }
+
+        // 事件监听器
+        document.addEventListener('DOMContentLoaded', function() {
+            // 授权码登录按钮
+            document.getElementById('auth-code-login').addEventListener('click', loginWithAuthCode);
+
+            // 检查是否有授权码回调
+            handleAuthCodeCallback();
+        });
+
+        // 工具函数
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+        }
+
+        function showResult(data) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <h3>登录结果:</h3>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+            resultDiv.style.display = 'block';
+        }
+
+        function hideMessages() {
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('success').style.display = 'none';
+            document.getElementById('result').style.display = 'none';
+        }
+
+        function generateRandomString() {
+            const array = new Uint32Array(28);
+            window.crypto.getRandomValues(array);
+            return Array.from(array, dec => ('0' + dec.toString(16)).substr(-2)).join('');
+        }
+    </script>
+</body>
+</html>
