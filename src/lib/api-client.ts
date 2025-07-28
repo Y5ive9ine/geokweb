@@ -1,0 +1,149 @@
+/**
+ * API客户端封装
+ * 统一处理API请求，支持环境变量配置
+ */
+
+// 获取API基础URL
+const getApiBaseUrl = () => {
+  // 优先使用环境变量，如果没有则使用默认值
+  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+};
+
+// 请求配置接口
+interface ApiRequestConfig {
+  method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+  headers?: Record<string, string>;
+  body?: any;
+  timeout?: number;
+}
+
+// 响应接口
+interface ApiResponse<T = any> {
+  success: boolean;
+  data?: T;
+  message?: string;
+  error?: string;
+  status: number;
+}
+
+// 获取认证token
+const getAuthToken = (): string | null => {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("auth_token");
+  }
+  return null;
+};
+
+// 封装的fetch请求
+export const apiRequest = async <T = any>(
+  endpoint: string,
+  config: ApiRequestConfig = {}
+): Promise<ApiResponse<T>> => {
+  const { method = "GET", headers = {}, body, timeout = 10000 } = config;
+
+  const baseUrl = getApiBaseUrl();
+  const url = `${baseUrl}${
+    endpoint.startsWith("/") ? endpoint : `/${endpoint}`
+  }`;
+
+  // 默认请求头
+  const defaultHeaders: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...headers,
+  };
+
+  // 自动添加认证token
+  const token = getAuthToken();
+  if (token) {
+    defaultHeaders["Authorization"] = `Bearer ${token}`;
+  }
+
+  // 请求配置
+  const requestConfig: RequestInit = {
+    method,
+    headers: defaultHeaders,
+    signal: AbortSignal.timeout(timeout),
+  };
+
+  // 处理请求体
+  if (body && method !== "GET") {
+    if (typeof body === "string") {
+      requestConfig.body = body;
+    } else {
+      requestConfig.body = JSON.stringify(body);
+    }
+  }
+
+  try {
+    console.log(`API Request: ${method} ${url}`, {
+      headers: defaultHeaders,
+      body,
+    });
+
+    const response = await fetch(url, requestConfig);
+
+    let data: any;
+    const contentType = response.headers.get("Content-Type");
+
+    if (contentType && contentType.includes("application/json")) {
+      data = await response.json();
+    } else {
+      data = await response.text();
+    }
+
+    console.log(`API Response: ${response.status}`, data);
+
+    const result: ApiResponse<T> = {
+      success: response.ok,
+      data: response.ok ? data : undefined,
+      message: response.ok ? data?.message : data?.message || data,
+      error: response.ok ? undefined : data?.error || data,
+      status: response.status,
+    };
+
+    return result;
+  } catch (error) {
+    console.error("API Request Error:", error);
+
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    return {
+      success: false,
+      error: errorMessage,
+      message: "Network error or timeout",
+      status: 0,
+    };
+  }
+};
+
+// 便捷方法
+export const api = {
+  get: <T = any>(endpoint: string, config?: Omit<ApiRequestConfig, "method">) =>
+    apiRequest<T>(endpoint, { ...config, method: "GET" }),
+
+  post: <T = any>(
+    endpoint: string,
+    body?: any,
+    config?: Omit<ApiRequestConfig, "method" | "body">
+  ) => apiRequest<T>(endpoint, { ...config, method: "POST", body }),
+
+  put: <T = any>(
+    endpoint: string,
+    body?: any,
+    config?: Omit<ApiRequestConfig, "method" | "body">
+  ) => apiRequest<T>(endpoint, { ...config, method: "PUT", body }),
+
+  delete: <T = any>(
+    endpoint: string,
+    config?: Omit<ApiRequestConfig, "method">
+  ) => apiRequest<T>(endpoint, { ...config, method: "DELETE" }),
+
+  patch: <T = any>(
+    endpoint: string,
+    body?: any,
+    config?: Omit<ApiRequestConfig, "method" | "body">
+  ) => apiRequest<T>(endpoint, { ...config, method: "PATCH", body }),
+};
+
+export default api;
