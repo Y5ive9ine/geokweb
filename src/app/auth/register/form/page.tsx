@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { GoogleIcon } from "@/components/auth/GoogleIcon";
 import { ArrowLeftIcon } from "@/components/auth/ArrowLeftIcon";
 import { authApi, authUtils } from "@/services/auth";
 
-export default function RegisterFormPage() {
+// 将使用 useSearchParams 的逻辑分离到单独的组件中
+function RegisterFormContent() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -252,5 +253,14 @@ export default function RegisterFormPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// 主导出组件，使用 Suspense 包装
+export default function RegisterFormPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RegisterFormContent />
+    </Suspense>
   );
 }

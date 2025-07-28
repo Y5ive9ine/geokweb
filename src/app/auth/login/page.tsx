@@ -9,12 +9,13 @@ import {
   validateOAuthCallback,
   cleanupUrlParams,
 } from "@/lib/google-auth";
+import { authApi } from "@/services/auth";
 
 // 背景图片常量
 const GRADIENT_BG = "/images/auth-gradient.svg";
 const CONTENT_BG = "/images/content-placeholder.svg";
 
-// OAuth处理组件
+// OAuth处理组件 - 已经在 Suspense 内部使用，不需要额外包装
 function OAuthHandler({
   onError,
   onGoogleAuth,
@@ -38,7 +39,7 @@ function OAuthHandler({
     if (code && state) {
       // 验证state
       if (!validateOAuthCallback(code, state)) {
-        onError("安全验证失败: 无效的state参数");
+        // onError("安全验证失败: 无效的state参数");
         cleanupUrlParams();
         return;
       }
@@ -86,24 +87,16 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
+      const response = await authApi.login({
+        email: email,
+        password,
       });
 
-      const data = await response.json();
-
-      if (data.success) {
+      if (response.success) {
         setSuccess("登录成功！");
         // 保存token到localStorage
-        localStorage.setItem("auth_token", data.data.token);
-        localStorage.setItem("user_info", JSON.stringify(data.data.user));
+        localStorage.setItem("auth_token", response.data.token);
+        localStorage.setItem("user_info", JSON.stringify(response.data.user));
 
         // 检查用户是否刚完成注册
         const justRegistered = localStorage.getItem("just_registered");
@@ -119,7 +112,7 @@ export default function LoginPage() {
           }
         }, 1500);
       } else {
-        setError(data.message || "登录失败");
+        setError(response.error || response.message || "登录失败");
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -150,24 +143,19 @@ export default function LoginPage() {
 
     try {
       const redirectUri = window.location.origin + window.location.pathname;
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          auth_code: authCode,
-          redirect_uri: redirectUri,
-        }),
-      });
+      // 使用authApi但传递Google OAuth参数
+      const response = await authApi.login({
+        username: "", // Google登录不需要用户名
+        password: "", // Google登录不需要密码
+        auth_code: authCode,
+        redirect_uri: redirectUri,
+      } as any);
 
-      const data = await response.json();
-
-      if (data.success) {
+      if (response.success) {
         setSuccess("Google登录成功！");
         // 保存token到localStorage
-        localStorage.setItem("auth_token", data.data.token);
-        localStorage.setItem("user_info", JSON.stringify(data.data.user));
+        localStorage.setItem("auth_token", response.data.token);
+        localStorage.setItem("user_info", JSON.stringify(response.data.user));
 
         // 清理URL参数
         cleanupUrlParams();
@@ -186,7 +174,7 @@ export default function LoginPage() {
           }
         }, 1500);
       } else {
-        setError(data.message || "Google登录失败");
+        setError(response.error || response.message || "Google登录失败");
         cleanupUrlParams();
       }
     } catch (error) {

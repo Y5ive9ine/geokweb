@@ -1,4 +1,5 @@
-'use client'
+"use client";
+
 
 import { useState } from 'react'
 import { Sidebar } from '@/components/dashboard/Sidebar'
@@ -54,5 +55,5 @@ export default function GeoOptimizationPage() {
         </div>
       </div>
     </div>
-  )
-} 
+  );
+}

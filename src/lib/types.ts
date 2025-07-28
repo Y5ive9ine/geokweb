@@ -229,6 +229,146 @@ export interface BlogListResponse {
   };
 }
 
+// GEO优化相关类型
+export interface GeoOverview {
+  id: string;
+  total_regions: number;
+  active_campaigns: number;
+  global_reach_score: number;
+  top_performing_region: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GeoPerformance {
+  id: string;
+  region: string;
+  country: string;
+  visibility_score: number;
+  market_penetration: number;
+  search_volume: number;
+  competition_level: "low" | "medium" | "high" | "very_high";
+  opportunity_score: number;
+  recommended_actions: string[];
+  key_metrics: Record<string, any>;
+  trending_keywords: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GeoOptimization {
+  id: string;
+  brand_id: string;
+  region: string;
+  country: string;
+  optimization_type: string;
+  status: "active" | "inactive" | "pending";
+  performance_data: Record<string, any>;
+  recommendations: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateGeoOptimizationRequest {
+  brand_id: string;
+  region: string;
+  country: string;
+  optimization_type: string;
+  performance_data?: Record<string, any>;
+  recommendations?: string[];
+}
+
+export interface UpdateGeoOptimizationRequest {
+  region?: string;
+  country?: string;
+  optimization_type?: string;
+  status?: "active" | "inactive" | "pending";
+  performance_data?: Record<string, any>;
+  recommendations?: string[];
+}
+
+// 数据库相关类型
+export interface DatabaseOverview {
+  id: string;
+  total_databases: number;
+  active_connections: number;
+  total_storage: string;
+  average_performance: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DatabaseInfo {
+  id: string;
+  name: string;
+  type: string;
+  version: string;
+  status: "online" | "offline" | "maintenance";
+  host: string;
+  port: number;
+  size: string;
+  connections: Record<string, any>;
+  performance: Record<string, any>;
+  backup_status: Record<string, any>;
+  tables: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GeoDatabase {
+  id: string;
+  geo_optimization_id: string;
+  database_name: string;
+  database_type: "mysql" | "postgresql" | "mongodb" | "redis";
+  connection_string: string;
+  status: "active" | "inactive";
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateGeoDatabaseRequest {
+  geo_optimization_id: string;
+  database_name: string;
+  database_type: "mysql" | "postgresql" | "mongodb" | "redis";
+  connection_string: string;
+}
+
+export interface UpdateGeoDatabaseRequest {
+  database_name?: string;
+  database_type?: "mysql" | "postgresql" | "mongodb" | "redis";
+  connection_string?: string;
+  status?: "active" | "inactive";
+}
+
+// Dashboard相关类型
+export interface DashboardData {
+  overview: {
+    total_brands: number;
+    total_searches: number;
+    total_responses: number;
+    avg_visibility_score: number;
+  };
+  recent_activity: Array<{
+    id: string;
+    type: string;
+    description: string;
+    timestamp: string;
+  }>;
+  performance_metrics: {
+    visibility_trend: Array<{
+      date: string;
+      score: number;
+    }>;
+    brand_distribution: Array<{
+      brand_name: string;
+      percentage: number;
+      color: string;
+    }>;
+  };
+  geo_performance: GeoOverview;
+  database_status: DatabaseOverview;
+}
+
 // 分页类型
 export interface PaginatedResponse<T> {
   items: T[];
