@@ -764,166 +764,171 @@ function AiContentGenerationPage() {
       </div>
 
       {/* 文章列表区域 */}
-      <div className="absolute bg-[#ffffff] h-[750px] left-[400px] rounded-[10px] top-[292px] right-[50px] border border-[#cccccc]">
-        {/* 表格内容 */}
-        <div className="relative w-full h-full">
+      <div
+        className="absolute bg-[#ffffff] left-[400px] rounded-[10px] top-[292px] right-[50px] border border-[#cccccc] flex flex-col"
+        style={{ minHeight: "750px" }}
+      >
+        {/* 表格内容容器 */}
+        <div className="flex-1 flex flex-col">
           {/* 表头 */}
-          <div className="absolute flex items-center text-[#333333] font-medium text-[16px] top-[18px] left-[50px] right-[50px]">
+          <div className="flex items-center text-[#333333] font-medium text-[16px] px-[50px] py-[18px] border-b border-[#cccccc]">
             <div className="w-[50%]">文章标题</div>
             <div className="w-[25%] text-center">GEOK</div>
             <div className="w-[25%] text-center">提及率</div>
           </div>
 
-          {/* 表格分割线 */}
-          <div className="absolute h-[1px] bg-[#cccccc] left-0 top-[60px] right-0" />
-
-          {/* 文章数据行 */}
-          {loading ? (
-            <div className="absolute left-[50px] top-[100px] text-[#666666] flex items-center space-x-2">
-              <svg
-                className="animate-spin h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              <span>加载中...</span>
-            </div>
-          ) : error ? (
-            <div className="absolute left-[50px] top-[100px] text-[#ff4d4d]">
-              <div className="mb-2">加载失败: {error}</div>
-              <button
-                onClick={refresh}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
-              >
-                重试
-              </button>
-            </div>
-          ) : blogs?.length === 0 ? (
-            <div className="absolute left-[50px] top-[100px] text-[#666666]">
-              <div className="mb-2">暂无文章数据</div>
-            </div>
-          ) : (
-            <div className="space-y-0">
-              {/* 表格头部 */}
-              <div className="grid grid-cols-2 gap-4 px-[50px]  bg-[#f8f9fa] border-b-2 border-[#eeeeee] py-8 "></div>
-
-              {/* 表格内容 */}
-              {blogs?.map((blog, index) => (
-                <div
-                  key={blog.id}
-                  className="grid grid-cols-12 gap-4 px-[50px] py-6 border-b border-[#eeeeee] hover:bg-[#f8f9fa] transition-colors items-center"
-                >
-                  {/* 左列：文章信息 */}
-                  <div className="col-span-6">
-                    <h3
-                      className="text-[#000000] text-[18px] font-semibold leading-normal mb-2 cursor-pointer hover:text-[#2663ff] transition-colors"
-                      onClick={() => handleArticleClick(blog)}
-                    >
-                      {blog.title}
-                    </h3>
-                    <div className="flex items-center mb-2 space-x-4">
-                      <span className="text-[#333333] text-[10px] underline">
-                        {blog.author?.name || "未知作者"}
-                      </span>
-                      <span className="text-[#333333] text-[10px] underline">
-                        {blog.published_at
-                          ? new Date(blog.published_at).toLocaleDateString(
-                              "zh-CN"
-                            )
-                          : blog.created_at
-                          ? new Date(blog.created_at).toLocaleDateString(
-                              "zh-CN"
-                            )
-                          : "未知日期"}
-                      </span>
-                    </div>
-                    <p className="text-[#666666] text-[14px] leading-normal">
-                      {blog.excerpt ||
-                        blog.content?.substring(0, 100) + "..." ||
-                        "暂无描述"}
-                    </p>
-                  </div>
-
-                  {/* 中列：GEOK */}
-                  <div className="col-span-3 flex justify-center items-center">
-                    <div className="bg-[rgba(38,99,255,0.2)] rounded-[10px] px-4 py-2 inline-flex items-center">
-                      <svg
-                        className="mr-2"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="22"
-                        height="22"
-                        viewBox="0 0 22 22"
-                        fill="none"
+          {/* 文章数据行容器 */}
+          <div className="flex-1 min-h-[500px]">
+            {loading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="flex items-center space-x-2 text-[#666666]">
+                  <svg
+                    className="animate-spin h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  <span>加载中...</span>
+                </div>
+              </div>
+            ) : error ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center text-[#ff4d4d]">
+                  <div className="mb-2">加载失败: {error}</div>
+                  <button
+                    onClick={refresh}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+                  >
+                    重试
+                  </button>
+                </div>
+              </div>
+            ) : blogs?.length === 0 ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center text-[#666666]">
+                  <div className="mb-2">暂无文章数据</div>
+                </div>
+              </div>
+            ) : (
+              <div className="divide-y divide-[#eeeeee]">
+                {/* 表格内容 */}
+                {blogs?.map((blog, index) => (
+                  <div
+                    key={blog.id}
+                    className="flex items-center px-[50px] py-6 hover:bg-[#f8f9fa] transition-colors"
+                  >
+                    {/* 左列：文章信息 */}
+                    <div className="w-[50%] pr-4">
+                      <h3
+                        className="text-[#000000] text-[18px] font-semibold leading-normal mb-2 cursor-pointer hover:text-[#2663ff] transition-colors"
+                        onClick={() => handleArticleClick(blog)}
                       >
-                        <g clipPath={`url(#clip0_332_2268_${blog.id})`}>
-                          <path
-                            d="M9.69145 11.4869L1.07716 7.39009C0.784128 7.27659 0.532274 7.07712 0.354673 6.81788C0.177073 6.55864 0.0820313 6.25174 0.0820312 5.9375C0.0820313 5.62325 0.177073 5.31636 0.354673 5.05711C0.532274 4.79787 0.784128 4.5984 1.07716 4.48491L9.69145 0.388056C10.1026 0.197084 10.5505 0.0981445 11.0038 0.0981445C11.4572 0.0981445 11.9051 0.197084 12.3162 0.388056L20.9305 4.48491C21.2236 4.5984 21.4754 4.79787 21.653 5.05711C21.8306 5.31636 21.9257 5.62325 21.9257 5.9375C21.9257 6.25174 21.8306 6.55864 21.653 6.81788C21.4754 7.07712 21.2236 7.27659 20.9305 7.39009L12.3162 11.4869C11.9051 11.6779 11.4572 11.7768 11.0038 11.7768C10.5505 11.7768 10.1026 11.6779 9.69145 11.4869Z"
-                            fill="#2663FF"
-                          />
-                          <path
-                            d="M11.0039 16.9662C10.3772 16.9664 9.75898 16.8225 9.19688 16.5456L0.746156 12.3475C0.594687 12.2888 0.457124 12.1992 0.34225 12.0843C0.227376 11.9695 0.137717 11.8319 0.0789981 11.6805C0.0202789 11.529 -0.00620962 11.367 0.00122396 11.2047C0.00865755 11.0424 0.0498499 10.8835 0.12217 10.738C0.194491 10.5926 0.29635 10.4638 0.421244 10.3599C0.546137 10.256 0.69132 10.1793 0.84752 10.1347C1.00372 10.0901 1.16751 10.0786 1.32842 10.1009C1.48933 10.1231 1.64383 10.1787 1.78205 10.264L10.225 14.4621C10.4677 14.58 10.734 14.6412 11.0039 14.6412C11.2737 14.6412 11.54 14.58 11.7827 14.4621L20.2335 10.264C20.3717 10.1787 20.5262 10.1231 20.6871 10.1009C20.848 10.0786 21.0118 10.0901 21.168 10.1347C21.3242 10.1793 21.4694 10.256 21.5943 10.3599C21.7192 10.4638 21.821 10.5926 21.8933 10.738C21.9657 10.8835 22.0068 11.0424 22.0143 11.2047C22.0217 11.367 21.9952 11.529 21.9365 11.6805C21.8778 11.8319 21.7881 11.9695 21.6733 12.0843C21.5584 12.1992 21.4208 12.2888 21.2693 12.3475L12.8108 16.5456C12.2489 16.8229 11.6305 16.9669 11.0039 16.9662Z"
-                            fill="#2663FF"
-                          />
-                          <path
-                            d="M11.0039 21.9042C10.3772 21.9049 9.75884 21.7609 9.19688 21.4836L0.746156 17.2855C0.594687 17.2268 0.457124 17.1372 0.34225 17.0223C0.227376 16.9075 0.137717 16.7699 0.0789981 16.6184C0.0202789 16.467 -0.00620962 16.3049 0.00122396 16.1427C0.00865755 15.9804 0.0498499 15.8215 0.12217 15.676C0.194491 15.5305 0.29635 15.4018 0.421244 15.2979C0.546137 15.194 0.69132 15.1173 0.84752 15.0727C1.00372 15.0281 1.16751 15.0166 1.32842 15.0389C1.48933 15.0611 1.64383 15.1167 1.78205 15.202L10.225 19.4001C10.4671 19.5199 10.7337 19.5823 11.0039 19.5823C11.274 19.5823 11.5406 19.5199 11.7827 19.4001L20.2335 15.202C20.3717 15.1167 20.5262 15.0611 20.6871 15.0389C20.848 15.0166 21.0118 15.0281 21.168 15.0727C21.3242 15.1173 21.4694 15.194 21.5943 15.2979C21.7192 15.4018 21.821 15.5305 21.8933 15.676C21.9657 15.8215 22.0068 15.9804 22.0143 16.1427C22.0217 16.3049 21.9952 16.467 21.9365 16.6184C21.8778 16.7699 21.7881 16.9075 21.6733 17.0223C21.5584 17.1372 21.4208 17.2268 21.2693 17.2855L12.8108 21.4836C12.2489 21.7609 11.6305 21.9049 11.0039 21.9042Z"
-                            fill="#2663FF"
-                          />
-                        </g>
-                        <defs>
-                          <clipPath id={`clip0_332_2268_${blog.id}`}>
-                            <rect width="22" height="22" fill="white" />
-                          </clipPath>
-                        </defs>
-                      </svg>
-                      <span className="text-[#2663ff] text-[12px] font-medium">
-                        EXAMINE
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* 右列：提及率 */}
-                  <div className="col-span-3 flex justify-center items-center">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-[#333333] text-[18px] font-normal">
-                        {blog.mention_rate
-                          ? `${blog.mention_rate.toFixed(1)}%`
-                          : `${(Math.random() * 100).toFixed(1)}%`}
-                      </span>
-                      <div className="flex items-center space-x-1">
-                        <span className="text-[14px] font-medium text-[#11ca9c]">
-                          +{(Math.random() * 5).toFixed(1)}%
+                        {blog.title}
+                      </h3>
+                      <div className="flex items-center mb-2 space-x-4">
+                        <span className="text-[#333333] text-[10px] underline">
+                          {blog.author?.name || "未知作者"}
                         </span>
-                        {/* 趋势箭头 */}
+                        <span className="text-[#333333] text-[10px] underline">
+                          {blog.published_at
+                            ? new Date(blog.published_at).toLocaleDateString(
+                                "zh-CN"
+                              )
+                            : blog.created_at
+                            ? new Date(blog.created_at).toLocaleDateString(
+                                "zh-CN"
+                              )
+                            : "未知日期"}
+                        </span>
+                      </div>
+                      <p className="text-[#666666] text-[14px] leading-normal">
+                        {blog.excerpt ||
+                          blog.content?.substring(0, 100) + "..." ||
+                          "暂无描述"}
+                      </p>
+                    </div>
+
+                    {/* 中列：GEOK */}
+                    <div className="w-[25%] flex justify-center items-center">
+                      <div className="bg-[rgba(38,99,255,0.2)] rounded-[10px] px-4 py-2 inline-flex items-center">
                         <svg
-                          width="14"
-                          height="8"
-                          viewBox="0 0 14 8"
-                          fill="none"
+                          className="mr-2"
                           xmlns="http://www.w3.org/2000/svg"
+                          width="22"
+                          height="22"
+                          viewBox="0 0 22 22"
+                          fill="none"
                         >
-                          <path d="M7 0L14 8H0L7 0Z" fill="#11ca9c" />
+                          <g clipPath={`url(#clip0_332_2268_${blog.id})`}>
+                            <path
+                              d="M9.69145 11.4869L1.07716 7.39009C0.784128 7.27659 0.532274 7.07712 0.354673 6.81788C0.177073 6.55864 0.0820313 6.25174 0.0820312 5.9375C0.0820313 5.62325 0.177073 5.31636 0.354673 5.05711C0.532274 4.79787 0.784128 4.5984 1.07716 4.48491L9.69145 0.388056C10.1026 0.197084 10.5505 0.0981445 11.0038 0.0981445C11.4572 0.0981445 11.9051 0.197084 12.3162 0.388056L20.9305 4.48491C21.2236 4.5984 21.4754 4.79787 21.653 5.05711C21.8306 5.31636 21.9257 5.62325 21.9257 5.9375C21.9257 6.25174 21.8306 6.55864 21.653 6.81788C21.4754 7.07712 21.2236 7.27659 20.9305 7.39009L12.3162 11.4869C11.9051 11.6779 11.4572 11.7768 11.0038 11.7768C10.5505 11.7768 10.1026 11.6779 9.69145 11.4869Z"
+                              fill="#2663FF"
+                            />
+                            <path
+                              d="M11.0039 16.9662C10.3772 16.9664 9.75898 16.8225 9.19688 16.5456L0.746156 12.3475C0.594687 12.2888 0.457124 12.1992 0.34225 12.0843C0.227376 11.9695 0.137717 11.8319 0.0789981 11.6805C0.0202789 11.529 -0.00620962 11.367 0.00122396 11.2047C0.00865755 11.0424 0.0498499 10.8835 0.12217 10.738C0.194491 10.5926 0.29635 10.4638 0.421244 10.3599C0.546137 10.256 0.69132 10.1793 0.84752 10.1347C1.00372 10.0901 1.16751 10.0786 1.32842 10.1009C1.48933 10.1231 1.64383 10.1787 1.78205 10.264L10.225 14.4621C10.4677 14.58 10.734 14.6412 11.0039 14.6412C11.2737 14.6412 11.54 14.58 11.7827 14.4621L20.2335 10.264C20.3717 10.1787 20.5262 10.1231 20.6871 10.1009C20.848 10.0786 21.0118 10.0901 21.168 10.1347C21.3242 10.1793 21.4694 10.256 21.5943 10.3599C21.7192 10.4638 21.821 10.5926 21.8933 10.738C21.9657 10.8835 22.0068 11.0424 22.0143 11.2047C22.0217 11.367 21.9952 11.529 21.9365 11.6805C21.8778 11.8319 21.7881 11.9695 21.6733 12.0843C21.5584 12.1992 21.4208 12.2888 21.2693 12.3475L12.8108 16.5456C12.2489 16.8229 11.6305 16.9669 11.0039 16.9662Z"
+                              fill="#2663FF"
+                            />
+                            <path
+                              d="M11.0039 21.9042C10.3772 21.9049 9.75884 21.7609 9.19688 21.4836L0.746156 17.2855C0.594687 17.2268 0.457124 17.1372 0.34225 17.0223C0.227376 16.9075 0.137717 16.7699 0.0789981 16.6184C0.0202789 16.467 -0.00620962 16.3049 0.00122396 16.1427C0.00865755 15.9804 0.0498499 15.8215 0.12217 15.676C0.194491 15.5305 0.29635 15.4018 0.421244 15.2979C0.546137 15.194 0.69132 15.1173 0.84752 15.0727C1.00372 15.0281 1.16751 15.0166 1.32842 15.0389C1.48933 15.0611 1.64383 15.1167 1.78205 15.202L10.225 19.4001C10.4671 19.5199 10.7337 19.5823 11.0039 19.5823C11.274 19.5823 11.5406 19.5199 11.7827 19.4001L20.2335 15.202C20.3717 15.1167 20.5262 15.0611 20.6871 15.0389C20.848 15.0166 21.0118 15.0281 21.168 15.0727C21.3242 15.1173 21.4694 15.194 21.5943 15.2979C21.7192 15.4018 21.821 15.5305 21.8933 15.676C21.9657 15.8215 22.0068 15.9804 22.0143 16.1427C22.0217 16.3049 21.9952 16.467 21.9365 16.6184C21.8778 16.7699 21.7881 16.9075 21.6733 17.0223C21.5584 17.1372 21.4208 17.2268 21.2693 17.2855L12.8108 21.4836C12.2489 21.7609 11.6305 21.9049 11.0039 21.9042Z"
+                              fill="#2663FF"
+                            />
+                          </g>
+                          <defs>
+                            <clipPath id={`clip0_332_2268_${blog.id}`}>
+                              <rect width="22" height="22" fill="white" />
+                            </clipPath>
+                          </defs>
                         </svg>
+                        <span className="text-[#2663ff] text-[12px] font-medium">
+                          EXAMINE
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 右列：提及率 */}
+                    <div className="w-[25%] flex justify-center items-center">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-[#333333] text-[18px] font-normal">
+                          {blog.mention_rate
+                            ? `${blog.mention_rate.toFixed(1)}%`
+                            : `${(Math.random() * 100).toFixed(1)}%`}
+                        </span>
+                        <div className="flex items-center space-x-1">
+                          <span className="text-[14px] font-medium text-[#11ca9c]">
+                            +{(Math.random() * 5).toFixed(1)}%
+                          </span>
+                          {/* 趋势箭头 */}
+                          <svg
+                            width="14"
+                            height="8"
+                            viewBox="0 0 14 8"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path d="M7 0L14 8H0L7 0Z" fill="#11ca9c" />
+                          </svg>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* 分页组件 */}
@@ -933,7 +938,7 @@ function AiContentGenerationPage() {
           blogs.length > 0 &&
           pagination &&
           pagination.total_pages > 1 && (
-            <div className="mt-8">
+            <div className="bg-white rounded-b-[10px]">
               <Pagination
                 currentPage={pagination.current_page}
                 totalPages={pagination.total_pages}

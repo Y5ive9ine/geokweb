@@ -5,14 +5,8 @@
 
 // 获取API基础URL
 const getApiBaseUrl = () => {
-  // 在客户端使用Next.js代理，在服务端直接连接后端
-  if (typeof window !== "undefined") {
-    // 客户端：使用Next.js代理
-    return process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-  } else {
-    // 服务端：直接连接后端API
-    return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8012/api/v1";
-  }
+  // 直接连接到外部后端API
+  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 };
 
 // 请求配置接口
@@ -35,7 +29,7 @@ interface ApiResponse<T = any> {
 // 获取认证token
 const getAuthToken = (): string | null => {
   if (typeof window !== "undefined") {
-    return localStorage.getItem("auth_token");
+    return localStorage.getItem("access_token");
   }
   return null;
 };

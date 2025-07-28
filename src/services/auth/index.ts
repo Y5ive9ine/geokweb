@@ -3,6 +3,7 @@
  */
 
 import { api } from "@/lib/api-client";
+import { LoginResponse, RegisterRequest } from "@/lib/types";
 
 // 专门的认证API方法
 export const authApi = {
@@ -11,8 +12,8 @@ export const authApi = {
     api.post("/api/auth/login", credentials),
 
   // 注册
-  register: (userData: { username: string; email: string; password: string }) =>
-    api.post("/api/auth/register", userData),
+  register: (userData: RegisterRequest) =>
+    api.post<LoginResponse>("/api/auth/register", userData),
 
   // 获取用户信息
   getMe: () => api.get("/api/auth/me"),
