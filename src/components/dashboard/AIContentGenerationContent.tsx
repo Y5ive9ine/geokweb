@@ -494,12 +494,12 @@ export function AIContentGenerationContent() {
             <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-normal transition-colors">
               下载/导出
             </button>
-            <button 
+            {/* <button 
               onClick={handleOpenAIGenerator}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-normal transition-colors"
             >
               AI生成内容
-            </button>
+            </button> */}
           </div>
 
           {/* 筛选选项 */}

@@ -2,121 +2,286 @@
  * AI Visibility数据管理的React Hooks
  */
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { aiVisibilityApi, AIVisibilityTrendParams, AIVisibilityMetrics, AIVisibilityTrendResponse, AIVisibilityReport, AIVisibilityStats } from "@/services/ai-visibility";
 
-// 品牌可见性趋势Hook
+// 缓存管理
+const trendCache = new Map<string, { data: AIVisibilityTrendResponse; timestamp: number }>();
+const statsCache = new Map<string, { data: AIVisibilityStats; timestamp: number }>();
+const reportCache = new Map<string, { data: AIVisibilityReport; timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5分钟缓存
+
+// 防抖函数
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// 品牌可见性趋势Hook - 优化版本
 export const useBrandVisibilityTrend = (brandId: string, params?: AIVisibilityTrendParams) => {
   const [trend, setTrend] = useState<AIVisibilityTrendResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // 防抖brandId，避免频繁请求
+  const debouncedBrandId = useDebounce(brandId, 300);
+  
+  // 用于控制请求的引用
+  const abortControllerRef = useRef<AbortController | null>(null);
+  
+  // 生成缓存key
+  const cacheKey = useMemo(() => {
+    if (!debouncedBrandId) return '';
+    return `trend-${debouncedBrandId}-${params?.days || 30}`;
+  }, [debouncedBrandId, params?.days]);
 
-  const fetchTrend = useCallback(async (days?: number) => {
-    if (!brandId) return;
+  const fetchTrend = useCallback(async () => {
+    if (!debouncedBrandId || !cacheKey) return;
+    
+    // 检查缓存
+    const cached = trendCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      setTrend(cached.data);
+      return;
+    }
+    
+    // 取消之前的请求
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    abortControllerRef.current = new AbortController();
     
     setLoading(true);
     setError(null);
 
     try {
-      const response = await aiVisibilityApi.getBrandVisibilityTrend(brandId, { ...params, days });
+      const response = await aiVisibilityApi.getBrandVisibilityTrend(debouncedBrandId, params);
       
       if (response.success && response.data) {
         setTrend(response.data);
+        // 更新缓存
+        trendCache.set(cacheKey, {
+          data: response.data,
+          timestamp: Date.now()
+        });
       } else {
         setError(response.error || response.message || "Failed to fetch visibility trend");
       }
     } catch (err) {
+      // 忽略被取消的请求错误
+      if (err instanceof Error && err.name === 'AbortError') {
+        return;
+      }
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
     }
-  }, [brandId, params]);
+  }, [debouncedBrandId, cacheKey, params]);
 
   useEffect(() => {
-    if (brandId) {
-      fetchTrend(params?.days);
+    if (debouncedBrandId && cacheKey) {
+      fetchTrend();
     }
-  }, [brandId, params?.days, fetchTrend]);
+    
+    // 清理函数
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [fetchTrend]);
 
   const refresh = useCallback(() => {
-    fetchTrend(params?.days);
-  }, [fetchTrend, params?.days]);
+    if (cacheKey) {
+      // 清除缓存后重新获取
+      trendCache.delete(cacheKey);
+      fetchTrend();
+    }
+  }, [cacheKey, fetchTrend]);
 
   return { trend, loading, error, refresh };
 };
 
-// 品牌可见性报告Hook
+// 品牌可见性报告Hook - 优化版本
 export const useBrandVisibilityReport = (brandId: string) => {
   const [report, setReport] = useState<AIVisibilityReport | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // 防抖brandId，避免频繁请求
+  const debouncedBrandId = useDebounce(brandId, 500); // 报告请求防抖时间稍长
+  
+  // 用于控制请求的引用
+  const abortControllerRef = useRef<AbortController | null>(null);
+  
+  // 生成缓存key
+  const cacheKey = useMemo(() => {
+    if (!debouncedBrandId) return '';
+    return `report-${debouncedBrandId}`;
+  }, [debouncedBrandId]);
 
   const fetchReport = useCallback(async () => {
-    if (!brandId) return;
+    if (!debouncedBrandId || !cacheKey) return;
+    
+    // 检查缓存
+    const cached = reportCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      setReport(cached.data);
+      return;
+    }
+    
+    // 取消之前的请求
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    abortControllerRef.current = new AbortController();
     
     setLoading(true);
     setError(null);
 
     try {
-      const response = await aiVisibilityApi.generateBrandVisibilityReport(brandId);
+      const response = await aiVisibilityApi.generateBrandVisibilityReport(debouncedBrandId);
       
       if (response.success && response.data) {
         setReport(response.data);
+        // 更新缓存
+        reportCache.set(cacheKey, {
+          data: response.data,
+          timestamp: Date.now()
+        });
       } else {
         setError(response.error || response.message || "Failed to generate visibility report");
       }
     } catch (err) {
+      // 忽略被取消的请求错误
+      if (err instanceof Error && err.name === 'AbortError') {
+        return;
+      }
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
     }
-  }, [brandId]);
+  }, [debouncedBrandId, cacheKey]);
 
   useEffect(() => {
-    if (brandId) {
+    if (debouncedBrandId && cacheKey) {
       fetchReport();
     }
-  }, [brandId, fetchReport]);
+    
+    // 清理函数
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [fetchReport]);
 
   const refresh = useCallback(() => {
-    fetchReport();
-  }, [fetchReport]);
+    if (cacheKey) {
+      // 清除缓存后重新获取
+      reportCache.delete(cacheKey);
+      fetchReport();
+    }
+  }, [cacheKey, fetchReport]);
 
   return { report, loading, error, refresh };
 };
 
-// 可见性统计Hook
+// 可见性统计Hook - 优化版本
 export const useVisibilityStats = (brandId?: string) => {
   const [stats, setStats] = useState<AIVisibilityStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // 防抖brandId，避免频繁请求
+  const debouncedBrandId = useDebounce(brandId || '', 300);
+  
+  // 用于控制请求的引用
+  const abortControllerRef = useRef<AbortController | null>(null);
+  
+  // 生成缓存key
+  const cacheKey = useMemo(() => {
+    if (!debouncedBrandId) return '';
+    return `stats-${debouncedBrandId}`;
+  }, [debouncedBrandId]);
 
   const fetchStats = useCallback(async () => {
+    if (!debouncedBrandId || !cacheKey) return;
+    
+    // 检查缓存
+    const cached = statsCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      setStats(cached.data);
+      return;
+    }
+    
+    // 取消之前的请求
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    abortControllerRef.current = new AbortController();
+    
     setLoading(true);
     setError(null);
 
     try {
-      const response = await aiVisibilityApi.getVisibilityStats(brandId);
+      const response = await aiVisibilityApi.getVisibilityStats(debouncedBrandId);
       
       if (response.success && response.data) {
         setStats(response.data);
+        // 更新缓存
+        statsCache.set(cacheKey, {
+          data: response.data,
+          timestamp: Date.now()
+        });
       } else {
         setError(response.error || response.message || "Failed to fetch visibility stats");
       }
     } catch (err) {
+      // 忽略被取消的请求错误
+      if (err instanceof Error && err.name === 'AbortError') {
+        return;
+      }
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
     }
-  }, [brandId]);
+  }, [debouncedBrandId, cacheKey]);
 
   useEffect(() => {
-    fetchStats();
+    if (debouncedBrandId && cacheKey) {
+      fetchStats();
+    }
+    
+    // 清理函数
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [fetchStats]);
 
   const refresh = useCallback(() => {
-    fetchStats();
-  }, [fetchStats]);
+    if (cacheKey) {
+      // 清除缓存后重新获取
+      statsCache.delete(cacheKey);
+      fetchStats();
+    }
+  }, [cacheKey, fetchStats]);
 
   return { stats, loading, error, refresh };
 };

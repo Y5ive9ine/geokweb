@@ -49,7 +49,7 @@ export default function DashboardPage() {
 
           {/* 主要内容 */}
           <ErrorBoundary>
-            <MainContent />
+            <MainContent activeTab={activeTab} />
           </ErrorBoundary>
         </div>
       </div>

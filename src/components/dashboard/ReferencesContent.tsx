@@ -1,239 +1,249 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useReferences, useBrandReferences, useTopReferences, useReference } from '@/hooks/useReferences'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { referencesUtils } from '@/services/references'
+import { authUtils } from '@/services/auth'
 
 export function ReferencesContent() {
-  // 假设当前品牌ID，实际应该从用户上下文或路由参数获取
-  const [currentBrandId] = useState('4fc86ecb-8e0e-476b-8826-bf4dc95fce0d')
+  const [currentBrandId, setCurrentBrandId] = useState<string>('')
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   
-  // 使用References相关的hooks
+  useEffect(() => {
+    const userInfo = authUtils.getUserInfo()
+    if (userInfo?.brand_id) {
+      setCurrentBrandId(userInfo.brand_id)
+    } else {
+      setCurrentBrandId('4fc86ecb-8e0e-476b-8826-bf4dc95fce0d')
+    }
+  }, [])
+
   const { references, pagination, loading, error, changePage, filter } = useReferences({ page_size: 10 })
   const { references: brandReferences, loading: brandLoading } = useBrandReferences(currentBrandId, selectedCategory)
   const { references: topReferences, loading: topLoading } = useTopReferences(10)
+  const { deleteReference } = useReference()
+
+  const handleDeleteReference = async (id: string) => {
+    if (confirm('确定要删除这个引用吗？')) {
+      try {
+        await deleteReference(id)
+        // 刷新列表
+        filter()
+      } catch (error) {
+        console.error('删除失败:', error)
+      }
+    }
+  }
+
+  // 按域名分组引用
+  const groupedByDomain = references.reduce((acc, ref) => {
+    const domain = referencesUtils.extractDomain(ref.url)
+    if (!acc[domain]) {
+      acc[domain] = []
+    }
+    acc[domain].push(ref)
+    return acc
+  }, {} as Record<string, typeof references>)
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-6">
       <h1 className="text-2xl font-bold mb-6">引用管理</h1>
 
-      {/* 热门引用 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>热门引用</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {topLoading ? (
-            <div className="animate-pulse">加载中...</div>
-          ) : topReferences.length > 0 ? (
-            <div className="space-y-3">
-              {topReferences.map((reference, index) => (
-                <div key={reference.id || index} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-blue-600 hover:underline cursor-pointer">
-                        {reference.title || '未命名引用'}
-                      </h3>
-                      {reference.description && (
-                        <p className="text-sm text-gray-600 mt-1">{reference.description}</p>
-                      )}
-                      <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                          </svg>
-                          {reference.domain || referencesUtils.extractDomain(reference.url || '')}
-                        </span>
-                        {reference.relevance_score && (
-                          <span>相关性: {(reference.relevance_score * 100).toFixed(0)}%</span>
-                        )}
-                        {reference.position && (
-                          <span>位置: #{reference.position}</span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="ml-4">
-                      <div className={`px-2 py-1 rounded text-xs font-medium ${
-                        referencesUtils.isTrustedDomain(reference.domain || '') 
-                          ? 'bg-green-100 text-green-700' 
-                          : 'bg-gray-100 text-gray-700'
-                      }`}>
-                        {referencesUtils.formatSourceType(reference.source_type || 'other')}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-gray-500">暂无热门引用</div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* 品牌引用 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>品牌相关引用</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {brandLoading ? (
-            <div className="animate-pulse">加载中...</div>
-          ) : brandReferences.length > 0 ? (
-            <>
-              {/* 引用统计 */}
-              <div className="mb-4 p-4 bg-blue-50 rounded-lg">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <div className="text-sm text-gray-600">总引用数</div>
-                    <div className="text-2xl font-bold text-blue-600">
-                      {brandReferences.length}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-600">平均相关性</div>
-                    <div className="text-2xl font-bold text-green-600">
-                      {(referencesUtils.getReferencesStats(brandReferences).averageRelevance * 100).toFixed(1)}%
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-600">域名覆盖</div>
-                    <div className="text-2xl font-bold text-purple-600">
-                      {Object.keys(referencesUtils.groupReferencesByDomain(brandReferences)).length}
-                    </div>
-                  </div>
-                </div>
+      <div className="space-y-6">
+        {/* 统计概览 */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold text-blue-600">
+                {pagination?.total_items || 0}
               </div>
+              <p className="text-xs text-gray-500 mt-1">总引用数</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold text-green-600">
+                {Object.keys(groupedByDomain).length}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">引用域名</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold text-purple-600">
+                {brandReferences?.length || 0}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">品牌相关</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold text-orange-600">
+                {topReferences?.length || 0}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">热门引用</p>
+            </CardContent>
+          </Card>
+        </div>
 
-              {/* 引用列表 */}
+        {/* 热门引用 */}
+        <Card>
+          <CardHeader>
+            <CardTitle>热门引用</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {topLoading ? (
+              <div className="space-y-2">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="h-16 bg-gray-100 animate-pulse rounded"></div>
+                ))}
+              </div>
+            ) : topReferences && topReferences.length > 0 ? (
               <div className="space-y-3">
-                {brandReferences.map((reference, index) => (
-                  <div key={reference.id || index} className="p-3 bg-gray-50 rounded-lg">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-semibold">{reference.title || '未命名引用'}</h3>
-                        {reference.url && (
-                          <a 
-                            href={reference.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-sm text-blue-600 hover:underline"
-                          >
-                            {reference.url}
-                          </a>
-                        )}
+                {topReferences.slice(0, 5).map((ref, index) => (
+                  <div key={ref.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-gray-700">#{index + 1}</span>
+                        <a href={ref.url} target="_blank" rel="noopener noreferrer" 
+                           className="text-sm text-blue-600 hover:underline truncate max-w-md">
+                          {ref.title || ref.url}
+                        </a>
                       </div>
-                      <div className="text-xs text-gray-500">
-                        质量评分: {referencesUtils.calculateReferenceQualityScore(reference)}%
+                      <div className="flex items-center gap-4 mt-1">
+                        <span className="text-xs text-gray-500">
+                          域名: {referencesUtils.extractDomain(ref.url)}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          引用次数: {ref.citation_count || 0}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          质量评分: {referencesUtils.calculateReferenceQualityScore(ref)}/10
+                        </span>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
-            </>
-          ) : (
-            <div className="text-gray-500">暂无品牌引用</div>
-          )}
-        </CardContent>
-      </Card>
+            ) : (
+              <p className="text-gray-500 text-center py-8">暂无热门引用</p>
+            )}
+          </CardContent>
+        </Card>
 
-      {/* 所有引用列表 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>所有引用</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="animate-pulse">加载中...</div>
-          ) : error ? (
-            <div className="text-red-500">错误: {error}</div>
-          ) : references.length > 0 ? (
-            <>
-              {/* 按域名分组的统计 */}
-              <div className="mb-4">
-                <h3 className="text-sm font-semibold text-gray-700 mb-2">热门域名</h3>
-                <div className="flex flex-wrap gap-2">
-                  {referencesUtils.getReferencesStats(references).topDomains.map((item) => (
-                    <div 
-                      key={item.domain}
-                      className="px-3 py-1 bg-gray-100 rounded-full text-sm"
-                    >
-                      <span className="font-medium">{item.domain}</span>
-                      <span className="text-gray-500 ml-1">({item.count})</span>
+        {/* 品牌相关引用 */}
+        <Card>
+          <CardHeader>
+            <CardTitle>品牌相关引用</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {brandLoading ? (
+              <div className="h-40 bg-gray-100 animate-pulse rounded"></div>
+            ) : brandReferences && brandReferences.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {brandReferences.slice(0, 6).map(ref => (
+                  <div key={ref.id} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
+                    <a href={ref.url} target="_blank" rel="noopener noreferrer"
+                       className="text-sm font-medium text-blue-600 hover:underline line-clamp-1">
+                      {ref.title || ref.url}
+                    </a>
+                    <p className="text-xs text-gray-500 mt-2">
+                      {referencesUtils.extractDomain(ref.url)}
+                    </p>
+                    {ref.snippet && (
+                      <p className="text-xs text-gray-600 mt-2 line-clamp-2">
+                        {ref.snippet}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-center py-8">暂无品牌相关引用</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* 按域名分组的引用 */}
+        <Card>
+          <CardHeader>
+            <CardTitle>所有引用（按域名分组）</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="space-y-3">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="h-20 bg-gray-100 animate-pulse rounded"></div>
+                ))}
+              </div>
+            ) : error ? (
+              <div className="text-red-500 text-center py-8">
+                加载失败: {error}
+              </div>
+            ) : Object.keys(groupedByDomain).length > 0 ? (
+              <>
+                <div className="space-y-4">
+                  {Object.entries(groupedByDomain).slice(0, 5).map(([domain, refs]) => (
+                    <div key={domain} className="border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium text-gray-800">{domain}</h4>
+                        <span className="text-sm text-gray-500">{refs.length} 个引用</span>
+                      </div>
+                      <div className="space-y-2">
+                        {refs.slice(0, 3).map(ref => (
+                          <div key={ref.id} className="flex items-center justify-between py-2 border-t">
+                            <a href={ref.url} target="_blank" rel="noopener noreferrer"
+                               className="text-sm text-blue-600 hover:underline truncate flex-1 mr-4">
+                              {ref.title || ref.url}
+                            </a>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-red-600 hover:text-red-700"
+                              onClick={() => handleDeleteReference(ref.id)}
+                            >
+                              删除
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>
-              </div>
 
-              {/* 引用列表 */}
-              <div className="space-y-3">
-                {references.map((reference, index) => (
-                  <div key={reference.id || index} className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{reference.title || '未命名引用'}</h3>
-                        {reference.description && (
-                          <p className="text-sm text-gray-600 mt-1">{reference.description}</p>
-                        )}
-                        {reference.url && (
-                          <div className="mt-2">
-                            <a 
-                              href={reference.url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-sm text-blue-600 hover:underline inline-flex items-center gap-1"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                              </svg>
-                              查看原文
-                            </a>
-                          </div>
-                        )}
-                      </div>
-                      {reference.extracted_date && (
-                        <span className="text-xs text-gray-500">
-                          提取于: {new Date(reference.extracted_date).toLocaleDateString('zh-CN')}
-                        </span>
-                      )}
-                    </div>
+                {/* 分页 */}
+                {pagination && pagination.total_pages > 1 && (
+                  <div className="flex justify-center gap-2 mt-6">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => changePage(pagination.current_page - 1)}
+                      disabled={pagination.current_page === 1}
+                    >
+                      上一页
+                    </Button>
+                    <span className="flex items-center px-4 text-sm">
+                      第 {pagination.current_page} / {pagination.total_pages} 页
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => changePage(pagination.current_page + 1)}
+                      disabled={pagination.current_page === pagination.total_pages}
+                    >
+                      下一页
+                    </Button>
                   </div>
-                ))}
-              </div>
-
-              {/* 分页 */}
-              {pagination.total_pages > 1 && (
-                <div className="mt-4 flex justify-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => changePage(pagination.current_page - 1)}
-                    disabled={pagination.current_page === 1}
-                  >
-                    上一页
-                  </Button>
-                  <span className="px-4 py-2 text-sm">
-                    第 {pagination.current_page} / {pagination.total_pages} 页
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => changePage(pagination.current_page + 1)}
-                    disabled={pagination.current_page === pagination.total_pages}
-                  >
-                    下一页
-                  </Button>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="text-gray-500">暂无引用数据</div>
-          )}
-        </CardContent>
-      </Card>
+                )}
+              </>
+            ) : (
+              <p className="text-gray-500 text-center py-8">暂无引用数据</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 } 
