@@ -5,8 +5,14 @@
 
 // 获取API基础URL
 const getApiBaseUrl = () => {
-  // 优先使用环境变量，如果没有则使用默认值
-  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  // 在客户端使用Next.js代理，在服务端直接连接后端
+  if (typeof window !== "undefined") {
+    // 客户端：使用Next.js代理
+    return process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  } else {
+    // 服务端：直接连接后端API
+    return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8012/api/v1";
+  }
 };
 
 // 请求配置接口
@@ -94,10 +100,14 @@ export const apiRequest = async <T = any>(
     console.log(`API Response: ${response.status}`, data);
 
     const result: ApiResponse<T> = {
-      success: response.ok,
-      data: response.ok ? data : undefined,
-      message: response.ok ? data?.message : data?.message || data,
-      error: response.ok ? undefined : data?.error || data,
+      success: response.ok && data?.success !== false,
+      data: response.ok ? data?.data || data : undefined,
+      message: data?.message || (response.ok ? "Success" : "Error"),
+      error: response.ok
+        ? data?.success === false
+          ? data?.error
+          : undefined
+        : data?.error || data,
       status: response.status,
     };
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { authApi, authUtils } from "@/app/api/auth";
+import { authApi, authUtils } from "@/services/auth";
 
 // 图标资源常量
 const imgFrame = "../images/Frame.svg";
@@ -753,7 +753,7 @@ export default function SettingsPage() {
 
       {activeMainTab === "用户管理" && (
         <div className="absolute left-[400px] top-[120px] right-[40px]">
-          <div className="bg-white rounded-[10px] p-8 border border-[#e0e0e0] w-[30vw]">
+          <div className="bg-white rounded-[10px] p-8 border border-[#e0e0e0] ">
             {!showEditUser && !userAdded ? (
               <>
                 {/* 标题区域 */}
