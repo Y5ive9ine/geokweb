@@ -3,19 +3,19 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 
-// 图标资源常量 - 参考Figma设计和现有页面
-const img2 = "../images/img2.png";
-const imgLine2 = "../images/Line2.svg";
-const imgFrame = "../images/Frame.svg";
-const imgFrame1 = "../images/Frame1.svg";
-const imgFrame2 = "../images/Frame2.svg";
-const imgFrame3 = "../images/Frame3.svg";
-const imgFrame4 = "../images/Frame4.svg";
-const imgFrame5 = "../images/Frame5.svg";
-const imgFrame6 = "../images/Frame6.svg";
-const imgVector = "../images/Vector.svg";
-const imgGroup134 = "../images/Group134.svg";
-const imgSearchBg = "../images/search.png";
+// 图标资源常量 - 使用绝对路径避免路径问题
+const img2 = "/images/img2.png";
+const imgLine2 = "/images/Line2.svg";
+const imgFrame = "/images/Frame.svg";
+const imgFrame1 = "/images/Frame1.svg";
+const imgFrame2 = "/images/Frame2.svg";
+const imgFrame3 = "/images/Frame3.svg";
+const imgFrame4 = "/images/Frame4.svg";
+const imgFrame5 = "/images/Frame5.svg";
+const imgFrame6 = "/images/Frame6.svg";
+const imgVector = "/images/Vector.svg";
+const imgGroup134 = "/images/Group134.svg";
+const imgSearchBg = "/images/search.png";
 
 export default function ConversationsPage() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)

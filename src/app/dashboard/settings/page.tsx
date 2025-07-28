@@ -17,7 +17,7 @@ const imgGroup134 = "../images/Group134.svg";
 const imgHomeIcon = "../images/home-icon.svg";
 
 export default function SettingsPage() {
-  const [activeMainTab, setActiveMainTab] = useState('通知')
+  const [activeMainTab, setActiveMainTab] = useState('账户设置')
   const [activeSubTab, setActiveSubTab] = useState('账户信息')
   const [showEditUser, setShowEditUser] = useState(false)
   const [userAdded, setUserAdded] = useState(false)
