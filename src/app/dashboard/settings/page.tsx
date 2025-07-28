@@ -107,17 +107,19 @@ export default function SettingsPage() {
       console.log("User info response:", response.data);
       console.log(response.data, "response.data.first_name");
       if (response.success && response.data) {
-        const user = response.data.data.user;
-        setUserInfo(user);
-        setProfileData({
-          first_name: user.first_name || "",
-          last_name: user.last_name || "",
-          bio: user.bio || "",
-          phone: user.phone || "",
-          company: user.company || "",
-          country: user.country || "",
-        });
-        setEmailData({ new_email: "" });
+        const user = response.data.data?.user;
+        if (user) {
+          setUserInfo(user);
+          setProfileData({
+            first_name: user?.first_name || "",
+            last_name: user?.last_name || "",
+            bio: user?.bio || "",
+            phone: user?.phone || "",
+            company: user?.company || "",
+            country: user?.country || "",
+          });
+          setEmailData({ new_email: "" });
+        } 
       } else {
         console.error("Failed to fetch user info:", response.message);
         showMessage(response.message || "获取用户信息失败", "error");

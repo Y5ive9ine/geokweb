@@ -51,6 +51,7 @@ export interface Brand {
   domain: string;
   keywords?: string;
   description?: string;
+  suggestions?: string[];
   status: "active" | "inactive";
   created_at: string;
   updated_at: string;
@@ -61,6 +62,7 @@ export interface CreateBrandRequest {
   domain: string;
   keywords?: string;
   description?: string;
+  suggestions?: string[];
 }
 
 // AI搜索相关类型
