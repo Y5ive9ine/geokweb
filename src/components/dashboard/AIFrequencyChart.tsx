@@ -10,10 +10,10 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { AIVisibilityStats } from "@/services/ai-visibility";
+import { AIVisibilityTrendResponse } from "@/services/ai-visibility";
 
 interface AIFrequencyChartProps {
-  data: AIVisibilityStats | null;
+  data: AIVisibilityTrendResponse | null;
   loading: boolean;
   error: string | null;
 }
@@ -22,49 +22,63 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
   ({ data, loading, error }) => {
     // 使用useMemo缓存数据点计算，避免每次render都重新计算
     const radarData = useMemo(() => {
-      if (!data) {
-        return [];
+      if (!data || !data.trend || data.trend.length === 0) {
+        // 如果没有数据，返回默认的5维度结构以确保雷达图能显示
+        return [
+          { subject: '总体评分', A: 0, fullMark: 100 },
+          { subject: '频率评分', A: 0, fullMark: 100 },
+          { subject: '推荐评分', A: 0, fullMark: 100 },
+          { subject: '搜索率评分', A: 0, fullMark: 100 },
+          { subject: '首选评分', A: 0, fullMark: 100 },
+        ];
       }
 
-      // 从真实数据中提取三个维度的平均值
-      const calculateAverageRate = (rateArray: Array<{ brand: string; rate: number }>) => {
-        if (!rateArray || rateArray.length === 0) return 0;
-        const totalRate = rateArray.reduce((sum, item) => sum + item.rate, 0);
-        return totalRate / rateArray.length;
+      // 从trend数据中获取最新的评分数据
+      const latestTrend = data.trend[data.trend.length - 1] || data.trend[0];
+      
+      // 安全转换评分数据
+      const parseScore = (score: string | undefined): number => {
+        if (!score) return 0;
+        const parsed = parseFloat(score);
+        return isNaN(parsed) ? 0 : Math.max(0, Math.min(100, parsed));
       };
 
-      const metrics = [
+      return [
         {
-          subject: '品牌首选率',
-          data: data.brand_first_choice_rate,
+          subject: '总体评分',
+          A: parseScore(latestTrend.overall_score),
+          fullMark: 100,
         },
         {
-          subject: '品牌推荐率',
-          data: data.brand_recommend_rate,
+          subject: '频率评分',
+          A: parseScore(latestTrend.frequency_score),
+          fullMark: 100,
         },
         {
-          subject: '品牌搜索率',
-          data: data.brand_search_rate,
+          subject: '推荐评分',
+          A: parseScore(latestTrend.recommendation_score),
+          fullMark: 100,
+        },
+        {
+          subject: '搜索率评分',
+          A: parseScore(latestTrend.search_rate_score),
+          fullMark: 100,
+        },
+        {
+          subject: '首选评分',
+          A: parseScore(latestTrend.first_choice_score),
+          fullMark: 100,
         },
       ];
-
-      return metrics.map(({ subject, data: rateData }) => {
-        const avgRate = calculateAverageRate(rateData);
-        return {
-          subject,
-          A: Math.max(0, Math.min(100, avgRate)), // 确保在0-100范围内
-          fullMark: 100,
-        };
-      }).filter(item => item.A > 0); // 只保留有数据的维度
     }, [data]);
 
     // 使用useMemo缓存渲染状态判断
     const renderState = useMemo(() => {
       if (loading) return "loading";
       if (error) return "error";
-      if (radarData.length === 0) return "empty";
+      // 始终显示雷达图
       return "normal";
-    }, [loading, error, radarData.length]);
+    }, [loading, error]);
 
     return (
       <div className="bg-white rounded-2xl border border-gray-300 p-6 h-[523px]">
@@ -74,7 +88,7 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
             在AI中出现频率
           </h3>
           <p className="text-xs text-gray-600">
-            搜索关键词内容在人工智能中出现频率的多维度分析
+            搜索关键词内容在人工智能中出现频率的五维度综合分析
           </p>
         </div>
 
@@ -95,17 +109,7 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
           </div>
         )}
 
-        {/* 空数据状态 */}
-        {renderState === "empty" && (
-          <div className="flex items-center justify-center h-[400px]">
-            <div className="text-center">
-              <p className="text-gray-500 text-sm mb-2">暂无数据</p>
-              <p className="text-gray-400 text-xs">请检查数据源或稍后重试</p>
-            </div>
-          </div>
-        )}
-
-        {/* 雷达图 */}
+        {/* 雷达图 - 移除空数据状态检查 */}
         {renderState === "normal" && (
           <div className="h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -123,7 +127,7 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
                   axisLine={false}
                 />
                 <Radar
-                  name="AI可见性分数"
+                  name="品牌综合评分"
                   dataKey="A"
                   stroke="#3b82f6"
                   fill="#3b82f6"

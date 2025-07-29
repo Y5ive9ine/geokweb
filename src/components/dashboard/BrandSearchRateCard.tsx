@@ -13,7 +13,7 @@ interface BrandSearchRateCardProps {
 export function BrandSearchRateCard({ data, loading, error }: BrandSearchRateCardProps) {
   // 从API数据计算搜索率
   const { searchData, chartData } = useMemo(() => {
-    if (!data || !data.brand_first_choice_rate || data.brand_first_choice_rate.length === 0) {
+    if (!data || !data.brand_search_rate || data.brand_search_rate.length === 0) {
       return {
         searchData: {
           currentRate: '0%',
@@ -33,8 +33,8 @@ export function BrandSearchRateCard({ data, loading, error }: BrandSearchRateCar
       }
     }
 
-    // 基于品牌首选率数据计算搜索率
-    const brandRates = data.brand_first_choice_rate
+    // 基于品牌搜索率数据计算搜索率 - 修正为品牌搜索率数据
+    const brandRates = data.brand_search_rate
     const totalRate = brandRates.reduce((sum, item) => sum + item.rate, 0)
     const currentBrandRate = brandRates.find(item => 
       item.brand === '当前品牌' || 

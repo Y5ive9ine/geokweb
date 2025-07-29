@@ -1153,7 +1153,7 @@
 
 > 创建时间: 2025-07-26 12:45:43
 
-> 更新时间: 2025-07-28 20:49:07
+> 更新时间: 2025-07-29 11:53:32
 
 **获取指定品牌的GEO数据库列表**
 
@@ -1179,19 +1179,13 @@
 
 **Content-Type**
 
-> json
+> none
 
 **路径变量**
 
 | 参数名 | 示例值 | 参数类型 | 是否必填 | 参数描述 |
 | --- | --- | ---- | ---- | ---- |
 | id | 4fc86ecb-8e0e-476b-8826-bf4dc95fce0d | string | 是 | - |
-
-**请求Body参数**
-
-```javascript
-{}
-```
 
 **认证方式**
 
@@ -1210,303 +1204,6 @@
 			{}
 		]
 	},
-	"timestamp": ""
-}
-```
-
-**Query**
-
-## 创建GEO数据库记录
-
-> 创建人: devin
-
-> 更新人: devin
-
-> 创建时间: 2025-07-26 12:45:43
-
-> 更新时间: 2025-07-26 12:45:43
-
-**创建新的GEO数据库记录**
-
-**接口状态**
-
-> 开发中
-
-**接口URL**
-
-> /geo-databases
-
-| 环境  | URL |
-| --- | --- |
-
-
-**Mock URL**
-
-> /geo-databases?apipost_id=56aee5e7700f5
-
-**请求方式**
-
-> POST
-
-**Content-Type**
-
-> json
-
-**请求Body参数**
-
-```javascript
-{
-	"geo_optimization_id": "",
-	"database_name": "",
-	"database_type": "",
-	"connection_string": ""
-}
-```
-
-| 参数名 | 示例值 | 参数类型 | 是否必填 | 参数描述 |
-| --- | --- | ---- | ---- | ---- |
-| database_name | - | string | 是 | 数据库名称 |
-| database_type | - | string | 是 | 数据库类型 |
-| connection_string | - | string | 否 | 连接字符串 |
-| geo_optimization_id | - | string | 是 | GEO优化ID |
-
-**认证方式**
-
-> 继承父级
-
-**响应示例**
-
-* GEO数据库记录创建成功(201)
-
-```javascript
-{
-	"success": true,
-	"message": "GEO database created successfully",
-	"data": {},
-	"timestamp": ""
-}
-```
-
-* 请求参数错误(400)
-
-```javascript
-暂无数据
-```
-
-**Query**
-
-## 获取GEO数据库详情
-
-> 创建人: devin
-
-> 更新人: devin
-
-> 创建时间: 2025-07-26 12:45:43
-
-> 更新时间: 2025-07-26 12:45:43
-
-**根据ID获取GEO数据库记录详情**
-
-**接口状态**
-
-> 开发中
-
-**接口URL**
-
-> /geo-databases/{id}
-
-| 环境  | URL |
-| --- | --- |
-
-
-**Mock URL**
-
-> /geo-databases/{id}?apipost_id=56aee5e7700f6
-
-**请求方式**
-
-> GET
-
-**Content-Type**
-
-> json
-
-**路径变量**
-
-| 参数名 | 示例值 | 参数类型 | 是否必填 | 参数描述 |
-| --- | --- | ---- | ---- | ---- |
-| id | - | string | 是 | - |
-
-**请求Body参数**
-
-```javascript
-{}
-```
-
-**认证方式**
-
-> 继承父级
-
-**响应示例**
-
-* GEO数据库详情(200)
-
-```javascript
-{
-	"success": true,
-	"message": "GEO database retrieved successfully",
-	"data": {},
-	"timestamp": ""
-}
-```
-
-* GEO数据库记录不存在(404)
-
-```javascript
-暂无数据
-```
-
-**Query**
-
-## 更新GEO数据库记录
-
-> 创建人: devin
-
-> 更新人: devin
-
-> 创建时间: 2025-07-26 12:45:43
-
-> 更新时间: 2025-07-26 12:45:43
-
-**更新指定的GEO数据库记录**
-
-**接口状态**
-
-> 开发中
-
-**接口URL**
-
-> /geo-databases/{id}
-
-| 环境  | URL |
-| --- | --- |
-
-
-**Mock URL**
-
-> /geo-databases/{id}?apipost_id=56aee5e7700f7
-
-**请求方式**
-
-> PUT
-
-**Content-Type**
-
-> json
-
-**路径变量**
-
-| 参数名 | 示例值 | 参数类型 | 是否必填 | 参数描述 |
-| --- | --- | ---- | ---- | ---- |
-| id | - | string | 是 | - |
-
-**请求Body参数**
-
-```javascript
-{
-	"database_name": "",
-	"database_type": "",
-	"connection_string": "",
-	"status": ""
-}
-```
-
-| 参数名 | 示例值 | 参数类型 | 是否必填 | 参数描述 |
-| --- | --- | ---- | ---- | ---- |
-| status | - | string | 否 | - |
-| database_name | - | string | 否 | - |
-| database_type | - | string | 否 | - |
-| connection_string | - | string | 否 | - |
-
-**认证方式**
-
-> 继承父级
-
-**响应示例**
-
-* GEO数据库记录更新成功(200)
-
-```javascript
-{
-	"success": true,
-	"message": "GEO database updated successfully",
-	"data": {},
-	"timestamp": ""
-}
-```
-
-**Query**
-
-## 删除GEO数据库记录
-
-> 创建人: devin
-
-> 更新人: devin
-
-> 创建时间: 2025-07-26 12:45:43
-
-> 更新时间: 2025-07-26 12:45:43
-
-**删除指定的GEO数据库记录**
-
-**接口状态**
-
-> 开发中
-
-**接口URL**
-
-> /geo-databases/{id}
-
-| 环境  | URL |
-| --- | --- |
-
-
-**Mock URL**
-
-> /geo-databases/{id}?apipost_id=56aee5e7700f8
-
-**请求方式**
-
-> DELETE
-
-**Content-Type**
-
-> json
-
-**路径变量**
-
-| 参数名 | 示例值 | 参数类型 | 是否必填 | 参数描述 |
-| --- | --- | ---- | ---- | ---- |
-| id | - | string | 是 | - |
-
-**请求Body参数**
-
-```javascript
-{}
-```
-
-**认证方式**
-
-> 继承父级
-
-**响应示例**
-
-* GEO数据库记录删除成功(200)
-
-```javascript
-{
-	"success": true,
-	"message": "GEO database deleted successfully",
 	"timestamp": ""
 }
 ```
@@ -1715,220 +1412,6 @@
 	"data": [
 		{}
 	]
-}
-```
-
-**Query**
-
-## 获取GEO统计数据
-
-> 创建人: devin
-
-> 更新人: devin
-
-> 创建时间: 2025-07-26 12:45:43
-
-> 更新时间: 2025-07-26 12:45:43
-
-**获取GEO优化的统计数据**
-
-**接口状态**
-
-> 开发中
-
-**接口URL**
-
-> /geo-optimizations/stats?brand_id=
-
-| 环境  | URL |
-| --- | --- |
-
-
-**Mock URL**
-
-> /geo-optimizations/stats?apipost_id=56aee5e7700fc
-
-**请求方式**
-
-> GET
-
-**Content-Type**
-
-> json
-
-**请求Query参数**
-
-| 参数名 | 示例值 | 参数类型 | 是否必填 | 参数描述 |
-| --- | --- | ---- | ---- | ---- |
-| brand_id | - | string | 否 | 品牌ID（可选） |
-
-**请求Body参数**
-
-```javascript
-{}
-```
-
-**认证方式**
-
-> 继承父级
-
-**响应示例**
-
-* GEO统计数据(200)
-
-```javascript
-{
-	"success": true,
-	"message": "GEO stats retrieved successfully",
-	"data": {}
-}
-```
-
-**Query**
-
-## 按地区获取GEO优化
-
-> 创建人: devin
-
-> 更新人: devin
-
-> 创建时间: 2025-07-26 12:45:43
-
-> 更新时间: 2025-07-26 12:45:43
-
-**根据地区获取GEO优化记录**
-
-**接口状态**
-
-> 开发中
-
-**接口URL**
-
-> /geo-optimizations/region/{region}
-
-| 环境  | URL |
-| --- | --- |
-
-
-**Mock URL**
-
-> /geo-optimizations/region/{region}?apipost_id=56aee5e7700fd
-
-**请求方式**
-
-> GET
-
-**Content-Type**
-
-> json
-
-**路径变量**
-
-| 参数名 | 示例值 | 参数类型 | 是否必填 | 参数描述 |
-| --- | --- | ---- | ---- | ---- |
-| region | - | string | 是 | - |
-
-**请求Body参数**
-
-```javascript
-{}
-```
-
-**认证方式**
-
-> 继承父级
-
-**响应示例**
-
-* 地区GEO优化记录(200)
-
-```javascript
-{
-	"success": true,
-	"message": "GEO optimizations retrieved successfully",
-	"data": {
-		"geo_optimizations": [
-			{}
-		]
-	},
-	"timestamp": ""
-}
-```
-
-* 未授权(401)
-
-```javascript
-暂无数据
-```
-
-**Query**
-
-## 获取GEO优化的数据库列表
-
-> 创建人: devin
-
-> 更新人: devin
-
-> 创建时间: 2025-07-26 12:45:43
-
-> 更新时间: 2025-07-26 12:45:43
-
-**获取指定GEO优化记录的数据库列表**
-
-**接口状态**
-
-> 开发中
-
-**接口URL**
-
-> /geo-optimizations/{id}/geo-databases
-
-| 环境  | URL |
-| --- | --- |
-
-
-**Mock URL**
-
-> /geo-optimizations/{id}/geo-databases?apipost_id=56aee5e7700fe
-
-**请求方式**
-
-> GET
-
-**Content-Type**
-
-> json
-
-**路径变量**
-
-| 参数名 | 示例值 | 参数类型 | 是否必填 | 参数描述 |
-| --- | --- | ---- | ---- | ---- |
-| id | - | string | 是 | - |
-
-**请求Body参数**
-
-```javascript
-{}
-```
-
-**认证方式**
-
-> 继承父级
-
-**响应示例**
-
-* GEO数据库列表(200)
-
-```javascript
-{
-	"success": true,
-	"message": "GEO databases retrieved successfully",
-	"data": {
-		"geo_databases": [
-			{}
-		]
-	},
-	"timestamp": ""
 }
 ```
 
@@ -2204,7 +1687,7 @@
 
 > 创建时间: 2025-07-26 12:45:43
 
-> 更新时间: 2025-07-26 12:45:43
+> 更新时间: 2025-07-29 14:37:43
 
 **用户登录认证，支持邮箱密码登录和Google OAuth登录**
 
@@ -2672,7 +2155,7 @@
 
 > 创建时间: 2025-07-26 12:45:43
 
-> 更新时间: 2025-07-26 12:45:43
+> 更新时间: 2025-07-29 15:27:35
 
 **上传或更新用户头像**
 
@@ -2704,7 +2187,7 @@
 
 ```javascript
 {
-	"url": "/asd"
+	"avatar_url": ""
 }
 ```
 
@@ -2864,6 +2347,128 @@
 
 **Query**
 
+## 更新当前品牌
+
+> 创建人: devin
+
+> 更新人: devin
+
+> 创建时间: 2025-07-29 12:51:14
+
+> 更新时间: 2025-07-29 12:56:11
+
+**修改当前用户的邮箱地址**
+
+**接口状态**
+
+> 开发中
+
+**接口URL**
+
+> /auth/current-brand
+
+| 环境  | URL |
+| --- | --- |
+
+
+**Mock URL**
+
+> /auth/current-brand?apipost_id=94851a3f7002d
+
+**请求方式**
+
+> PUT
+
+**Content-Type**
+
+> json
+
+**请求Body参数**
+
+```javascript
+{
+	"brand_id": ""
+}
+```
+
+| 参数名 | 示例值 | 参数类型 | 是否必填 | 参数描述 |
+| --- | --- | ---- | ---- | ---- |
+| new_email | newemail@example.com | string | 是 | - |
+
+**认证方式**
+
+> 继承父级
+
+**响应示例**
+
+* 邮箱修改成功(200)
+
+```javascript
+{
+	"success": true,
+	"message": "Operation successful",
+	"data": {},
+	"timestamp": "2025-07-20T21:56:01Z"
+}
+```
+
+**Query**
+
+## 获取当前品牌
+
+> 创建人: devin
+
+> 更新人: devin
+
+> 创建时间: 2025-07-29 12:52:22
+
+> 更新时间: 2025-07-29 12:56:47
+
+**修改当前用户的邮箱地址**
+
+**接口状态**
+
+> 开发中
+
+**接口URL**
+
+> /auth/current-brand
+
+| 环境  | URL |
+| --- | --- |
+
+
+**Mock URL**
+
+> /auth/current-brand?apipost_id=948e1d877002e
+
+**请求方式**
+
+> GET
+
+**Content-Type**
+
+> none
+
+**认证方式**
+
+> 继承父级
+
+**响应示例**
+
+* 邮箱修改成功(200)
+
+```javascript
+{
+	"success": true,
+	"message": "Operation successful",
+	"data": {},
+	"timestamp": "2025-07-20T21:56:01Z"
+}
+```
+
+**Query**
+
 # Brands
 
 > 创建人: devin
@@ -2908,7 +2513,7 @@
 
 > 创建时间: 2025-07-26 12:45:43
 
-> 更新时间: 2025-07-26 12:45:43
+> 更新时间: 2025-07-29 13:33:17
 
 **获取用户的品牌列表，支持分页和搜索**
 
@@ -2918,7 +2523,7 @@
 
 **接口URL**
 
-> /brands?page=&page_size=&search=
+> /brands?page=&page_size=
 
 | 环境  | URL |
 | --- | --- |
@@ -2942,7 +2547,6 @@
 | --- | --- | ---- | ---- | ---- |
 | page | - | integer | 否 | 页码 |
 | page_size | - | integer | 否 | 每页数量 |
-| search | - | string | 否 | 搜索关键词 |
 
 **请求Body参数**
 
@@ -3344,7 +2948,7 @@
 
 > 创建时间: 2025-07-26 12:45:43
 
-> 更新时间: 2025-07-26 12:45:43
+> 更新时间: 2025-07-29 11:23:11
 
 **获取指定品牌的AI可见性趋势分析**
 
@@ -3354,7 +2958,7 @@
 
 **接口URL**
 
-> /brands/{id}/ai-visibility/trend?days=
+> /brands/{id}/ai-visibility/trend?days=7
 
 | 环境  | URL |
 | --- | --- |
@@ -3376,7 +2980,7 @@
 
 | 参数名 | 示例值 | 参数类型 | 是否必填 | 参数描述 |
 | --- | --- | ---- | ---- | ---- |
-| days | - | integer | 否 | 分析天数 |
+| days | 7 | integer | 否 | 分析天数 |
 
 **路径变量**
 
@@ -3975,7 +3579,7 @@
 
 > 创建时间: 2025-07-26 12:45:43
 
-> 更新时间: 2025-07-26 12:45:43
+> 更新时间: 2025-07-29 14:37:51
 
 **获取可见性指标的统计信息**
 
@@ -3985,7 +3589,7 @@
 
 **接口URL**
 
-> /ai-visibility/stats?brand_id=
+> /ai-visibility/stats?brand_id=4fc86ecb-8e0e-476b-8826-bf4dc95fce0d&days=7
 
 | 环境  | URL |
 | --- | --- |
@@ -4001,19 +3605,14 @@
 
 **Content-Type**
 
-> json
+> none
 
 **请求Query参数**
 
 | 参数名 | 示例值 | 参数类型 | 是否必填 | 参数描述 |
 | --- | --- | ---- | ---- | ---- |
-| brand_id | - | string | 否 | 品牌ID（可选） |
-
-**请求Body参数**
-
-```javascript
-{}
-```
+| brand_id | 4fc86ecb-8e0e-476b-8826-bf4dc95fce0d | string | 否 | 品牌ID（可选） |
+| days | 7 | string | 是 | - |
 
 **认证方式**
 
@@ -4082,7 +3681,7 @@
 
 > 创建时间: 2025-07-26 12:45:43
 
-> 更新时间: 2025-07-26 12:45:43
+> 更新时间: 2025-07-29 11:06:11
 
 **获取指定品牌的提示词列表**
 
@@ -4120,7 +3719,7 @@
 
 | 参数名 | 示例值 | 参数类型 | 是否必填 | 参数描述 |
 | --- | --- | ---- | ---- | ---- |
-| id | - | string | 是 | - |
+| id | 4fc86ecb-8e0e-476b-8826-bf4dc95fce0d | string | 是 | - |
 
 **请求Body参数**
 
@@ -4511,7 +4110,7 @@
 
 > 创建时间: 2025-07-26 12:45:43
 
-> 更新时间: 2025-07-26 12:45:43
+> 更新时间: 2025-07-29 11:06:15
 
 **获取排名靠前的热门提示词**
 
@@ -4614,7 +4213,7 @@
 
 > 创建时间: 2025-07-26 12:45:43
 
-> 更新时间: 2025-07-26 12:45:43
+> 更新时间: 2025-07-29 11:20:06
 
 **获取指定品牌的引用列表**
 
@@ -4624,7 +4223,7 @@
 
 **接口URL**
 
-> /brands/{id}/references?category=
+> /brands/{id}/references?days=7
 
 | 环境  | URL |
 | --- | --- |
@@ -4646,13 +4245,13 @@
 
 | 参数名 | 示例值 | 参数类型 | 是否必填 | 参数描述 |
 | --- | --- | ---- | ---- | ---- |
-| category | - | string | 否 | 引用分类 |
+| days | 7 | string | 是 | - |
 
 **路径变量**
 
 | 参数名 | 示例值 | 参数类型 | 是否必填 | 参数描述 |
 | --- | --- | ---- | ---- | ---- |
-| id | - | string | 是 | - |
+| id | 4fc86ecb-8e0e-476b-8826-bf4dc95fce0d | string | 是 | - |
 
 **请求Body参数**
 
@@ -7011,7 +6610,7 @@
 
 > 创建时间: 2025-07-26 12:45:43
 
-> 更新时间: 2025-07-26 12:45:43
+> 更新时间: 2025-07-29 14:48:35
 
 ```text
 暂无描述
@@ -7045,7 +6644,7 @@
 
 | 参数名 | 示例值 | 参数类型 | 是否必填 | 参数描述 |
 | --- | --- | ---- | ---- | ---- |
-| file | D:\下载\Snipaste_2025-07-18_17-52-01.png | file | 否 | - |
+| file | D:\下载\Polygon6.svg | file | 否 | - |
 
 **认证方式**
 
@@ -7111,7 +6710,7 @@
 
 > 创建时间: 2025-07-26 12:45:43
 
-> 更新时间: 2025-07-26 12:45:43
+> 更新时间: 2025-07-29 20:15:29
 
 **获取博客列表，支持分页、搜索和筛选**
 
@@ -7121,7 +6720,7 @@
 
 **接口URL**
 
-> /blogs?page=&page_size=&status=&category=&search=
+> /blogs?page=&page_size=&status=&category=&search=&brand_id=
 
 | 环境  | URL |
 | --- | --- |
@@ -7148,6 +6747,7 @@
 | status | - | string | 否 | 按状态筛选 |
 | category | - | string | 否 | 按分类筛选 |
 | search | - | string | 否 | 搜索关键词（在标题、摘要、内容中搜索） |
+| brand_id | - | string | 是 | - |
 
 **请求Body参数**
 
