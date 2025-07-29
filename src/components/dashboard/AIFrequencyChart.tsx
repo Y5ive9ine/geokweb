@@ -22,52 +22,38 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
   ({ data, loading, error }) => {
     // 使用useMemo缓存数据点计算，避免每次render都重新计算
     const radarData = useMemo(() => {
-      if (!data) {
-        // 如果没有数据，返回默认的结构以确保雷达图能显示
-        return [
-          { subject: '品牌首选率', A: 0, fullMark: 100 },
-          { subject: '品牌推荐率', A: 0, fullMark: 100 },
-          { subject: '品牌搜索率', A: 0, fullMark: 100 },
-        ];
+      // 始终返回6个维度保持六边形
+      const maxKeywords = 6;
+      
+      if (!data || !data.keyword_frequency || data.keyword_frequency.length === 0) {
+        // 如果没有数据，返回6个空关键词，不使用模拟数据
+        return Array.from({ length: maxKeywords }, (_, index) => ({
+          subject: `关键词${index + 1}`,
+          A: 0,
+          fullMark: 100,
+        }));
       }
 
-      // 从真实的stats数据中提取当前品牌的数据
-      const getCurrentBrandRate = (rateArray: Array<{ brand: string; rate: number }>) => {
-        if (!rateArray || rateArray.length === 0) return 0;
-        
-        // 尝试找到当前品牌的数据
-        const currentBrand = rateArray.find(item => 
-          item.brand === '当前品牌' || 
-          item.brand.includes('当前') ||
-          item.brand === data.brand_id
-        );
-        
-        if (currentBrand) {
-          return currentBrand.rate;
-        }
-        
-        // 如果找不到当前品牌，返回第一个品牌的数据或0
-        return rateArray.length > 0 ? rateArray[0].rate : 0;
-      };
-
-      // 基于真实的stats数据构建3个维度
-      return [
-        {
-          subject: '品牌首选率',
-          A: Math.max(0, Math.min(100, getCurrentBrandRate(data.brand_first_choice_rate || []))),
+      // 取前6个关键词
+      const keywords = data.keyword_frequency.slice(0, maxKeywords);
+      
+      // 构建雷达图数据
+      const result = keywords.map(item => ({
+        subject: item.keyword,
+        A: Math.max(0, Math.min(100, item.frequency)), // 确保在0-100范围内
+        fullMark: 100,
+      }));
+      
+      // 如果关键词不足6个，用空关键词填充
+      while (result.length < maxKeywords) {
+        result.push({
+          subject: `关键词${result.length + 1}`,
+          A: 0,
           fullMark: 100,
-        },
-        {
-          subject: '品牌推荐率',
-          A: Math.max(0, Math.min(100, getCurrentBrandRate(data.brand_recommend_rate || []))),
-          fullMark: 100,
-        },
-        {
-          subject: '品牌搜索率',
-          A: Math.max(0, Math.min(100, getCurrentBrandRate(data.brand_search_rate || []))),
-          fullMark: 100,
-        },
-      ];
+        });
+      }
+      
+      return result;
     }, [data]);
 
     // 使用useMemo缓存渲染状态判断

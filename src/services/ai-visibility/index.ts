@@ -98,9 +98,16 @@ export interface BrandFirstChoiceRate {
   rate: number;
 }
 
+// 关键词频率数据接口
+export interface KeywordFrequency {
+  keyword: string;
+  frequency: number;
+}
+
 // AI可见性统计接口
 export interface AIVisibilityStats {
   brand_id: string;
+  keyword_frequency: KeywordFrequency[];
   brand_first_choice_rate: BrandFirstChoiceRate[];
   brand_recommend_rate: BrandFirstChoiceRate[];
   brand_search_rate: BrandFirstChoiceRate[];
