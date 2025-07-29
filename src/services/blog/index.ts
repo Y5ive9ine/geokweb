@@ -11,6 +11,7 @@ export interface BlogListParams {
   status?: "draft" | "published" | "scheduled" | "archived";
   category?: string;
   search?: string;
+  brand_id?: string;
 }
 
 // 创建博客请求接口
@@ -125,6 +126,7 @@ export const blogApi = {
     if (params?.status) searchParams.append("status", params.status);
     if (params?.category) searchParams.append("category", params.category);
     if (params?.search) searchParams.append("search", params.search);
+    if (params?.brand_id) searchParams.append("brand_id", params.brand_id);
 
     const queryString = searchParams.toString();
     const endpoint = queryString ? `/api/blogs?${queryString}` : "/api/blogs";

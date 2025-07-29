@@ -27,6 +27,7 @@ export const useBlogs = (initialParams?: BlogListParams) => {
       initialParams?.status,
       initialParams?.category,
       initialParams?.search,
+      initialParams?.brand_id,
     ]
   );
 
@@ -78,12 +79,16 @@ export const useBlogs = (initialParams?: BlogListParams) => {
 
   // 初始化加载
   useEffect(() => {
-    fetchBlogs(stableParams);
+    if (stableParams) {
+      fetchBlogs(stableParams);
+    }
   }, [fetchBlogs, stableParams]);
 
   // 刷新数据
   const refresh = useCallback(() => {
-    fetchBlogs(stableParams);
+    if (stableParams) {
+      fetchBlogs(stableParams);
+    }
   }, [fetchBlogs, stableParams]);
 
   // 搜索
