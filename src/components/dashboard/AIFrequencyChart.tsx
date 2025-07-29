@@ -23,48 +23,65 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
     // 使用useMemo缓存数据点计算，避免每次render都重新计算
     const radarData = useMemo(() => {
       if (!data) {
-        return [];
+        // 如果没有数据，返回默认的结构以确保雷达图能显示
+        return [
+          { subject: '品牌首选率', A: 0, fullMark: 100 },
+          { subject: '品牌推荐率', A: 0, fullMark: 100 },
+          { subject: '品牌搜索率', A: 0, fullMark: 100 },
+        ];
       }
 
-      // 从真实数据中提取三个维度的平均值
-      const calculateAverageRate = (rateArray: Array<{ brand: string; rate: number }>) => {
+      // 从真实数据中提取当前品牌的数据
+      const getCurrentBrandRate = (rateArray: Array<{ brand: string; rate: number }>) => {
         if (!rateArray || rateArray.length === 0) return 0;
-        const totalRate = rateArray.reduce((sum, item) => sum + item.rate, 0);
-        return totalRate / rateArray.length;
+        
+        // 尝试找到当前品牌的数据
+        const currentBrand = rateArray.find(item => 
+          item.brand === '当前品牌' || 
+          item.brand.includes('当前') ||
+          item.brand === data?.brand_id // 如果有brand_id，也尝试匹配
+        );
+        
+        if (currentBrand) {
+          return currentBrand.rate;
+        }
+        
+        // 如果找不到当前品牌，返回第一个品牌的数据或0
+        return rateArray.length > 0 ? rateArray[0].rate : 0;
       };
 
       const metrics = [
         {
           subject: '品牌首选率',
-          data: data.brand_first_choice_rate,
+          data: data.brand_first_choice_rate || [],
         },
         {
           subject: '品牌推荐率',
-          data: data.brand_recommend_rate,
+          data: data.brand_recommend_rate || [],
         },
         {
           subject: '品牌搜索率',
-          data: data.brand_search_rate,
+          data: data.brand_search_rate || [],
         },
       ];
 
       return metrics.map(({ subject, data: rateData }) => {
-        const avgRate = calculateAverageRate(rateData);
+        const brandRate = getCurrentBrandRate(rateData);
         return {
           subject,
-          A: Math.max(0, Math.min(100, avgRate)), // 确保在0-100范围内
+          A: Math.max(0, Math.min(100, brandRate)), // 确保在0-100范围内
           fullMark: 100,
         };
-      }).filter(item => item.A > 0); // 只保留有数据的维度
+      }); // 移除过滤逻辑，即使值为0也显示
     }, [data]);
 
     // 使用useMemo缓存渲染状态判断
     const renderState = useMemo(() => {
       if (loading) return "loading";
       if (error) return "error";
-      if (radarData.length === 0) return "empty";
+      // 移除空数据检查，始终显示雷达图
       return "normal";
-    }, [loading, error, radarData.length]);
+    }, [loading, error]);
 
     return (
       <div className="bg-white rounded-2xl border border-gray-300 p-6 h-[523px]">
@@ -95,17 +112,7 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
           </div>
         )}
 
-        {/* 空数据状态 */}
-        {renderState === "empty" && (
-          <div className="flex items-center justify-center h-[400px]">
-            <div className="text-center">
-              <p className="text-gray-500 text-sm mb-2">暂无数据</p>
-              <p className="text-gray-400 text-xs">请检查数据源或稍后重试</p>
-            </div>
-          </div>
-        )}
-
-        {/* 雷达图 */}
+        {/* 雷达图 - 移除空数据状态检查 */}
         {renderState === "normal" && (
           <div className="h-[400px]">
             <ResponsiveContainer width="100%" height="100%">

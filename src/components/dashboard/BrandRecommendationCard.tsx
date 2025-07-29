@@ -13,7 +13,7 @@ interface BrandRecommendationCardProps {
 export function BrandRecommendationCard({ data, loading, error }: BrandRecommendationCardProps) {
   // 从API数据生成品牌推荐率信息
   const { brands, currentBrandData } = useMemo(() => {
-    if (!data || !data.brand_first_choice_rate || data.brand_first_choice_rate.length === 0) {
+    if (!data || !data.brand_recommend_rate || data.brand_recommend_rate.length === 0) {
       return {
         brands: [
           { name: '其它品牌1', color: '#ffb200', percentage: '20%', value: 20 },
@@ -25,8 +25,8 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
       }
     }
 
-    // 使用API返回的实际数据
-    const brandRateData = data.brand_first_choice_rate
+    // 使用API返回的实际数据 - 修正为品牌推荐率数据
+    const brandRateData = data.brand_recommend_rate
     const total = brandRateData.reduce((sum, item) => sum + item.rate, 0)
     
     // 颜色映射
@@ -167,7 +167,7 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
                             dominantBaseline="central"
                             fontSize="9"
                           >
-                            {entry.value.toFixed(1)}%
+                            {(entry.value || 0).toFixed(1)}%
                           </text>
                         </g>
                       );
@@ -195,8 +195,8 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
           {/* API数据指标 */}
           {data && (
             <div className="absolute bottom-2 left-2 text-xs text-gray-500">
-              <div>品牌数: {data.brand_first_choice_rate?.length || 0}</div>
-              <div>总评分: {data.brand_first_choice_rate?.reduce((sum, item) => sum + item.rate, 0).toFixed(1) || 0}</div>
+              <div>品牌数: {data.brand_recommend_rate?.length || 0}</div>
+              <div>总评分: {data.brand_recommend_rate?.reduce((sum, item) => sum + item.rate, 0).toFixed(1) || 0}</div>
             </div>
           )}
         </div>
