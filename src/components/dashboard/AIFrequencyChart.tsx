@@ -10,10 +10,10 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { AIVisibilityTrendResponse } from "@/services/ai-visibility";
+import { AIVisibilityStats } from "@/services/ai-visibility";
 
 interface AIFrequencyChartProps {
-  data: AIVisibilityTrendResponse | null;
+  data: AIVisibilityStats | null;
   loading: boolean;
   error: string | null;
 }
@@ -22,51 +22,49 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
   ({ data, loading, error }) => {
     // 使用useMemo缓存数据点计算，避免每次render都重新计算
     const radarData = useMemo(() => {
-      if (!data || !data.trend || data.trend.length === 0) {
-        // 如果没有数据，返回默认的5维度结构以确保雷达图能显示
+      if (!data) {
+        // 如果没有数据，返回默认的结构以确保雷达图能显示
         return [
-          { subject: '总体评分', A: 0, fullMark: 100 },
-          { subject: '频率评分', A: 0, fullMark: 100 },
-          { subject: '推荐评分', A: 0, fullMark: 100 },
-          { subject: '搜索率评分', A: 0, fullMark: 100 },
-          { subject: '首选评分', A: 0, fullMark: 100 },
+          { subject: '品牌首选率', A: 0, fullMark: 100 },
+          { subject: '品牌推荐率', A: 0, fullMark: 100 },
+          { subject: '品牌搜索率', A: 0, fullMark: 100 },
         ];
       }
 
-      // 从trend数据中获取最新的评分数据
-      const latestTrend = data.trend[data.trend.length - 1] || data.trend[0];
-      
-      // 安全转换评分数据
-      const parseScore = (score: string | undefined): number => {
-        if (!score) return 0;
-        const parsed = parseFloat(score);
-        return isNaN(parsed) ? 0 : Math.max(0, Math.min(100, parsed));
+      // 从真实的stats数据中提取当前品牌的数据
+      const getCurrentBrandRate = (rateArray: Array<{ brand: string; rate: number }>) => {
+        if (!rateArray || rateArray.length === 0) return 0;
+        
+        // 尝试找到当前品牌的数据
+        const currentBrand = rateArray.find(item => 
+          item.brand === '当前品牌' || 
+          item.brand.includes('当前') ||
+          item.brand === data.brand_id
+        );
+        
+        if (currentBrand) {
+          return currentBrand.rate;
+        }
+        
+        // 如果找不到当前品牌，返回第一个品牌的数据或0
+        return rateArray.length > 0 ? rateArray[0].rate : 0;
       };
 
+      // 基于真实的stats数据构建3个维度
       return [
         {
-          subject: '总体评分',
-          A: parseScore(latestTrend.overall_score),
+          subject: '品牌首选率',
+          A: Math.max(0, Math.min(100, getCurrentBrandRate(data.brand_first_choice_rate || []))),
           fullMark: 100,
         },
         {
-          subject: '频率评分',
-          A: parseScore(latestTrend.frequency_score),
+          subject: '品牌推荐率',
+          A: Math.max(0, Math.min(100, getCurrentBrandRate(data.brand_recommend_rate || []))),
           fullMark: 100,
         },
         {
-          subject: '推荐评分',
-          A: parseScore(latestTrend.recommendation_score),
-          fullMark: 100,
-        },
-        {
-          subject: '搜索率评分',
-          A: parseScore(latestTrend.search_rate_score),
-          fullMark: 100,
-        },
-        {
-          subject: '首选评分',
-          A: parseScore(latestTrend.first_choice_score),
+          subject: '品牌搜索率',
+          A: Math.max(0, Math.min(100, getCurrentBrandRate(data.brand_search_rate || []))),
           fullMark: 100,
         },
       ];
@@ -88,7 +86,7 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
             在AI中出现频率
           </h3>
           <p className="text-xs text-gray-600">
-            搜索关键词内容在人工智能中出现频率的五维度综合分析
+            搜索关键词内容在人工智能中出现频率的多维度分析
           </p>
         </div>
 
@@ -127,7 +125,7 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
                   axisLine={false}
                 />
                 <Radar
-                  name="品牌综合评分"
+                  name="品牌AI可见性"
                   dataKey="A"
                   stroke="#3b82f6"
                   fill="#3b82f6"
