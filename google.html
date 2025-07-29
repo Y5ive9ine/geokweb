@@ -108,7 +108,7 @@
         <h1>Google 登录</h1>
         <div class="info">
             <p><strong>前端服务:</strong> http://localhost:8082 (Python HTTP Server)</p>
-            <p><strong>API端点:</strong> http://localhost:8012/api/v1/auth/login</p>
+            <p><strong>API端点:</strong> http://47.99.189.222:8012/api/v1/auth/login</p>
             <p><strong>客户端ID:</strong> 837367551114-old3ir22j8ajdn9ej2jsphsm7ndfaqqr.apps.googleusercontent.com</p>
             <p>使用Google OAuth 2.0授权码流程进行安全登录</p>
         </div>
@@ -133,7 +133,9 @@
 
     <script>
         const CLIENT_ID = '837367551114-old3ir22j8ajdn9ej2jsphsm7ndfaqqr.apps.googleusercontent.com';
-        const API_BASE_URL = 'http://localhost:8012/api/v1/auth';
+        const API_BASE_URL = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_API_URL) 
+          ? process.env.NEXT_PUBLIC_API_URL + '/auth' 
+          : 'http://47.99.189.222:8012/api/v1/auth';
 
 
 

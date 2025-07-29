@@ -102,6 +102,8 @@ export interface BrandFirstChoiceRate {
 export interface AIVisibilityStats {
   brand_id: string;
   brand_first_choice_rate: BrandFirstChoiceRate[];
+  brand_recommend_rate: BrandFirstChoiceRate[];
+  brand_search_rate: BrandFirstChoiceRate[];
   total_metrics?: number;
   average_score?: string;
   timestamp?: string;
