@@ -3,7 +3,13 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { referencesApi, ReferencesListParams, Reference, ReferencesResponse, TopReferencesParams } from "@/services/references";
+import {
+  referencesApi,
+  ReferencesListParams,
+  Reference,
+  ReferencesResponse,
+  TopReferencesParams,
+} from "@/services/references";
 
 // 引用列表Hook
 export const useReferences = (initialParams?: ReferencesListParams) => {
@@ -20,11 +26,7 @@ export const useReferences = (initialParams?: ReferencesListParams) => {
   // 使用useMemo来稳定initialParams引用
   const stableParams = useMemo(
     () => initialParams,
-    [
-      initialParams?.page,
-      initialParams?.page_size,
-      initialParams?.category,
-    ]
+    [initialParams?.page, initialParams?.page_size, initialParams?.category]
   );
 
   const fetchReferences = useCallback(async (params?: ReferencesListParams) => {
@@ -33,16 +35,20 @@ export const useReferences = (initialParams?: ReferencesListParams) => {
 
     try {
       const response = await referencesApi.getReferences(params);
-      
+
       if (response.success && response.data) {
-        const references = Array.isArray(response.data.references) ? response.data.references : [];
+        const references = Array.isArray(response.data.references)
+          ? response.data.references
+          : [];
         setReferences(references);
-        
+
         if (response.data.pagination) {
           setPagination(response.data.pagination);
         }
       } else {
-        setError(response.error || response.message || "Failed to fetch references");
+        setError(
+          response.error || response.message || "Failed to fetch references"
+        );
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -85,32 +91,51 @@ export const useReferences = (initialParams?: ReferencesListParams) => {
 };
 
 // 品牌引用Hook
-export const useBrandReferences = (brandId: string, category?: string) => {
+export const useBrandReferences = (brandId: string, days: number = 7) => {
   const [references, setReferences] = useState<Reference[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchBrandReferences = useCallback(async () => {
     if (!brandId) return;
-    
+
     setLoading(true);
     setError(null);
 
     try {
-      const response = await referencesApi.getBrandReferences(brandId, category);
-      
+      const response = await referencesApi.getBrandReferences(brandId, days);
+
       if (response.success && response.data) {
-        const references = Array.isArray(response.data.references) ? response.data.references : [];
+        const references = Array.isArray(response.data.references)
+          ? response.data.references
+          : [];
         setReferences(references);
       } else {
-        setError(response.error || response.message || "Failed to fetch brand references");
+        // 检查是否是认证错误，如果是则不设置错误状态，只是保持空数据
+        const errorMessage =
+          typeof response.error === "string"
+            ? response.error
+            : typeof response.message === "string"
+            ? response.message
+            : "Failed to fetch brand references";
+
+        // 如果是认证相关错误，不显示错误信息，只显示空状态
+        if (
+          errorMessage.includes("not logged in") ||
+          errorMessage.includes("unauthorized")
+        ) {
+          setReferences([]);
+          setError(null);
+        } else {
+          setError(errorMessage);
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
     }
-  }, [brandId, category]);
+  }, [brandId, days]);
 
   useEffect(() => {
     if (brandId) {
@@ -137,11 +162,13 @@ export const useReference = (referenceId?: string) => {
 
     try {
       const response = await referencesApi.getReference(id);
-      
+
       if (response.success && response.data) {
         setReference(response.data);
       } else {
-        setError(response.error || response.message || "Failed to fetch reference");
+        setError(
+          response.error || response.message || "Failed to fetch reference"
+        );
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -156,13 +183,17 @@ export const useReference = (referenceId?: string) => {
 
     try {
       const response = await referencesApi.deleteReference(id);
-      
+
       if (response.success) {
         setReference(null);
         return true;
       } else {
-        setError(response.error || response.message || "Failed to delete reference");
-        throw new Error(response.error || response.message || "Failed to delete reference");
+        setError(
+          response.error || response.message || "Failed to delete reference"
+        );
+        throw new Error(
+          response.error || response.message || "Failed to delete reference"
+        );
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -199,12 +230,16 @@ export const useTopReferences = (limit?: number) => {
 
     try {
       const response = await referencesApi.getTopReferences({ limit });
-      
+
       if (response.success && response.data) {
-        const references = Array.isArray(response.data.references) ? response.data.references : [];
+        const references = Array.isArray(response.data.references)
+          ? response.data.references
+          : [];
         setReferences(references);
       } else {
-        setError(response.error || response.message || "Failed to fetch top references");
+        setError(
+          response.error || response.message || "Failed to fetch top references"
+        );
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -232,18 +267,24 @@ export const useReferencesByDomain = (domain: string) => {
 
   const fetchReferencesByDomain = useCallback(async () => {
     if (!domain) return;
-    
+
     setLoading(true);
     setError(null);
 
     try {
       const response = await referencesApi.getReferencesByDomain(domain);
-      
+
       if (response.success && response.data) {
-        const references = Array.isArray(response.data.references) ? response.data.references : [];
+        const references = Array.isArray(response.data.references)
+          ? response.data.references
+          : [];
         setReferences(references);
       } else {
-        setError(response.error || response.message || "Failed to fetch references by domain");
+        setError(
+          response.error ||
+            response.message ||
+            "Failed to fetch references by domain"
+        );
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -278,12 +319,13 @@ export const useExtractReferences = () => {
 
     try {
       const response = await referencesApi.extractReferences(responseId);
-      
+
       if (response.success && response.data) {
         setResult(response.data);
         return response.data;
       } else {
-        const errorMsg = response.error || response.message || "Failed to extract references";
+        const errorMsg =
+          response.error || response.message || "Failed to extract references";
         setError(errorMsg);
         throw new Error(errorMsg);
       }
@@ -321,4 +363,4 @@ export const useBatchDeleteReferences = () => {
   }, []);
 
   return { batchDelete, loading, error };
-}; 
+};

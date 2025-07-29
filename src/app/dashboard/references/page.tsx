@@ -1,90 +1,94 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import { Sidebar } from '@/components/dashboard/Sidebar'
-import { TopNavigation } from '@/components/dashboard/TopNavigation'
-import { useSidebarState } from '@/hooks/useSidebarState'
-import { 
-  DownloadIcon, 
+import React, { useState, useEffect } from "react";
+import { Sidebar } from "@/components/dashboard/Sidebar";
+import { TopNavigation } from "@/components/dashboard/TopNavigation";
+import { useSidebarState } from "@/hooks/useSidebarState";
+import { useBrandReferences } from "@/hooks/useReferences";
+import { authUtils } from "@/services/auth";
+import { referencesUtils } from "@/services/references";
+import {
+  DownloadIcon,
   ChevronDownIcon,
-  ExternalLinkIcon
-} from 'lucide-react'
-import Image from 'next/image'
+  ExternalLinkIcon,
+  LoaderIcon,
+} from "lucide-react";
+import Image from "next/image";
 
 export default function ReferencesPage() {
-  const [activeTab, setActiveTab] = useState('references')
+  const [activeTab, setActiveTab] = useState("references");
+  const [currentBrandId, setCurrentBrandId] = useState<string>("");
+  const [days, setDays] = useState(7);
+
   const {
     sidebarCollapsed,
     mobileSidebarOpen,
     toggleSidebar,
     toggleMobileSidebar,
-    setMobileSidebarOpen
-  } = useSidebarState()
+    setMobileSidebarOpen,
+  } = useSidebarState();
 
-  const referencesData = [
-    {
-      id: 1,
-      rank: 1,
-      domain: 'http://deeplumen.cn/?p=79337',
-      platform: 'sohu',
-      category: 'Earned',
-      count: 5300,
-      countChange: -507,
-      share: 6,
-      shareChange: 0.2
-    },
-    {
-      id: 2,
-      rank: 2,
-      domain: 'http://deeplumen.cn/?p=65',
-      platform: 'sohu',
-      category: 'Earned',
-      count: 4800,
-      countChange: 304,
-      share: 5.4,
-      shareChange: -1
-    },
-    {
-      id: 3,
-      rank: 3,
-      domain: 'https://weibo.com/',
-      platform: 'weibo',
-      category: 'Earned',
-      count: 5300,
-      countChange: -507,
-      share: 6,
-      shareChange: 0.2
-    },
-    {
-      id: 4,
-      rank: 4,
-      domain: 'https://www.toutiao.com/',
-      platform: 'toutiao',
-      category: 'Earned',
-      count: 4800,
-      countChange: 304,
-      share: 5.4,
-      shareChange: 1
-    },
-    {
-      id: 5,
-      rank: 5,
-      domain: 'https://www.smzdm.com/',
-      platform: 'smzdm',
-      category: 'Earned',
-      count: 4800,
-      countChange: 304,
-      share: 5.4,
-      shareChange: 1
+  // 获取品牌ID
+  useEffect(() => {
+    const userInfo = authUtils.getUserInfo();
+    if (userInfo?.brand_id) {
+      setCurrentBrandId(userInfo.brand_id);
+    } else {
+      // 使用默认品牌ID
+      setCurrentBrandId("4fc86ecb-8e0e-476b-8826-bf4dc95fce0d");
     }
-  ]
+  }, []);
 
-  const platformIcons: Record<string, string> = {
-    sohu: '/images/sohu-icon.svg',
-    weibo: '/images/weibo-icon.svg',
-    toutiao: '/images/toutiao-icon.svg',
-    smzdm: '/images/smzdm-icon.svg'
-  }
+  // 使用真实的API获取品牌引用数据
+  const { references, loading, error, refresh } = useBrandReferences(
+    currentBrandId,
+    days
+  );
+
+  // 处理平台图标显示
+  const getPlatformIcon = (domain: string) => {
+    const lowerDomain = domain.toLowerCase();
+    if (lowerDomain.includes("weibo")) return "weibo";
+    if (lowerDomain.includes("toutiao")) return "toutiao";
+    if (lowerDomain.includes("smzdm")) return "smzdm";
+    if (lowerDomain.includes("sohu")) return "sohu";
+    return "other";
+  };
+
+  // 格式化引用数据以匹配UI需求
+  const formatReferencesData = () => {
+    if (!references || !Array.isArray(references) || references.length === 0)
+      return [];
+
+    return references
+      .map((ref, index) => {
+        // 确保ref是一个对象而不是错误响应
+        if (!ref || typeof ref !== "object") {
+          console.warn("Invalid reference data:", ref);
+          return null;
+        }
+
+        return {
+          id: String(ref.id || `ref-${index}`),
+          rank: index + 1,
+          domain: String(ref.url || ref.domain || ""),
+          platform: getPlatformIcon(String(ref.domain || ref.url || "")),
+          category: referencesUtils.formatSourceType(
+            String(ref.source_type || "other")
+          ),
+          count: Math.floor(Math.random() * 5000) + 1000, // 临时数据，等待后端提供
+          countChange: Math.floor(Math.random() * 1000) - 500,
+          share: Math.floor(Math.random() * 10) + 1,
+          shareChange: Math.floor(Math.random() * 4) - 2,
+          title: String(ref.title || ""),
+          description: String(ref.description || ""),
+          relevanceScore: Number(ref.relevance_score || 0),
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null); // 类型安全的过滤
+  };
+
+  const referencesData = formatReferencesData();
 
   return (
     <div className="min-h-screen bg-gray-50 font-['PingFang_SC'] relative">
@@ -131,6 +135,7 @@ export default function ReferencesPage() {
                     <button className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium">
                       查询
                     </button>
+
                     <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center space-x-2">
                       <DownloadIcon className="w-5 h-5" />
                       <span>下载/导出</span>
@@ -141,7 +146,7 @@ export default function ReferencesPage() {
                 {/* 筛选选项 */}
                 <div className="flex items-center space-x-4 mt-4">
                   <div className="flex items-center space-x-2 bg-white border border-gray-300 rounded px-4 py-2">
-                    <span className="text-gray-700">最近7日</span>
+                    <span className="text-gray-700">最近{days}日</span>
                     <ChevronDownIcon className="w-4 h-4 text-gray-500" />
                   </div>
                   <span className="text-gray-500">VS</span>
@@ -193,77 +198,145 @@ export default function ReferencesPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {referencesData.map((item) => (
-                      <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
-                        <td className="px-6 py-4 text-gray-900">{item.rank}.</td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center space-x-2">
-                            {/* 平台图标 */}
-                            {item.platform === 'weibo' && (
-                              <div className="w-7 h-7 bg-red-500 rounded flex items-center justify-center">
-                                <span className="text-white text-xs font-bold">微</span>
-                              </div>
-                            )}
-                            {item.platform === 'toutiao' && (
-                              <div className="w-7 h-7 rounded overflow-hidden">
-                                <div className="w-full h-full bg-red-600 flex items-center justify-center">
-                                  <span className="text-white text-xs font-bold">头</span>
-                                </div>
-                              </div>
-                            )}
-                            {item.platform === 'smzdm' && (
-                              <div className="w-7 h-7 bg-red-600 rounded flex items-center justify-center">
-                                <span className="text-white text-xs font-bold">值</span>
-                              </div>
-                            )}
-                            {item.platform === 'sohu' && (
-                              <div className="w-7 h-7 bg-orange-500 rounded flex items-center justify-center">
-                                <span className="text-white text-xs font-bold">搜</span>
-                              </div>
-                            )}
-                            <a 
-                              href={item.domain} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-gray-700 hover:text-blue-600 flex items-center space-x-1"
-                            >
-                              <span className="text-sm">{item.domain}</span>
-                              <ExternalLinkIcon className="w-3 h-3" />
-                            </a>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center">
-                              <svg className="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                              </svg>
-                            </div>
-                            <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg text-xs font-medium">
-                              {item.category}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-gray-900">
-                              {item.count >= 1000 ? `${(item.count / 1000).toFixed(1)}k` : item.count}
-                            </span>
-                            <span className={`text-sm ${item.countChange > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {item.countChange > 0 ? '+' : ''}{item.countChange}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-gray-900">{item.share}%</span>
-                            <span className={`text-sm ${item.shareChange > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {item.shareChange > 0 ? '+' : ''}{item.shareChange}%
-                            </span>
+                    {loading ? (
+                      <tr>
+                        <td colSpan={5} className="px-6 py-12 text-center">
+                          <div className="flex items-center justify-center space-x-2">
+                            <LoaderIcon className="w-5 h-5 animate-spin text-blue-600" />
+                            <span className="text-gray-600">加载中...</span>
                           </div>
                         </td>
                       </tr>
-                    ))}
+                    ) : error || referencesData.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={5}
+                          className="px-6 py-12 text-center text-gray-500"
+                        >
+                          暂无引用数据
+                        </td>
+                      </tr>
+                    ) : (
+                      referencesData.map((item) => (
+                        <tr
+                          key={item.id}
+                          className="border-b border-gray-100 hover:bg-gray-50"
+                        >
+                          <td className="px-6 py-4 text-gray-900">
+                            {item.rank}.
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center space-x-2">
+                              {/* 平台图标 */}
+                              {item.platform === "weibo" && (
+                                <div className="w-7 h-7 bg-red-500 rounded flex items-center justify-center">
+                                  <span className="text-white text-xs font-bold">
+                                    微
+                                  </span>
+                                </div>
+                              )}
+                              {item.platform === "toutiao" && (
+                                <div className="w-7 h-7 rounded overflow-hidden">
+                                  <div className="w-full h-full bg-red-600 flex items-center justify-center">
+                                    <span className="text-white text-xs font-bold">
+                                      头
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+                              {item.platform === "smzdm" && (
+                                <div className="w-7 h-7 bg-red-600 rounded flex items-center justify-center">
+                                  <span className="text-white text-xs font-bold">
+                                    值
+                                  </span>
+                                </div>
+                              )}
+                              {item.platform === "sohu" && (
+                                <div className="w-7 h-7 bg-orange-500 rounded flex items-center justify-center">
+                                  <span className="text-white text-xs font-bold">
+                                    搜
+                                  </span>
+                                </div>
+                              )}
+                              {item.platform === "other" && (
+                                <div className="w-7 h-7 bg-gray-500 rounded flex items-center justify-center">
+                                  <span className="text-white text-xs font-bold">
+                                    其
+                                  </span>
+                                </div>
+                              )}
+                              <a
+                                href={item.domain}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-gray-700 hover:text-blue-600 flex items-center space-x-1"
+                              >
+                                <span className="text-sm">{item.domain}</span>
+                                <ExternalLinkIcon className="w-3 h-3" />
+                              </a>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center space-x-2">
+                              <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center">
+                                <svg
+                                  className="w-3 h-3 text-blue-600"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                              </div>
+                              <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg text-xs font-medium">
+                                {item.category}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-gray-900">
+                                {item.count >= 1000
+                                  ? `${(item.count / 1000).toFixed(1)}k`
+                                  : item.count}
+                              </span>
+                              <span
+                                className={`text-sm ${
+                                  item.countChange > 0
+                                    ? "text-green-600"
+                                    : "text-red-600"
+                                }`}
+                              >
+                                {item.countChange > 0 ? "+" : ""}
+                                {item.countChange}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-gray-900">
+                                {item.share}%
+                              </span>
+                              <span
+                                className={`text-sm ${
+                                  item.shareChange > 0
+                                    ? "text-green-600"
+                                    : "text-red-600"
+                                }`}
+                              >
+                                {item.shareChange > 0 ? "+" : ""}
+                                {item.shareChange}%
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -272,5 +345,5 @@ export default function ReferencesPage() {
         </div>
       </div>
     </div>
-  )
-} 
+  );
+}

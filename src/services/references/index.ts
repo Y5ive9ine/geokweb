@@ -61,15 +61,15 @@ export const referencesApi = {
    * 获取品牌引用
    * GET /brands/{id}/references
    */
-  getBrandReferences: (brandId: string, category?: string) => {
+  getBrandReferences: (brandId: string, days: number = 7) => {
     const searchParams = new URLSearchParams();
-    if (category) searchParams.append("category", category);
-    
+    if (days) searchParams.append("days", String(days));
+
     const queryString = searchParams.toString();
-    const endpoint = queryString 
+    const endpoint = queryString
       ? `/api/brands/${brandId}/references?${queryString}`
       : `/api/brands/${brandId}/references`;
-    
+
     return api.get<ReferencesResponse>(endpoint);
   },
 
@@ -79,13 +79,16 @@ export const referencesApi = {
    */
   getReferences: (params?: ReferencesListParams) => {
     const searchParams = new URLSearchParams();
-    
+
     if (params?.page) searchParams.append("page", params.page.toString());
-    if (params?.page_size) searchParams.append("page_size", params.page_size.toString());
-    
+    if (params?.page_size)
+      searchParams.append("page_size", params.page_size.toString());
+
     const queryString = searchParams.toString();
-    const endpoint = queryString ? `/api/references?${queryString}` : "/api/references";
-    
+    const endpoint = queryString
+      ? `/api/references?${queryString}`
+      : "/api/references";
+
     return api.get<ReferencesResponse>(endpoint);
   },
 
@@ -112,12 +115,12 @@ export const referencesApi = {
   getTopReferences: (params?: TopReferencesParams) => {
     const searchParams = new URLSearchParams();
     if (params?.limit) searchParams.append("limit", params.limit.toString());
-    
+
     const queryString = searchParams.toString();
-    const endpoint = queryString 
-      ? `/api/references/top?${queryString}` 
+    const endpoint = queryString
+      ? `/api/references/top?${queryString}`
       : "/api/references/top";
-    
+
     return api.get<ReferencesResponse>(endpoint);
   },
 
@@ -134,14 +137,19 @@ export const referencesApi = {
    * POST /references/extract/{responseId}
    */
   extractReferences: (responseId: string) => {
-    return api.post<ExtractReferencesResponse>(`/api/references/extract/${responseId}`);
+    return api.post<ExtractReferencesResponse>(
+      `/api/references/extract/${responseId}`
+    );
   },
 
   /**
    * 按分类获取引用
    * 便捷方法，基于getReferences实现
    */
-  getReferencesByCategory: (category: string, params?: Omit<ReferencesListParams, 'category'>) => {
+  getReferencesByCategory: (
+    category: string,
+    params?: Omit<ReferencesListParams, "category">
+  ) => {
     return referencesApi.getReferences({ ...params, category });
   },
 
@@ -150,7 +158,7 @@ export const referencesApi = {
    * 便捷方法
    */
   batchDeleteReferences: async (ids: string[]) => {
-    const promises = ids.map(id => referencesApi.deleteReference(id));
+    const promises = ids.map((id) => referencesApi.deleteReference(id));
     return Promise.all(promises);
   },
 };
@@ -171,14 +179,18 @@ export const referencesUtils = {
 
   // 格式化来源类型
   formatSourceType: (sourceType: string): string => {
-    return referencesUtils.SOURCE_TYPES[sourceType as keyof typeof referencesUtils.SOURCE_TYPES] || sourceType;
+    return (
+      referencesUtils.SOURCE_TYPES[
+        sourceType as keyof typeof referencesUtils.SOURCE_TYPES
+      ] || sourceType
+    );
   },
 
   // 提取域名
   extractDomain: (url: string): string => {
     try {
       const urlObj = new URL(url);
-      return urlObj.hostname.replace('www.', '');
+      return urlObj.hostname.replace("www.", "");
     } catch {
       return "未知域名";
     }
@@ -205,7 +217,8 @@ export const referencesUtils = {
     if (reference.title && reference.title.length >= 10) score += 20;
 
     // 描述完整性
-    if (reference.description && reference.description.length >= 30) score += 20;
+    if (reference.description && reference.description.length >= 30)
+      score += 20;
 
     // 相关性分数
     if (reference.relevance_score) {
@@ -220,17 +233,24 @@ export const referencesUtils = {
   },
 
   // 引用排序
-  sortReferences: (references: Reference[], sortBy: 'date' | 'relevance' | 'position' = 'date'): Reference[] => {
+  sortReferences: (
+    references: Reference[],
+    sortBy: "date" | "relevance" | "position" = "date"
+  ): Reference[] => {
     const sorted = [...references];
-    
+
     switch (sortBy) {
-      case 'date':
-        return sorted.sort((a, b) => 
-          new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+      case "date":
+        return sorted.sort(
+          (a, b) =>
+            new Date(b.created_at || 0).getTime() -
+            new Date(a.created_at || 0).getTime()
         );
-      case 'relevance':
-        return sorted.sort((a, b) => (b.relevance_score || 0) - (a.relevance_score || 0));
-      case 'position':
+      case "relevance":
+        return sorted.sort(
+          (a, b) => (b.relevance_score || 0) - (a.relevance_score || 0)
+        );
+      case "position":
         return sorted.sort((a, b) => (a.position || 999) - (b.position || 999));
       default:
         return sorted;
@@ -238,22 +258,26 @@ export const referencesUtils = {
   },
 
   // 按域名分组引用
-  groupReferencesByDomain: (references: Reference[]): Record<string, Reference[]> => {
+  groupReferencesByDomain: (
+    references: Reference[]
+  ): Record<string, Reference[]> => {
     const grouped: Record<string, Reference[]> = {};
-    
-    references.forEach(ref => {
-      const domain = ref.domain || referencesUtils.extractDomain(ref.url || '');
+
+    references.forEach((ref) => {
+      const domain = ref.domain || referencesUtils.extractDomain(ref.url || "");
       if (!grouped[domain]) {
         grouped[domain] = [];
       }
       grouped[domain].push(ref);
     });
-    
+
     return grouped;
   },
 
   // 获取引用统计信息
-  getReferencesStats: (references: Reference[]): {
+  getReferencesStats: (
+    references: Reference[]
+  ): {
     total: number;
     byDomain: Record<string, number>;
     bySourceType: Record<string, number>;
@@ -270,14 +294,15 @@ export const referencesUtils = {
 
     let totalRelevance = 0;
 
-    references.forEach(ref => {
+    references.forEach((ref) => {
       // 域名统计
-      const domain = ref.domain || referencesUtils.extractDomain(ref.url || '');
+      const domain = ref.domain || referencesUtils.extractDomain(ref.url || "");
       stats.byDomain[domain] = (stats.byDomain[domain] || 0) + 1;
 
       // 来源类型统计
       if (ref.source_type) {
-        stats.bySourceType[ref.source_type] = (stats.bySourceType[ref.source_type] || 0) + 1;
+        stats.bySourceType[ref.source_type] =
+          (stats.bySourceType[ref.source_type] || 0) + 1;
       }
 
       // 相关性统计
@@ -303,36 +328,36 @@ export const referencesUtils = {
   // 生成引用摘要
   generateReferenceSummary: (reference: Reference): string => {
     const parts = [];
-    
+
     if (reference.title) {
       parts.push(reference.title);
     }
-    
+
     if (reference.domain) {
       parts.push(`来源: ${reference.domain}`);
     }
-    
+
     if (reference.relevance_score) {
       parts.push(`相关性: ${(reference.relevance_score * 100).toFixed(0)}%`);
     }
-    
-    return parts.join(' | ');
+
+    return parts.join(" | ");
   },
 
   // 检查是否为可信域名
   isTrustedDomain: (domain: string): boolean => {
     const trustedDomains = [
-      'wikipedia.org',
-      'baidu.com',
-      'zhihu.com',
-      'weibo.com',
-      'gov.cn',
-      'edu.cn',
-      'org.cn',
+      "wikipedia.org",
+      "baidu.com",
+      "zhihu.com",
+      "weibo.com",
+      "gov.cn",
+      "edu.cn",
+      "org.cn",
     ];
-    
-    return trustedDomains.some(trusted => domain.endsWith(trusted));
+
+    return trustedDomains.some((trusted) => domain.endsWith(trusted));
   },
 };
 
-export default referencesApi; 
+export default referencesApi;
