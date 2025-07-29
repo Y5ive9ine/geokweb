@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { authApi, authUtils } from "@/services/auth";
+import { brandApi } from "@/services/brand";
 
 interface SettingsContentProps {
   activeTab?: string;
@@ -51,6 +52,13 @@ export function SettingsContent({
     confirm_password: "",
   });
 
+  // 品牌设置相关状态
+  const [currentBrand, setCurrentBrand] = useState<any>(null);
+  const [availableBrands, setAvailableBrands] = useState<any[]>([]);
+  const [brandLoading, setBrandLoading] = useState(false);
+  const [brandPage, setBrandPage] = useState(1);
+  const [brandMeta, setBrandMeta] = useState<any>(null);
+
   const [editUserData, setEditUserData] = useState({
     username: "cosme",
     role: "订阅者",
@@ -66,15 +74,7 @@ export function SettingsContent({
     confirmPassword: "1427677523777773",
   });
 
-  const mainTabs = [
-    "账户设置",
-    "订阅信息",
-    "用户管理",
-    "通知",
-    "日志",
-    "授权插件",
-  ];
-  const accountSubTabs = ["账户信息", "电子邮件", "密码"];
+  const accountSubTabs = ["账户信息", "电子邮件", "密码", "品牌设置"];
 
   // 当activeTab变化时，重置子标签
   useEffect(() => {
@@ -234,6 +234,130 @@ export function SettingsContent({
       setLoading(false);
     }
   };
+  const [currentBrandId, setCurrentBrandId] = useState("");
+
+  // 获取当前品牌信息
+  const fetchCurrentBrand = async () => {
+    console.log("开始获取当前品牌...");
+    setBrandLoading(true);
+    try {
+      const response = await authApi.getCurrentBrand();
+      console.log("当前品牌API响应:", response);
+
+      if (response.success && response.data) {
+        // getCurrentBrand 返回的是 brand_id，需要从品牌列表中找到对应的品牌信息
+        const currentBrandId = response.data.brand_id || response.data;
+        console.log("当前品牌ID:", currentBrandId);
+        setCurrentBrandId(currentBrandId);
+        // 从已获取的品牌列表中找到当前品牌
+      } else {
+        console.error("获取当前品牌失败:", response);
+      }
+    } catch (error) {
+      console.error("获取当前品牌异常:", error);
+    } finally {
+      setBrandLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    UpdateBrandData(currentBrandId, availableBrands);
+  }, [currentBrandId, availableBrands]);
+
+  const UpdateBrandData = (currentBrandId: string, availableBrands: any[]) => {
+    if (currentBrandId && availableBrands.length > 0) {
+      const currentBrandInfo = availableBrands.find(
+        (brand) => brand.id === currentBrandId
+      );
+      console.log(availableBrands, currentBrandInfo, "availableBrands");
+      if (currentBrandInfo) {
+        setCurrentBrand(currentBrandInfo);
+        console.log("设置当前品牌信息:", currentBrandInfo);
+      }
+    }
+  };
+
+  // 获取可用品牌列表
+  const fetchAvailableBrands = async (page: number = 1) => {
+    console.log(`开始获取品牌列表，第${page}页...`);
+
+    // 检查认证状态
+    const token = authUtils.getToken();
+    console.log("认证token存在:", !!token);
+    console.log("用户信息:", authUtils.getUserInfo());
+
+    try {
+      const response = await brandApi.list({
+        page: page,
+        page_size: 3, // 每页显示3个品牌
+      });
+      if (response.success && response.data) {
+        let brands: any[] = [];
+        let meta: any = null;
+
+        // 检查数据结构
+        if (Array.isArray(response.data)) {
+          // 如果data直接是数组
+          brands = response.data;
+          console.log("数据结构：data直接是数组");
+        } else if (response.data.data && Array.isArray(response.data.data)) {
+          // 如果data是对象，包含data和meta字段
+          brands = response.data.data;
+          meta = response.data.meta;
+          console.log("数据结构：data包含data和meta字段");
+        } else {
+          console.log("未知的数据结构:", response.data);
+        }
+
+        setAvailableBrands(brands);
+
+        // 保存分页信息
+        if (meta) {
+          setBrandMeta(meta);
+        }
+        setBrandPage(page);
+      } else {
+        if (page === 1) {
+          setAvailableBrands([]);
+        }
+      }
+    } catch (error) {
+      console.error("获取品牌列表异常:", error);
+      if (page === 1) {
+        setAvailableBrands([]);
+      }
+    }
+  };
+
+  // 更新当前品牌
+  const updateCurrentBrand = useCallback(
+    async (brandId: string) => {
+      setBrandLoading(true);
+      try {
+        const response = await authApi.updateCurrentBrand({
+          brand_id: brandId,
+        });
+        if (response.success) {
+          showMessage("品牌设置更新成功", "success");
+          UpdateBrandData(brandId, availableBrands);
+          // 更新localStorage中的用户信息
+          const userInfo = authUtils.getUserInfo();
+          if (userInfo) {
+            userInfo.brand_id = brandId;
+            authUtils.setUserInfo(userInfo);
+          }
+        } else {
+          showMessage(response.error || "品牌设置更新失败", "error");
+        }
+      } catch (error) {
+        console.error("Update current brand error:", error);
+        showMessage("品牌设置更新失败", "error");
+      } finally {
+        setBrandLoading(false);
+      }
+    },
+    [availableBrands, showMessage]
+  );
 
   // 初始化用户数据
   const initializeUserData = () => {
@@ -265,6 +389,14 @@ export function SettingsContent({
     console.log("Settings page mounted, initializing...");
     initializeUserData(); // 先加载localStorage中的数据
     fetchUserInfo(); // 然后从API获取最新数据
+
+    // 先获取品牌列表，再获取当前品牌，这样可以立即进行匹配
+    const loadBrandData = async () => {
+      await fetchAvailableBrands(1); // 先获取第一页品牌列表
+      await fetchCurrentBrand(); // 再获取当前品牌信息
+    };
+
+    loadBrandData();
   }, []);
 
   // 当前显示的选项卡，默认为账户设置
@@ -602,6 +734,142 @@ export function SettingsContent({
                       className="bg-gray-100 text-gray-600 px-6 py-3 rounded-lg text-base font-medium hover:bg-gray-200 transition-colors"
                     >
                       取消
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 品牌设置标签页 */}
+            {activeSubTab === "品牌设置" && (
+              <div className="bg-white rounded-lg p-6 md:p-8 border border-gray-200 max-w-2xl">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-gray-800 text-xl font-bold mb-4">
+                      品牌设置
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-6">
+                      选择您当前使用的品牌，这将影响您在系统中看到的数据和分析结果。
+                    </p>
+                  </div>
+
+                  {/* 当前品牌显示 */}
+                  {currentBrand && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="text-blue-800 font-medium">
+                            当前品牌
+                          </h4>
+                          <p className="text-blue-600 text-sm mt-1">
+                            {currentBrand?.name || "未知品牌"} (
+                            {currentBrand?.domain || "无域名"})
+                          </p>
+                        </div>
+                        <div className="text-blue-500">
+                          <svg
+                            className="w-6 h-6"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 品牌选择 */}
+                  <div>
+                    <label className="block text-gray-800 text-base font-medium mb-2">
+                      选择品牌
+                    </label>
+                    {brandLoading ? (
+                      <div className="flex items-center justify-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        <span className="ml-2 text-gray-600">加载中...</span>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {(() => {
+                          // 过滤掉当前品牌，避免重复显示
+                          const otherBrands = availableBrands.filter(
+                            (brand) => brand.id !== currentBrand?.brand_id
+                          );
+
+                          if (otherBrands.length > 0) {
+                            return otherBrands.map((brand) => (
+                              <div
+                                key={brand.id}
+                                className="border rounded-lg p-4 cursor-pointer transition-colors border-gray-200 hover:border-gray-300"
+                                onClick={() => updateCurrentBrand(brand.id)}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <h4 className="font-medium text-gray-800">
+                                      {brand.name}
+                                    </h4>
+                                    <p className="text-sm text-gray-600">
+                                      {brand.domain}
+                                    </p>
+                                    {brand.description && (
+                                      <p className="text-xs text-gray-500 mt-1">
+                                        {brand.description}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <div className="w-4 h-4 rounded-full border-2 border-gray-300"></div>
+                                </div>
+                              </div>
+                            ));
+                          } else {
+                            return (
+                              <div className="text-center py-8 text-gray-500">
+                                <p>暂无其他可用品牌</p>
+                                <p className="text-sm mt-1">
+                                  请先创建更多品牌后再进行切换
+                                </p>
+                              </div>
+                            );
+                          }
+                        })()}
+
+                        {/* 加载更多按钮 */}
+                        {brandMeta && brandPage < brandMeta.total_pages && (
+                          <div className="text-center pt-4">
+                            <button
+                              onClick={() =>
+                                fetchAvailableBrands(brandPage + 1)
+                              }
+                              disabled={brandLoading}
+                              className="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors disabled:opacity-50"
+                            >
+                              {brandLoading ? "加载中..." : "加载更多品牌"}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 刷新按钮 */}
+                  <div className="flex justify-end pt-4">
+                    <button
+                      onClick={() => {
+                        // 重置分页状态并刷新
+                        setBrandPage(1);
+                        setBrandMeta(null);
+                        fetchCurrentBrand();
+                        fetchAvailableBrands(1);
+                      }}
+                      disabled={brandLoading}
+                      className="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors disabled:opacity-50"
+                    >
+                      {brandLoading ? "刷新中..." : "刷新品牌列表"}
                     </button>
                   </div>
                 </div>

@@ -159,5 +159,4 @@ export const api = {
   ) => apiRequest<T>(endpoint, { ...config, method: "PATCH", body }),
 };
 
-export { api };
 export default api;
