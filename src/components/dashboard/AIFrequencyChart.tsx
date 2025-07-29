@@ -31,29 +31,40 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
         return [];
       }
 
-      // 从API数据计算最近的可见性分数
-      const recentData = data.trend.slice(-6); // 取最近6个数据点
-      const labels = ["价格", "质量", "性能", "性价比", "品牌"];
+      // 从实际数据中提取可用的分数维度
+      const scoreMetrics = [
+        { key: 'overall_score', label: '总体分数' },
+        { key: 'frequency_score', label: '频率分数' },
+        { key: 'recommendation_score', label: '推荐分数' },
+        { key: 'search_rate_score', label: '搜索率分数' },
+        { key: 'first_choice_score', label: '首选分数' },
+      ];
 
-      return labels.map((label, index) => {
-        const metricData = recentData[index];
-        const score = metricData?.overall_score
-          ? parseFloat(metricData.overall_score)
+      // 计算每个维度的平均分数
+      return scoreMetrics.map(({ key, label }) => {
+        const scores = data.trend
+          .map(item => parseFloat(item[key as keyof typeof item] as string || '0'))
+          .filter(score => !isNaN(score));
+        
+        const avgScore = scores.length > 0 
+          ? scores.reduce((sum, score) => sum + score, 0) / scores.length 
           : 0;
+        
         return {
           subject: label,
-          A: Math.max(0, Math.min(100, score)), // 确保在0-100范围内
+          A: Math.max(0, Math.min(100, avgScore)), // 确保在0-100范围内
           fullMark: 100,
         };
-      });
+      }).filter(item => item.A > 0); // 只保留有数据的维度
     }, [data]);
 
     // 使用useMemo缓存渲染状态判断
     const renderState = useMemo(() => {
       if (loading) return "loading";
       if (error) return "error";
+      if (radarData.length === 0) return "empty";
       return "normal";
-    }, [loading, error]);
+    }, [loading, error, radarData.length]);
 
     return (
       <div className="bg-white rounded-2xl border border-gray-300 p-6 h-[523px]">
@@ -63,7 +74,7 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
             在AI中出现频率
           </h3>
           <p className="text-xs text-gray-600">
-            搜索关键词内容在人工智能中出现频率
+            搜索关键词内容在人工智能中出现频率的多维度分析
           </p>
         </div>
 
@@ -80,6 +91,16 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
             <div className="text-center">
               <p className="text-red-500 text-sm mb-2">加载失败</p>
               <p className="text-gray-500 text-xs">{error || "未知错误"}</p>
+            </div>
+          </div>
+        )}
+
+        {/* 空数据状态 */}
+        {renderState === "empty" && (
+          <div className="flex items-center justify-center h-[400px]">
+            <div className="text-center">
+              <p className="text-gray-500 text-sm mb-2">暂无数据</p>
+              <p className="text-gray-400 text-xs">请检查数据源或稍后重试</p>
             </div>
           </div>
         )}
@@ -102,7 +123,7 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
                   axisLine={false}
                 />
                 <Radar
-                  name="在AI中出现频率"
+                  name="AI可见性分数"
                   dataKey="A"
                   stroke="#3b82f6"
                   fill="#3b82f6"

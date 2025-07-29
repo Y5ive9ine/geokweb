@@ -210,12 +210,30 @@ export const mockBrandDistribution: BrandDistribution[] = [
   { brand_name: "ARM Holdings", percentage: 1.2, color: "#FF4D4D" },
 ];
 
-// 模拟关键词频率数据
+// 模拟关键词频率数据 - 动态生成，支持不同的关键词类型
 export const mockKeywordFrequency = [
-  { keyword: "价格", frequency: 85, score: 0.8 },
-  { keyword: "质量", frequency: 92, score: 0.9 },
-  { keyword: "性能", frequency: 88, score: 0.85 },
-  { keyword: "性价比", frequency: 76, score: 0.75 },
-  { keyword: "品牌", frequency: 94, score: 0.95 },
-  { keyword: "产品", frequency: 82, score: 0.8 },
+  { keyword: "用户体验", frequency: 85, score: 0.8 },
+  { keyword: "技术创新", frequency: 92, score: 0.9 },
+  { keyword: "市场竞争", frequency: 88, score: 0.85 },
+  { keyword: "成本效益", frequency: 76, score: 0.75 },
+  { keyword: "服务质量", frequency: 94, score: 0.95 },
+  { keyword: "解决方案", frequency: 82, score: 0.8 },
+  { keyword: "行业领先", frequency: 78, score: 0.82 },
+  { keyword: "客户满意", frequency: 89, score: 0.88 },
 ];
+
+// 生成动态关键词数据的工具函数
+export const generateDynamicKeywords = (categories: string[] = []) => {
+  const defaultCategories = [
+    "技术能力", "用户体验", "市场定位", "成本优势", 
+    "创新能力", "服务水平", "品牌认知", "竞争优势"
+  ];
+  
+  const keywordsToUse = categories.length > 0 ? categories : defaultCategories;
+  
+  return keywordsToUse.map(keyword => ({
+    keyword,
+    frequency: Math.floor(Math.random() * 40) + 60, // 60-100之间的随机值
+    score: (Math.random() * 0.4) + 0.6, // 0.6-1.0之间的随机分数
+  }));
+};

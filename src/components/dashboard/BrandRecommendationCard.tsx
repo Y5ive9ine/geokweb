@@ -19,9 +19,9 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
           { name: '其它品牌1', color: '#ffb200', percentage: '20%', value: 20 },
           { name: '其它品牌2', color: '#11ca9c', percentage: '25%', value: 25 },
           { name: '其它品牌3', color: '#ff4d4d', percentage: '15%', value: 15 },
-          { name: '当前品牌', color: '#333333', percentage: '40%', value: 40 },
+          { name: '当前品牌', color: '#4285F4', percentage: '40%', value: 40 },
         ],
-        currentBrandData: { name: '当前品牌', color: '#333333', percentage: '40%', value: 40 }
+        currentBrandData: { name: '当前品牌', color: '#4285F4', percentage: '40%', value: 40 }
       }
     }
 
@@ -30,7 +30,7 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
     const total = brandRateData.reduce((sum, item) => sum + item.rate, 0)
     
     // 颜色映射
-    const colors = ['#333333', '#ffb200', '#11ca9c', '#ff4d4d', '#9c27b0']
+    const colors = ['#4285F4', '#FF9800', '#4CAF50', '#F44336', '#9C27B0']
     
     const brandsData = brandRateData.map((item, index) => {
       const percentage = total > 0 ? ((item.rate / total) * 100) : 0
@@ -55,22 +55,13 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
     }
   }, [data])
 
-  const CustomLegend = ({ payload }: any) => (
-    <div className="flex flex-col space-y-2 ml-4">
-      {payload.map((entry: any, index: number) => (
-        <div key={index} className="flex items-center space-x-2 text-sm">
-          <div 
-            className="w-3 h-3 rounded-sm"
-            style={{ backgroundColor: entry.color }}
-          />
-          <span className="text-gray-700">{entry.value}</span>
-          <span className="text-gray-500 ml-auto">
-            {brands.find(b => b.name === entry.value)?.percentage}
-          </span>
-        </div>
-      ))}
-    </div>
-  )
+  // 根据数值大小分配不同的外半径
+  const getOuterRadius = (value: number) => {
+    if (value >= 40) return 80;      // 最大扇形 (40%+)
+    if (value >= 25) return 70;       // 较大扇形 (25%-40%)
+    if (value >= 15) return 60;       // 中等扇形 (15%-25%)
+    return 50;                        // 最小扇形 (<15%)
+  };
 
   return (
     <div className="bg-white rounded-2xl border border-gray-300 p-6 h-[326px]">
@@ -109,59 +100,105 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
         </div>
       )}
 
-      {/* 饼图区域 */}
+      {/* 动态半径饼图区域 */}
       {!loading && !error && (
         <div className="relative h-[180px]">
-          <div className="flex items-center h-full">
-            <div className="flex-1">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              {/* 为每个数据项创建单独的Pie，实现不同半径的突出效果 */}
+              {brands.map((item, index) => {
+                const outerRadius = getOuterRadius(item.value);
+                const innerRadius = 45;
+                
+                // 计算这个扇形的起始和结束角度
+                let startAngle = 90; // 从顶部开始
+                for (let i = 0; i < index; i++) {
+                  startAngle -= (brands[i].value / 100) * 360;
+                }
+                const endAngle = startAngle - (item.value / 100) * 360;
+                
+                return (
                   <Pie
-                    data={brands}
-                    cx="40%"
+                    key={`pie-${index}`}
+                    data={[item]}
+                    cx="50%"
                     cy="50%"
-                    innerRadius={40}
-                    outerRadius={80}
-                    startAngle={90}
-                    endAngle={450}
+                    outerRadius={outerRadius}
+                    innerRadius={innerRadius}
+                    fill={item.color}
                     dataKey="value"
-                  >
-                    {brands.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Legend 
-                    content={<CustomLegend />}
-                    wrapperStyle={{ 
-                      position: 'absolute',
-                      right: '10px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      width: '120px'
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+                    strokeWidth={0}
+                    startAngle={startAngle}
+                    endAngle={endAngle}
+                    labelLine={false}
+                    label={(entry) => {
+                      const RADIAN = Math.PI / 180;
+                      const midAngle = (startAngle + endAngle) / 2;
+                      const radius = outerRadius + 15;
+                      const x = entry.cx + radius * Math.cos(-midAngle * RADIAN);
+                      const y = entry.cy + radius * Math.sin(-midAngle * RADIAN);
 
-            {/* 中心显示推荐率 */}
-            <div className="absolute left-[25%] top-[50%] transform -translate-x-1/2 -translate-y-1/2">
-              <div className="text-center">
-                <div className="text-xl font-bold text-gray-800">
+                      return (
+                        <g>
+                          <line
+                            x1={entry.cx + (outerRadius + 3) * Math.cos(-midAngle * RADIAN)}
+                            y1={entry.cy + (outerRadius + 3) * Math.sin(-midAngle * RADIAN)}
+                            x2={x - (x > entry.cx ? 10 : -10)}
+                            y2={y}
+                            stroke="#ccc"
+                            strokeWidth={1}
+                          />
+                          <text
+                            x={x}
+                            y={y - 3}
+                            fill="#666"
+                            textAnchor={x > entry.cx ? 'start' : 'end'}
+                            dominantBaseline="central"
+                            fontSize="10"
+                            className="font-medium"
+                          >
+                            {entry.name}
+                          </text>
+                          <text
+                            x={x}
+                            y={y + 8}
+                            fill="#999"
+                            textAnchor={x > entry.cx ? 'start' : 'end'}
+                            dominantBaseline="central"
+                            fontSize="9"
+                          >
+                            {entry.value.toFixed(1)}%
+                          </text>
+                        </g>
+                      );
+                    }}
+                  >
+                    <Cell fill={item.color} />
+                  </Pie>
+                );
+              })}
+            </PieChart>
+          </ResponsiveContainer>
+
+          {/* 中心显示当前品牌推荐率 */}
+          <div className="absolute left-[50%] top-[50%] transform -translate-x-1/2 -translate-y-1/2">
+            <div className="text-center bg-white rounded-full w-16 h-16 flex items-center justify-center shadow-sm">
+              <div>
+                <div className="text-sm font-bold text-gray-800">
                   {currentBrandData?.percentage || '0%'}
                 </div>
                 <div className="text-xs text-gray-600">推荐率</div>
               </div>
             </div>
-
-            {/* API数据指标 */}
-            {data && (
-              <div className="absolute bottom-2 left-2 text-xs text-gray-500">
-                <div>品牌数: {data.brand_first_choice_rate?.length || 0}</div>
-                <div>总评分: {data.brand_first_choice_rate?.reduce((sum, item) => sum + item.rate, 0) || 0}</div>
-              </div>
-            )}
           </div>
+
+          {/* API数据指标 */}
+          {data && (
+            <div className="absolute bottom-2 left-2 text-xs text-gray-500">
+              <div>品牌数: {data.brand_first_choice_rate?.length || 0}</div>
+              <div>总评分: {data.brand_first_choice_rate?.reduce((sum, item) => sum + item.rate, 0).toFixed(1) || 0}</div>
+            </div>
+          )}
         </div>
       )}
     </div>
