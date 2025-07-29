@@ -2,18 +2,18 @@
 
 import React, { useMemo } from 'react'
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
-import { AIVisibilityReport } from '@/services/ai-visibility'
+import { AIVisibilityStats } from '@/services/ai-visibility'
 
 interface BrandMarketShareCardProps {
-  data: AIVisibilityReport | null
+  data: AIVisibilityStats | null
   loading: boolean
   error: string | null
 }
 
 export function BrandMarketShareCard({ data, loading, error }: BrandMarketShareCardProps) {
-  // 从API数据生成市场份额信息
+  // 从API数据生成品牌首推率信息
   const brands = useMemo(() => {
-    if (!data) {
+    if (!data || !data.brand_first_choice_rate || data.brand_first_choice_rate.length === 0) {
       return [
         { name: '当前品牌', percentage: '35.6%', value: 35.6, color: '#4285F4' },
         { name: '竞品A', percentage: '18.7%', value: 18.7, color: '#FF9800' },
@@ -23,84 +23,24 @@ export function BrandMarketShareCard({ data, loading, error }: BrandMarketShareC
       ]
     }
 
-    // 尝试从API数据中提取真实的市场份额信息
-    let currentBrandScore = 35.6;
-    let competitors: number[] = [18.7, 12.2, 8.3];
+    // 使用品牌首推率数据
+    const brandRateData = data.brand_first_choice_rate
+    const total = brandRateData.reduce((sum, item) => sum + item.rate, 0)
     
-    // 检查summary中是否有市场份额相关数据
-    if (data.summary && typeof data.summary === 'object') {
-      // 尝试提取market_share字段
-      if (data.summary.market_share) {
-        currentBrandScore = parseFloat(data.summary.market_share) || currentBrandScore;
+    // 颜色映射
+    const colors = ['#4285F4', '#FF9800', '#4CAF50', '#F44336', '#9C27B0']
+    
+    const brandsData = brandRateData.map((item, index) => {
+      const percentage = total > 0 ? ((item.rate / total) * 100) : 0
+      return {
+        name: item.brand,
+        color: colors[index % colors.length],
+        percentage: `${percentage.toFixed(1)}%`,
+        value: percentage
       }
-      // 尝试提取competitor_data字段
-      if (data.summary.competitor_data && Array.isArray(data.summary.competitor_data)) {
-        competitors = data.summary.competitor_data.map((comp: any) => 
-          parseFloat(comp.share || comp.percentage || comp.rate) || 0
-        ).slice(0, 3);
-      }
-    }
+    })
 
-    // 检查metrics中是否有相关数据
-    if (data.metrics && typeof data.metrics === 'object') {
-      if (data.metrics.market_position) {
-        currentBrandScore = parseFloat(data.metrics.market_position) || currentBrandScore;
-      }
-      if (data.metrics.competitors && Array.isArray(data.metrics.competitors)) {
-        competitors = data.metrics.competitors.map((comp: any) => 
-          parseFloat(comp.share || comp.score) || 0
-        ).slice(0, 3);
-      }
-    }
-
-    // 如果没有真实的竞品数据，基于当前品牌分数生成合理的竞品分布
-    if (competitors.length === 0 || competitors.every(c => c === 0)) {
-      const remaining = 100 - currentBrandScore;
-      competitors = [
-        remaining * 0.4,  // 最大竞品
-        remaining * 0.25, // 第二竞品
-        remaining * 0.15  // 第三竞品
-      ];
-    }
-    
-    // 确保总和不超过100%
-    const totalCompetitors = competitors.reduce((sum, val) => sum + val, 0);
-    const otherShare = Math.max(0, 100 - currentBrandScore - totalCompetitors);
-    
-    const colors = ['#4285F4', '#FF9800', '#4CAF50', '#FF5722', '#E91E63'];
-    
-    return [
-      { 
-        name: '当前品牌', 
-        percentage: `${currentBrandScore.toFixed(1)}%`, 
-        value: currentBrandScore,
-        color: colors[0]
-      },
-      { 
-        name: '竞品A', 
-        percentage: `${competitors[0].toFixed(1)}%`, 
-        value: competitors[0],
-        color: colors[1]
-      },
-      { 
-        name: '竞品B', 
-        percentage: `${competitors[1].toFixed(1)}%`, 
-        value: competitors[1],
-        color: colors[2]
-      },
-      { 
-        name: '竞品C', 
-        percentage: `${competitors[2].toFixed(1)}%`, 
-        value: competitors[2],
-        color: colors[3]
-      },
-      { 
-        name: '其他', 
-        percentage: `${otherShare.toFixed(1)}%`, 
-        value: otherShare,
-        color: colors[4]
-      },
-    ];
+    return brandsData;
   }, [data])
 
   // 自定义图例组件
@@ -194,10 +134,8 @@ export function BrandMarketShareCard({ data, loading, error }: BrandMarketShareC
       {/* API数据指标 */}
       {data && !loading && !error && (
         <div className="mt-2 text-xs text-gray-500">
-          <span>报告日期: {new Date(data.report_date).toLocaleDateString('zh-CN')}</span>
-          {data.summary && (
-            <span className="ml-4">品牌ID: {data.brand_id}</span>
-          )}
+          <span>统计时间: {data.timestamp ? new Date(data.timestamp).toLocaleDateString('zh-CN') : '未知'}</span>
+          <span className="ml-4">品牌ID: {data.brand_id}</span>
         </div>
       )}
     </div>

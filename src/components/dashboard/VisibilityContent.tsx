@@ -90,12 +90,12 @@ export function VisibilityContent() {
   const renderBrandMarketShareCard = useCallback(
     () => (
       <BrandMarketShareCard
-        data={report}
-        loading={reportLoading}
-        error={reportError}
+        data={stats}
+        loading={statsLoading}
+        error={statsError}
       />
     ),
-    [report, reportLoading, reportError]
+    [stats, statsLoading, statsError]
   );
 
   return (
