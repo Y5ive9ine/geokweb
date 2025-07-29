@@ -77,14 +77,16 @@ export const useBrandVisibilityTrend = (brandId: string, params?: AIVisibilityTr
           timestamp: Date.now()
         });
       } else {
-        setError(response.error || response.message || "Failed to fetch visibility trend");
+        const errorMsg = response.error || response.message || "Failed to fetch visibility trend";
+        setError(typeof errorMsg === 'string' ? errorMsg : String(errorMsg));
       }
     } catch (err) {
       // 忽略被取消的请求错误
       if (err instanceof Error && err.name === 'AbortError') {
         return;
       }
-      setError(err instanceof Error ? err.message : "Unknown error");
+      const errorMsg = err instanceof Error ? err.message : "Unknown error";
+      setError(typeof errorMsg === 'string' ? errorMsg : String(errorMsg));
     } finally {
       setLoading(false);
     }
@@ -163,14 +165,16 @@ export const useBrandVisibilityReport = (brandId: string) => {
           timestamp: Date.now()
         });
       } else {
-        setError(response.error || response.message || "Failed to generate visibility report");
+        const errorMsg = response.error || response.message || "Failed to generate visibility report";
+        setError(typeof errorMsg === 'string' ? errorMsg : String(errorMsg));
       }
     } catch (err) {
       // 忽略被取消的请求错误
       if (err instanceof Error && err.name === 'AbortError') {
         return;
       }
-      setError(err instanceof Error ? err.message : "Unknown error");
+      const errorMsg = err instanceof Error ? err.message : "Unknown error";
+      setError(typeof errorMsg === 'string' ? errorMsg : String(errorMsg));
     } finally {
       setLoading(false);
     }
@@ -249,14 +253,16 @@ export const useVisibilityStats = (brandId?: string) => {
           timestamp: Date.now()
         });
       } else {
-        setError(response.error || response.message || "Failed to fetch visibility stats");
+        const errorMsg = response.error || response.message || "Failed to fetch visibility stats";
+        setError(typeof errorMsg === 'string' ? errorMsg : String(errorMsg));
       }
     } catch (err) {
       // 忽略被取消的请求错误
       if (err instanceof Error && err.name === 'AbortError') {
         return;
       }
-      setError(err instanceof Error ? err.message : "Unknown error");
+      const errorMsg = err instanceof Error ? err.message : "Unknown error";
+      setError(typeof errorMsg === 'string' ? errorMsg : String(errorMsg));
     } finally {
       setLoading(false);
     }
@@ -304,10 +310,12 @@ export const useBrandComparison = (brandId1?: string, brandId2?: string) => {
       if (response.success && response.data) {
         setComparison(response.data);
       } else {
-        setError(response.error || response.message || "Failed to compare brands");
+        const errorMsg = response.error || response.message || "Failed to compare brands";
+        setError(typeof errorMsg === 'string' ? errorMsg : String(errorMsg));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      const errorMsg = err instanceof Error ? err.message : "Unknown error";
+      setError(typeof errorMsg === 'string' ? errorMsg : String(errorMsg));
     } finally {
       setLoading(false);
     }
@@ -344,10 +352,12 @@ export const useBrandAggregation = (brandId: string) => {
           setAggregation(historyResponse.data);
         }
       } else {
-        setError(response.error || response.message || "Failed to calculate aggregation");
+        const errorMsg = response.error || response.message || "Failed to calculate aggregation";
+        setError(typeof errorMsg === 'string' ? errorMsg : String(errorMsg));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      const errorMsg = err instanceof Error ? err.message : "Unknown error";
+      setError(typeof errorMsg === 'string' ? errorMsg : String(errorMsg));
     } finally {
       setLoading(false);
     }
@@ -365,10 +375,12 @@ export const useBrandAggregation = (brandId: string) => {
       if (response.success && response.data) {
         setAggregation(response.data);
       } else {
-        setError(response.error || response.message || "Failed to fetch aggregation history");
+        const errorMsg = response.error || response.message || "Failed to fetch aggregation history";
+        setError(typeof errorMsg === 'string' ? errorMsg : String(errorMsg));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      const errorMsg = err instanceof Error ? err.message : "Unknown error";
+      setError(typeof errorMsg === 'string' ? errorMsg : String(errorMsg));
     } finally {
       setLoading(false);
     }
@@ -399,10 +411,12 @@ export const useResponseMetrics = (responseId?: string) => {
       if (response.success && response.data) {
         setMetrics(response.data);
       } else {
-        setError(response.error || response.message || "Failed to fetch response metrics");
+        const errorMsg = response.error || response.message || "Failed to fetch response metrics";
+        setError(typeof errorMsg === 'string' ? errorMsg : String(errorMsg));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      const errorMsg = err instanceof Error ? err.message : "Unknown error";
+      setError(typeof errorMsg === 'string' ? errorMsg : String(errorMsg));
     } finally {
       setLoading(false);
     }
@@ -419,10 +433,12 @@ export const useResponseMetrics = (responseId?: string) => {
         // 重新获取计算后的指标
         await fetchMetrics(id);
       } else {
-        setError(response.error || response.message || "Failed to calculate response metrics");
+        const errorMsg = response.error || response.message || "Failed to calculate response metrics";
+        setError(typeof errorMsg === 'string' ? errorMsg : String(errorMsg));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      const errorMsg = err instanceof Error ? err.message : "Unknown error";
+      setError(typeof errorMsg === 'string' ? errorMsg : String(errorMsg));
     } finally {
       setLoading(false);
     }
@@ -456,8 +472,9 @@ export const useBatchCalculateMetrics = () => {
         return response.data;
       } else {
         const errorMsg = response.error || response.message || "Failed to batch calculate metrics";
-        setError(errorMsg);
-        throw new Error(errorMsg);
+        const errorStr = typeof errorMsg === 'string' ? errorMsg : String(errorMsg);
+        setError(errorStr);
+        throw new Error(errorStr);
       }
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Unknown error";

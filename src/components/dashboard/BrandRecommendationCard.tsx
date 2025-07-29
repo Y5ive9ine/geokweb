@@ -1,6 +1,7 @@
 'use client'
 
-import Image from 'next/image'
+import React, { useMemo } from 'react'
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts'
 import { AIVisibilityStats } from '@/services/ai-visibility'
 
 interface BrandRecommendationCardProps {
@@ -11,61 +12,65 @@ interface BrandRecommendationCardProps {
 
 export function BrandRecommendationCard({ data, loading, error }: BrandRecommendationCardProps) {
   // 从API数据生成品牌推荐率信息
-  const getBrandData = () => {
-    if (!data) {
-      return [
-        { name: '其它品牌1', color: '#ffb200', percentage: '0%', value: 0 },
-        { name: '其它品牌2', color: '#11ca9c', percentage: '0%', value: 0 },
-        { name: '其它品牌3', color: '#ff4d4d', percentage: '0%', value: 0 },
-        { name: '当前品牌', color: '#333333', percentage: '0%', value: 0 },
-      ]
+  const { brands, currentBrandData } = useMemo(() => {
+    if (!data || !data.brand_first_choice_rate || data.brand_first_choice_rate.length === 0) {
+      return {
+        brands: [
+          { name: '其它品牌1', color: '#ffb200', percentage: '20%', value: 20 },
+          { name: '其它品牌2', color: '#11ca9c', percentage: '25%', value: 25 },
+          { name: '其它品牌3', color: '#ff4d4d', percentage: '15%', value: 15 },
+          { name: '当前品牌', color: '#333333', percentage: '40%', value: 40 },
+        ],
+        currentBrandData: { name: '当前品牌', color: '#333333', percentage: '40%', value: 40 }
+      }
     }
 
-    // 模拟计算品牌推荐率，实际项目中应该从API获取具体数据
-    const totalVisibility = data.total_visibility_score || 0
-    const averagePosition = data.average_position || 0
-    const mentionCount = data.mention_count || 0
+    // 使用API返回的实际数据
+    const brandRateData = data.brand_first_choice_rate
+    const total = brandRateData.reduce((sum, item) => sum + item.rate, 0)
     
-    // 基于可见性数据计算推荐率分布
-    const currentBrandRate = Math.min(totalVisibility * 0.6, 0.8) // 当前品牌最高80%
-    const otherBrands = [
-      Math.random() * 0.3,
-      Math.random() * 0.25,
-      Math.random() * 0.2
-    ]
+    // 颜色映射
+    const colors = ['#333333', '#ffb200', '#11ca9c', '#ff4d4d', '#9c27b0']
     
-    const total = currentBrandRate + otherBrands.reduce((sum, val) => sum + val, 0)
-    
-    return [
-      { 
-        name: '其它品牌1', 
-        color: '#ffb200', 
-        percentage: `${((otherBrands[0] / total) * 100).toFixed(1)}%`,
-        value: otherBrands[0] / total
-      },
-      { 
-        name: '其它品牌2', 
-        color: '#11ca9c', 
-        percentage: `${((otherBrands[1] / total) * 100).toFixed(1)}%`,
-        value: otherBrands[1] / total
-      },
-      { 
-        name: '其它品牌3', 
-        color: '#ff4d4d', 
-        percentage: `${((otherBrands[2] / total) * 100).toFixed(1)}%`,
-        value: otherBrands[2] / total
-      },
-      { 
-        name: '当前品牌', 
-        color: '#333333', 
-        percentage: `${((currentBrandRate / total) * 100).toFixed(1)}%`,
-        value: currentBrandRate / total
-      },
-    ]
-  }
+    const brandsData = brandRateData.map((item, index) => {
+      const percentage = total > 0 ? ((item.rate / total) * 100) : 0
+      return {
+        name: item.brand,
+        color: colors[index % colors.length],
+        percentage: `${percentage.toFixed(1)}%`,
+        value: percentage
+      }
+    })
 
-  const brands = getBrandData()
-  const currentBrandData = brands.find(b => b.name === '当前品牌')
+    // 找到当前品牌数据（通常是第一个或者品牌名包含"当前"的）
+    const currentBrand = brandsData.find(b => 
+      b.name === '当前品牌' || 
+      b.name.includes('当前') || 
+      brandsData.indexOf(b) === 0
+    ) || brandsData[0]
+
+    return {
+      brands: brandsData,
+      currentBrandData: currentBrand
+    }
+  }, [data])
+
+  const CustomLegend = ({ payload }: any) => (
+    <div className="flex flex-col space-y-2 ml-4">
+      {payload.map((entry: any, index: number) => (
+        <div key={index} className="flex items-center space-x-2 text-sm">
+          <div 
+            className="w-3 h-3 rounded-sm"
+            style={{ backgroundColor: entry.color }}
+          />
+          <span className="text-gray-700">{entry.value}</span>
+          <span className="text-gray-500 ml-auto">
+            {brands.find(b => b.name === entry.value)?.percentage}
+          </span>
+        </div>
+      ))}
+    </div>
+  )
 
   return (
     <div className="bg-white rounded-2xl border border-gray-300 p-6 h-[326px]">
@@ -89,14 +94,14 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
 
       {/* 加载状态 */}
       {loading && (
-        <div className="flex items-center justify-center h-[200px]">
+        <div className="flex items-center justify-center h-[180px]">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
       )}
 
       {/* 错误状态 */}
       {error && !loading && (
-        <div className="flex items-center justify-center h-[200px]">
+        <div className="flex items-center justify-center h-[180px]">
           <div className="text-center">
             <p className="text-red-500 text-xs mb-1">加载失败</p>
             <p className="text-gray-500 text-xs">{error}</p>
@@ -104,61 +109,59 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
         </div>
       )}
 
-      {/* 图表区域 */}
+      {/* 饼图区域 */}
       {!loading && !error && (
-        <div className="relative flex items-center justify-center h-[200px]">
-          {/* 主要饼图 */}
-          <div className="relative w-[229px] h-[229px]">
-            <Image
-              src="/images/Group49.svg"
-              alt="Brand recommendation chart"
-              fill
-              className="object-contain"
-            />
-          </div>
-
-          {/* 数据显示 */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-gray-800">
-                {currentBrandData?.percentage || '0%'}
-              </div>
-              <div className="text-xs text-gray-600">推荐率</div>
+        <div className="relative h-[180px]">
+          <div className="flex items-center h-full">
+            <div className="flex-1">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={brands}
+                    cx="40%"
+                    cy="50%"
+                    innerRadius={40}
+                    outerRadius={80}
+                    startAngle={90}
+                    endAngle={450}
+                    dataKey="value"
+                  >
+                    {brands.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Legend 
+                    content={<CustomLegend />}
+                    wrapperStyle={{ 
+                      position: 'absolute',
+                      right: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      width: '120px'
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
-          </div>
 
-          {/* 品牌标签 */}
-          <div className="absolute inset-0">
-            {brands.map((brand, index) => (
-              <div
-                key={brand.name}
-                className="absolute text-xs font-light flex items-center"
-                style={{
-                  color: brand.color,
-                  // 根据原始设计的位置进行调整
-                  ...(index === 0 && { left: '25%', top: '20%' }),
-                  ...(index === 1 && { right: '20%', top: '35%' }),
-                  ...(index === 2 && { right: '15%', bottom: '25%' }),
-                  ...(index === 3 && { left: '5%', bottom: '40%' }),
-                }}
-              >
-                <div
-                  className="w-2 h-2 rounded-full mr-1"
-                  style={{ backgroundColor: brand.color }}
-                />
-                <span>{brand.name}</span>
-                <span className="ml-1 font-medium">{brand.percentage}</span>
+            {/* 中心显示推荐率 */}
+            <div className="absolute left-[25%] top-[50%] transform -translate-x-1/2 -translate-y-1/2">
+              <div className="text-center">
+                <div className="text-xl font-bold text-gray-800">
+                  {currentBrandData?.percentage || '0%'}
+                </div>
+                <div className="text-xs text-gray-600">推荐率</div>
               </div>
-            ))}
-          </div>
-
-          {/* API数据指标 */}
-          {data && (
-            <div className="absolute bottom-2 left-2 text-xs text-gray-500">
-              <div>提及次数: {data.mention_count || 0}</div>
-              <div>平均位置: {data.average_position?.toFixed(1) || 'N/A'}</div>
             </div>
-          )}
+
+            {/* API数据指标 */}
+            {data && (
+              <div className="absolute bottom-2 left-2 text-xs text-gray-500">
+                <div>品牌数: {data.brand_first_choice_rate?.length || 0}</div>
+                <div>总评分: {data.brand_first_choice_rate?.reduce((sum, item) => sum + item.rate, 0) || 0}</div>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

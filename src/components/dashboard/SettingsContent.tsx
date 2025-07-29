@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { authApi, authUtils } from "@/services/auth";
 import { brandApi } from "@/services/brand";
 
@@ -13,6 +14,7 @@ export function SettingsContent({
   activeTab,
   setActiveTab,
 }: SettingsContentProps) {
+  const router = useRouter();
   const [activeSubTab, setActiveSubTab] = useState("账户信息");
   const [showEditUser, setShowEditUser] = useState(false);
   const [userAdded, setUserAdded] = useState(false);
@@ -87,10 +89,29 @@ export function SettingsContent({
   const getAuthToken = authUtils.getToken;
 
   // 显示消息
-  const showMessage = (msg: string, type: "success" | "error") => {
+  const showMessage = useCallback((msg: string, type: "success" | "error") => {
     setMessage(msg);
     setMessageType(type);
-    setTimeout(() => setMessage(""), 3000);
+    setTimeout(() => {
+      setMessage("");
+    }, 3000);
+  }, []);
+
+  // 退出登录
+  const handleLogout = async () => {
+    if (confirm("确定要退出登录吗？")) {
+      setLoading(true);
+      try {
+        await authApi.logout();
+        router.push('/auth/login');
+      } catch (error) {
+        console.error("Logout error:", error);
+        // 即使出错也跳转到登录页面
+        router.push('/auth/login');
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   // 获取用户信息
@@ -570,33 +591,46 @@ export function SettingsContent({
                     </select>
                   </div>
 
-                  <div className="flex gap-4">
-                    <button
-                      onClick={updateProfile}
-                      disabled={loading}
-                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      {loading ? "保存中..." : "保存更改"}
-                    </button>
-                    <button
-                      type="button"
-                      className="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-                      onClick={() => {
-                        // 重置表单
-                        if (userInfo) {
-                          setProfileData({
-                            first_name: userInfo.first_name || "",
-                            last_name: userInfo.last_name || "",
-                            bio: userInfo.bio || "",
-                            phone: userInfo.phone || "",
-                            company: userInfo.company || "",
-                            country: userInfo.country || "",
-                          });
-                        }
-                      }}
-                    >
-                      取消
-                    </button>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex gap-4">
+                      <button
+                        onClick={updateProfile}
+                        disabled={loading}
+                        className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {loading ? "保存中..." : "保存更改"}
+                      </button>
+                      <button
+                        type="button"
+                        className="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                        onClick={() => {
+                          // 重置表单
+                          if (userInfo) {
+                            setProfileData({
+                              first_name: userInfo.first_name || "",
+                              last_name: userInfo.last_name || "",
+                              bio: userInfo.bio || "",
+                              phone: userInfo.phone || "",
+                              company: userInfo.company || "",
+                              country: userInfo.country || "",
+                            });
+                          }
+                        }}
+                      >
+                        取消
+                      </button>
+                    </div>
+                    
+                    {/* 退出登录按钮 */}
+                    <div className="sm:ml-auto">
+                      <button
+                        onClick={handleLogout}
+                        disabled={loading}
+                        className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        退出登录
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -9,7 +9,7 @@ import {
   validateOAuthCallback,
   cleanupUrlParams,
 } from "@/lib/google-auth";
-import { authApi } from "@/services/auth";
+import { authApi, authUtils } from "@/services/auth";
 
 // 背景图片常量
 const GRADIENT_BG = "/images/auth-gradient.svg";
@@ -71,6 +71,28 @@ export default function LoginPage() {
     }
   }, []);
 
+  const getRedirectPath = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectParam = urlParams.get("redirect");
+    
+    // 检查用户是否刚完成注册
+    const justRegistered = localStorage.getItem("just_registered");
+    
+    if (justRegistered === "true") {
+      // 清除注册标记
+      localStorage.removeItem("just_registered");
+      return "/auth/register/onboarding";
+    }
+    
+    // 如果有重定向参数且是安全的路径，使用它
+    if (redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//')) {
+      return decodeURIComponent(redirectParam);
+    }
+    
+    // 默认跳转到dashboard
+    return "/dashboard";
+  };
+
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) {
@@ -94,22 +116,14 @@ export default function LoginPage() {
 
       if (response.success) {
         setSuccess("登录成功！");
-        // 保存token到localStorage
-        localStorage.setItem("auth_token", response.data.token);
-        localStorage.setItem("user_info", JSON.stringify(response.data.user));
-
-        // 检查用户是否刚完成注册
-        const justRegistered = localStorage.getItem("just_registered");
+        // 使用authUtils保存token和用户信息
+        authUtils.setToken(response.data.token);
+        authUtils.setUserInfo(response.data.user);
 
         // 跳转到相应页面
         setTimeout(() => {
-          if (justRegistered === "true") {
-            // 清除注册标记
-            localStorage.removeItem("just_registered");
-            router.push("/auth/register/onboarding");
-          } else {
-            router.push("/dashboard");
-          }
+          const redirectPath = getRedirectPath();
+          router.push(redirectPath);
         }, 1500);
       } else {
         setError(response.error || response.message || "登录失败");
@@ -153,25 +167,17 @@ export default function LoginPage() {
 
       if (response.success) {
         setSuccess("Google登录成功！");
-        // 保存token到localStorage
-        localStorage.setItem("auth_token", response.data.token);
-        localStorage.setItem("user_info", JSON.stringify(response.data.user));
+        // 使用authUtils保存token和用户信息
+        authUtils.setToken(response.data.token);
+        authUtils.setUserInfo(response.data.user);
 
         // 清理URL参数
         cleanupUrlParams();
 
-        // 检查用户是否刚完成注册
-        const justRegistered = localStorage.getItem("just_registered");
-
         // 跳转到相应页面
         setTimeout(() => {
-          if (justRegistered === "true") {
-            // 清除注册标记
-            localStorage.removeItem("just_registered");
-            router.push("/auth/register/onboarding");
-          } else {
-            router.push("/dashboard");
-          }
+          const redirectPath = getRedirectPath();
+          router.push(redirectPath);
         }, 1500);
       } else {
         setError(response.error || response.message || "Google登录失败");

@@ -43,7 +43,18 @@ export const authApi = {
     api.put("/api/auth/avatar", avatarData),
 
   // 登出
-  logout: () => api.post("/api/auth/logout"),
+  logout: async () => {
+    try {
+      // 调用服务器端logout API
+      await api.post("/api/auth/logout");
+    } catch (error) {
+      // 即使服务器端失败，也要清除本地认证信息
+      console.error("Server logout failed:", error);
+    } finally {
+      // 无论如何都清除本地认证信息
+      authUtils.clearAuth();
+    }
+  },
 
   // 刷新token
   refresh: () => api.post("/api/auth/refresh"),
@@ -56,12 +67,46 @@ export const authApi = {
     api.put("/api/auth/current-brand", brandData),
 };
 
+// Cookie操作工具函数
+const cookieUtils = {
+  // 设置cookie
+  setCookie: (name: string, value: string, days: number = 7): void => {
+    if (typeof window !== "undefined") {
+      const expires = new Date();
+      expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+      document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;secure;samesite=strict`;
+    }
+  },
+
+  // 获取cookie
+  getCookie: (name: string): string | null => {
+    if (typeof window !== "undefined") {
+      const nameEQ = name + "=";
+      const ca = document.cookie.split(';');
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+      }
+    }
+    return null;
+  },
+
+  // 删除cookie
+  deleteCookie: (name: string): void => {
+    if (typeof window !== "undefined") {
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+    }
+  }
+};
+
 // 认证相关的工具函数
 export const authUtils = {
   // 获取认证token
   getToken: (): string | null => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("auth_token");
+      // 优先从localStorage获取，如果没有则从cookie获取
+      return localStorage.getItem("auth_token") || cookieUtils.getCookie("auth_token");
     }
     return null;
   },
@@ -69,7 +114,9 @@ export const authUtils = {
   // 设置认证token
   setToken: (token: string): void => {
     if (typeof window !== "undefined") {
+      // 同时保存到localStorage和cookie
       localStorage.setItem("auth_token", token);
+      cookieUtils.setCookie("auth_token", token, 7); // 7天过期
     }
   },
 
@@ -78,6 +125,7 @@ export const authUtils = {
     if (typeof window !== "undefined") {
       localStorage.removeItem("auth_token");
       localStorage.removeItem("user_info");
+      cookieUtils.deleteCookie("auth_token");
     }
   },
 
