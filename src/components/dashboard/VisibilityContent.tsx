@@ -1,78 +1,102 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
-import { useBrandVisibilityTrend, useVisibilityStats, useBrandVisibilityReport } from '@/hooks/useAIVisibility'
-import { authUtils } from '@/services/auth'
-import { SearchSection } from './SearchSection'
-import { AIFrequencyChart } from './AIFrequencyChart'
-import { BrandSearchRateCard } from './BrandSearchRateCard'
-import { BrandRecommendationCard } from './BrandRecommendationCard'
-import { BrandMarketShareCard } from './BrandMarketShareCard'
+import { useState, useEffect, useMemo, useCallback } from "react";
+import {
+  useBrandVisibilityTrend,
+  useVisibilityStats,
+  useBrandVisibilityReport,
+} from "@/hooks/useAIVisibility";
+import { authUtils } from "@/services/auth";
+import { SearchSection } from "./SearchSection";
+import { AIFrequencyChart } from "./AIFrequencyChart";
+import { BrandSearchRateCard } from "./BrandSearchRateCard";
+import { BrandRecommendationCard } from "./BrandRecommendationCard";
+import { BrandMarketShareCard } from "./BrandMarketShareCard";
 
 export function VisibilityContent() {
-  const [currentBrandId, setCurrentBrandId] = useState<string>('')
-  
+  const [currentBrandId, setCurrentBrandId] = useState<string>("");
+
   useEffect(() => {
     // 从localStorage获取用户信息，获取品牌ID
-    const userInfo = authUtils.getUserInfo()
-    if (userInfo?.brand_id) {
-      setCurrentBrandId(userInfo.brand_id)
+    const userInfo = authUtils.getUserInfo();
+    if (userInfo?.current_brand_id) {
+      setCurrentBrandId(userInfo.current_brand_id);
     } else {
       // 如果没有品牌ID，可以使用默认值或显示错误
-      setCurrentBrandId('4fc86ecb-8e0e-476b-8826-bf4dc95fce0d')
+      setCurrentBrandId("4fc86ecb-8e0e-476b-8826-bf4dc95fce0d");
     }
-  }, [])
+  }, []);
 
   // 使用useMemo缓存API参数，避免不必要的重新请求
-  const trendParams = useMemo(() => ({ days: 30 }), [])
-  
+  const trendParams = useMemo(() => ({ days: 30 }), []);
+
   // 只有当brandId存在时才发起API请求
-  const shouldFetchData = Boolean(currentBrandId)
-  
+  const shouldFetchData = Boolean(currentBrandId);
+
   // 获取API数据，传递给子组件
-  const { trend, loading: trendLoading, error: trendError } = useBrandVisibilityTrend(
-    shouldFetchData ? currentBrandId : '', 
+  const {
+    trend,
+    loading: trendLoading,
+    error: trendError,
+  } = useBrandVisibilityTrend(
+    shouldFetchData ? currentBrandId : "",
     trendParams
-  )
-  const { stats, loading: statsLoading, error: statsError } = useVisibilityStats(
-    shouldFetchData ? currentBrandId : undefined
-  )
-  const { report, loading: reportLoading, error: reportError } = useBrandVisibilityReport(
-    shouldFetchData ? currentBrandId : ''
-  )
+  );
+  const {
+    stats,
+    loading: statsLoading,
+    error: statsError,
+  } = useVisibilityStats(shouldFetchData ? currentBrandId : undefined);
+  const {
+    report,
+    loading: reportLoading,
+    error: reportError,
+  } = useBrandVisibilityReport(shouldFetchData ? currentBrandId : "");
 
   // 使用useCallback缓存render函数
-  const renderAIFrequencyChart = useCallback(() => (
-    <AIFrequencyChart 
-      data={trend} 
-      loading={trendLoading} 
-      error={trendError}
-    />
-  ), [trend, trendLoading, trendError])
+  const renderAIFrequencyChart = useCallback(
+    () => (
+      <AIFrequencyChart
+        data={trend}
+        loading={trendLoading}
+        error={trendError}
+      />
+    ),
+    [trend, trendLoading, trendError]
+  );
 
-  const renderBrandRecommendationCard = useCallback(() => (
-    <BrandRecommendationCard 
-      data={stats} 
-      loading={statsLoading} 
-      error={statsError}
-    />
-  ), [stats, statsLoading, statsError])
+  const renderBrandRecommendationCard = useCallback(
+    () => (
+      <BrandRecommendationCard
+        data={stats}
+        loading={statsLoading}
+        error={statsError}
+      />
+    ),
+    [stats, statsLoading, statsError]
+  );
 
-  const renderBrandSearchRateCard = useCallback(() => (
-    <BrandSearchRateCard 
-      data={stats} 
-      loading={statsLoading} 
-      error={statsError}
-    />
-  ), [stats, statsLoading, statsError])
+  const renderBrandSearchRateCard = useCallback(
+    () => (
+      <BrandSearchRateCard
+        data={stats}
+        loading={statsLoading}
+        error={statsError}
+      />
+    ),
+    [stats, statsLoading, statsError]
+  );
 
-  const renderBrandMarketShareCard = useCallback(() => (
-    <BrandMarketShareCard 
-      data={report} 
-      loading={reportLoading} 
-      error={reportError}
-    />
-  ), [report, reportLoading, reportError])
+  const renderBrandMarketShareCard = useCallback(
+    () => (
+      <BrandMarketShareCard
+        data={report}
+        loading={reportLoading}
+        error={reportError}
+      />
+    ),
+    [report, reportLoading, reportError]
+  );
 
   return (
     <div className="flex-1 overflow-auto bg-gray-50 p-4 md:p-6">
@@ -109,5 +133,5 @@ export function VisibilityContent() {
         </p>
       </div>
     </div>
-  )
-} 
+  );
+}

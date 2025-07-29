@@ -31,12 +31,9 @@ export default function ReferencesPage() {
   // 获取品牌ID
   useEffect(() => {
     const userInfo = authUtils.getUserInfo();
-    if (userInfo?.brand_id) {
-      setCurrentBrandId(userInfo.brand_id);
-    } else {
-      // 使用默认品牌ID
-      setCurrentBrandId("4fc86ecb-8e0e-476b-8826-bf4dc95fce0d");
-    }
+    if (userInfo?.curren) {
+      setCurrentBrandId(userInfo.current_brand_id);
+    } 
   }, []);
 
   // 使用真实的API获取品牌引用数据

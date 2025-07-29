@@ -1,51 +1,59 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useReferences, useBrandReferences, useTopReferences, useReference } from '@/hooks/useReferences'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { referencesUtils } from '@/services/references'
-import { authUtils } from '@/services/auth'
+import { useState, useEffect } from "react";
+import {
+  useReferences,
+  useBrandReferences,
+  useTopReferences,
+  useReference,
+} from "@/hooks/useReferences";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { referencesUtils } from "@/services/references";
+import { authUtils } from "@/services/auth";
 
 export function ReferencesContent() {
-  const [currentBrandId, setCurrentBrandId] = useState<string>('')
-  const [selectedCategory, setSelectedCategory] = useState<string>('')
-  
-  useEffect(() => {
-    const userInfo = authUtils.getUserInfo()
-    if (userInfo?.brand_id) {
-      setCurrentBrandId(userInfo.brand_id)
-    } else {
-      setCurrentBrandId('4fc86ecb-8e0e-476b-8826-bf4dc95fce0d')
-    }
-  }, [])
+  const [currentBrandId, setCurrentBrandId] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
 
-  const { references, pagination, loading, error, changePage, filter } = useReferences({ page_size: 10 })
-  const { references: brandReferences, loading: brandLoading } = useBrandReferences(currentBrandId, selectedCategory)
-  const { references: topReferences, loading: topLoading } = useTopReferences(10)
-  const { deleteReference } = useReference()
+  useEffect(() => {
+    const userInfo = authUtils.getUserInfo();
+    if (userInfo?.current_brand_id) {
+      setCurrentBrandId(userInfo.current_brand_id);
+    } else {
+      setCurrentBrandId("4fc86ecb-8e0e-476b-8826-bf4dc95fce0d");
+    }
+  }, []);
+
+  const { references, pagination, loading, error, changePage, filter } =
+    useReferences({ page_size: 10 });
+  const { references: brandReferences, loading: brandLoading } =
+    useBrandReferences(currentBrandId, selectedCategory);
+  const { references: topReferences, loading: topLoading } =
+    useTopReferences(10);
+  const { deleteReference } = useReference();
 
   const handleDeleteReference = async (id: string) => {
-    if (confirm('确定要删除这个引用吗？')) {
+    if (confirm("确定要删除这个引用吗？")) {
       try {
-        await deleteReference(id)
+        await deleteReference(id);
         // 刷新列表
-        filter()
+        filter();
       } catch (error) {
-        console.error('删除失败:', error)
+        console.error("删除失败:", error);
       }
     }
-  }
+  };
 
   // 按域名分组引用
   const groupedByDomain = references.reduce((acc, ref) => {
-    const domain = referencesUtils.extractDomain(ref.url)
+    const domain = referencesUtils.extractDomain(ref.url);
     if (!acc[domain]) {
-      acc[domain] = []
+      acc[domain] = [];
     }
-    acc[domain].push(ref)
-    return acc
-  }, {} as Record<string, typeof references>)
+    acc[domain].push(ref);
+    return acc;
+  }, {} as Record<string, typeof references>);
 
   return (
     <div className="p-4 md:p-6">
@@ -96,19 +104,31 @@ export function ReferencesContent() {
           <CardContent>
             {topLoading ? (
               <div className="space-y-2">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="h-16 bg-gray-100 animate-pulse rounded"></div>
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="h-16 bg-gray-100 animate-pulse rounded"
+                  ></div>
                 ))}
               </div>
             ) : topReferences && topReferences.length > 0 ? (
               <div className="space-y-3">
                 {topReferences.slice(0, 5).map((ref, index) => (
-                  <div key={ref.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div
+                    key={ref.id}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  >
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-gray-700">#{index + 1}</span>
-                        <a href={ref.url} target="_blank" rel="noopener noreferrer" 
-                           className="text-sm text-blue-600 hover:underline truncate max-w-md">
+                        <span className="text-sm font-medium text-gray-700">
+                          #{index + 1}
+                        </span>
+                        <a
+                          href={ref.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-600 hover:underline truncate max-w-md"
+                        >
                           {ref.title || ref.url}
                         </a>
                       </div>
@@ -120,7 +140,9 @@ export function ReferencesContent() {
                           引用次数: {ref.citation_count || 0}
                         </span>
                         <span className="text-xs text-gray-500">
-                          质量评分: {referencesUtils.calculateReferenceQualityScore(ref)}/10
+                          质量评分:{" "}
+                          {referencesUtils.calculateReferenceQualityScore(ref)}
+                          /10
                         </span>
                       </div>
                     </div>
@@ -143,10 +165,17 @@ export function ReferencesContent() {
               <div className="h-40 bg-gray-100 animate-pulse rounded"></div>
             ) : brandReferences && brandReferences.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {brandReferences.slice(0, 6).map(ref => (
-                  <div key={ref.id} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
-                    <a href={ref.url} target="_blank" rel="noopener noreferrer"
-                       className="text-sm font-medium text-blue-600 hover:underline line-clamp-1">
+                {brandReferences.slice(0, 6).map((ref) => (
+                  <div
+                    key={ref.id}
+                    className="p-4 border rounded-lg hover:shadow-md transition-shadow"
+                  >
+                    <a
+                      href={ref.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-medium text-blue-600 hover:underline line-clamp-1"
+                    >
                       {ref.title || ref.url}
                     </a>
                     <p className="text-xs text-gray-500 mt-2">
@@ -174,8 +203,11 @@ export function ReferencesContent() {
           <CardContent>
             {loading ? (
               <div className="space-y-3">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="h-20 bg-gray-100 animate-pulse rounded"></div>
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="h-20 bg-gray-100 animate-pulse rounded"
+                  ></div>
                 ))}
               </div>
             ) : error ? (
@@ -185,32 +217,45 @@ export function ReferencesContent() {
             ) : Object.keys(groupedByDomain).length > 0 ? (
               <>
                 <div className="space-y-4">
-                  {Object.entries(groupedByDomain).slice(0, 5).map(([domain, refs]) => (
-                    <div key={domain} className="border rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-medium text-gray-800">{domain}</h4>
-                        <span className="text-sm text-gray-500">{refs.length} 个引用</span>
-                      </div>
-                      <div className="space-y-2">
-                        {refs.slice(0, 3).map(ref => (
-                          <div key={ref.id} className="flex items-center justify-between py-2 border-t">
-                            <a href={ref.url} target="_blank" rel="noopener noreferrer"
-                               className="text-sm text-blue-600 hover:underline truncate flex-1 mr-4">
-                              {ref.title || ref.url}
-                            </a>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="text-red-600 hover:text-red-700"
-                              onClick={() => handleDeleteReference(ref.id)}
+                  {Object.entries(groupedByDomain)
+                    .slice(0, 5)
+                    .map(([domain, refs]) => (
+                      <div key={domain} className="border rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="font-medium text-gray-800">
+                            {domain}
+                          </h4>
+                          <span className="text-sm text-gray-500">
+                            {refs.length} 个引用
+                          </span>
+                        </div>
+                        <div className="space-y-2">
+                          {refs.slice(0, 3).map((ref) => (
+                            <div
+                              key={ref.id}
+                              className="flex items-center justify-between py-2 border-t"
                             >
-                              删除
-                            </Button>
-                          </div>
-                        ))}
+                              <a
+                                href={ref.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-blue-600 hover:underline truncate flex-1 mr-4"
+                              >
+                                {ref.title || ref.url}
+                              </a>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-red-600 hover:text-red-700"
+                                onClick={() => handleDeleteReference(ref.id)}
+                              >
+                                删除
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
 
                 {/* 分页 */}
@@ -231,7 +276,9 @@ export function ReferencesContent() {
                       size="sm"
                       variant="outline"
                       onClick={() => changePage(pagination.current_page + 1)}
-                      disabled={pagination.current_page === pagination.total_pages}
+                      disabled={
+                        pagination.current_page === pagination.total_pages
+                      }
                     >
                       下一页
                     </Button>
@@ -245,5 +292,5 @@ export function ReferencesContent() {
         </Card>
       </div>
     </div>
-  )
-} 
+  );
+}

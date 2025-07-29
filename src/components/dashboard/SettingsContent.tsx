@@ -371,7 +371,7 @@ export function SettingsContent({
           // 更新localStorage中的用户信息
           const userInfo = authUtils.getUserInfo();
           if (userInfo) {
-            userInfo.brand_id = brandId;
+            userInfo.current_brand_id = brandId;
             authUtils.setUserInfo(userInfo);
           }
         } else {
