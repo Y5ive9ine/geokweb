@@ -28,6 +28,11 @@ export interface GeoSearchData {
   status: "active" | "inactive";
   created_at: string;
   updated_at: string;
+  keywords?: string[]; // 添加关键词数组
+  mention_rate?: number; // 添加提及率
+  mention_rate_change?: number; // 添加提及率变化
+  search_count?: number; // 添加搜索量
+  search_count_change?: number; // 添加搜索量变化
   geo_optimization?: {
     search_volume: number;
     mention_frequency: number;
@@ -111,21 +116,41 @@ export default function GeoDatabaseTable({
       dataIndex: "title",
       align: "left",
       width: 300,
-      render: (value) => {
-        // 高亮关键词
-        if (value && value.includes("英伟达")) {
-          const parts = value.split("英伟达");
-          return (
-            <span className="text-[#333333] text-[14px]">
-              <span>{parts[0]}</span>
-              <span className="text-[#2663ff]">英伟达</span>
-              <span>{parts[1]}</span>
-            </span>
-          );
+      render: (value, record) => {
+        if (!value) {
+          return <span className="text-[#333333] text-[14px]">未知标题</span>;
         }
+
+        // 获取关键词列表
+        const keywords = record.keywords || [];
+
+        if (keywords.length === 0) {
+          return <span className="text-[#333333] text-[14px]">{value}</span>;
+        }
+
+        // 创建正则表达式来匹配所有关键词
+        const keywordPattern = new RegExp(`(${keywords.join("|")})`, "gi");
+
+        // 分割文本并高亮关键词
+        const parts = value.split(keywordPattern);
+
         return (
           <span className="text-[#333333] text-[14px]">
-            {value || "未知标题"}
+            {parts.map((part: string, index: number) => {
+              // 检查当前部分是否是关键词
+              const isKeyword = keywords.some(
+                (keyword: string) =>
+                  keyword.toLowerCase() === part.toLowerCase()
+              );
+
+              return isKeyword ? (
+                <span key={index} className="text-[#2663ff] font-medium">
+                  {part}
+                </span>
+              ) : (
+                <span key={index}>{part}</span>
+              );
+            })}
           </span>
         );
       },
@@ -141,28 +166,30 @@ export default function GeoDatabaseTable({
     {
       key: "search_volume",
       title: "搜索量",
-      dataIndex: "search_volume",
+      dataIndex: "search_count",
       width: 100,
       align: "center",
       render: (value, record) => {
-        // 从geo_optimization中获取搜索量，如果没有则使用模拟数据
-        const searchVolume =
-          record.geo_optimization?.search_volume ||
-          value ||
-          Math.floor(Math.random() * 5000) + 1000;
+        // 使用API返回的真实搜索量数据
+        const searchCount = record.search_count || value || 0;
+        const searchCountChange = record.search_count_change || 0;
+
         const formattedVolume =
-          searchVolume >= 1000
-            ? `${(searchVolume / 1000).toFixed(1)}k`
-            : searchVolume.toString();
+          searchCount >= 1000
+            ? `${(searchCount / 1000).toFixed(1)}k`
+            : searchCount.toString();
+
+        const formattedChange =
+          searchCountChange >= 1000
+            ? `${(searchCountChange / 1000).toFixed(1)}k`
+            : searchCountChange.toString();
 
         return (
           <div className="text-center flex gap-2 justify-center">
             <div className="text-[#333333] font-medium text-[14px]">
               {formattedVolume}
             </div>
-            <div className="text-[12px] text-[#11ca9c]">
-              +{Math.floor(Math.random() * 500) + 100}
-            </div>
+            <div className="text-[12px] text-[#11ca9c]">+{formattedChange}</div>
           </div>
         );
       },
@@ -170,25 +197,26 @@ export default function GeoDatabaseTable({
     {
       key: "mention_rate",
       title: "提及率",
-      dataIndex: "mention_frequency",
+      dataIndex: "mention_rate",
       width: 100,
       align: "center",
       render: (value, record) => {
-        // 从geo_optimization中获取提及频率，如果没有则使用模拟数据
-        const mentionFreq =
-          record.geo_optimization?.mention_frequency ||
-          value ||
-          Math.floor(Math.random() * 10) + 1;
-        const mentionRate = `${(mentionFreq * 1.2 + Math.random() * 2).toFixed(
-          1
-        )}%`;
-        const trend = Math.random() > 0.5 ? "+" : "-";
-        const trendValue = `${trend}${(Math.random() * 2).toFixed(1)}%`;
+        // 使用API返回的真实提及率数据
+        const mentionRate = record.mention_rate || value || 0;
+        const mentionRateChange = record.mention_rate_change || 0;
+
+        const formattedRate = `${(mentionRate * 100).toFixed(1)}%`;
+        const formattedChange = `${(mentionRateChange * 100).toFixed(1)}%`;
+
+        // 判断趋势方向
+        const trend = mentionRateChange >= 0 ? "+" : "-";
+        const trendValue =
+          trend === "+" ? `+${formattedChange}` : formattedChange;
 
         return (
           <div className="flex items-center justify-center space-x-2">
             <span className="text-[#333333] font-medium text-[14px]">
-              {mentionRate}
+              {formattedRate}
             </span>
             <div className="flex items-center space-x-1">
               <span
