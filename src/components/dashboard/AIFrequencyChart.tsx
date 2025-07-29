@@ -1,7 +1,7 @@
 'use client'
 
-import Image from 'next/image'
 import React, { useMemo } from 'react'
+import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from 'recharts'
 import { AIVisibilityTrendResponse } from '@/services/ai-visibility'
 
 interface AIFrequencyChartProps {
@@ -12,36 +12,31 @@ interface AIFrequencyChartProps {
 
 export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(({ data, loading, error }) => {
   // 使用useMemo缓存数据点计算，避免每次render都重新计算
-  const dataPoints = useMemo(() => {
-    if (!data || !Array.isArray(data) || data.length === 0) {
+  const radarData = useMemo(() => {
+    if (!data || !data.trend || !Array.isArray(data.trend) || data.trend.length === 0) {
       return [
-        { label: '价格', value: 0, x: '38%', y: '45%' },
-        { label: '质量', value: 0, x: '62%', y: '25%' },
-        { label: '性能', value: 0, x: '78%', y: '45%' },
-        { label: '性价比', value: 0, x: '78%', y: '75%' },
-        { label: '品牌', value: 0, x: '62%', y: '85%' },
-        { label: '产品', value: 0, x: '38%', y: '75%' },
+        { subject: '价格', A: 20, fullMark: 100 },
+        { subject: '质量', A: 30, fullMark: 100 },
+        { subject: '性能', A: 25, fullMark: 100 },
+        { subject: '性价比', A: 40, fullMark: 100 },
+        { subject: '品牌', A: 35, fullMark: 100 },
+        { subject: '产品', A: 28, fullMark: 100 },
       ]
     }
 
     // 从API数据计算最近的可见性分数
-    const recentData = data.slice(-6) // 取最近6个数据点
+    const recentData = data.trend.slice(-6) // 取最近6个数据点
     const labels = ['价格', '质量', '性能', '性价比', '品牌', '产品']
-    const positions = [
-      { x: '38%', y: '45%' },
-      { x: '62%', y: '25%' },
-      { x: '78%', y: '45%' },
-      { x: '78%', y: '75%' },
-      { x: '62%', y: '85%' },
-      { x: '38%', y: '75%' },
-    ]
 
-    return labels.map((label, index) => ({
-      label,
-      value: recentData[index]?.visibility_score || 0,
-      x: positions[index].x,
-      y: positions[index].y,
-    }))
+    return labels.map((label, index) => {
+      const metricData = recentData[index]
+      const score = metricData?.overall_score ? parseFloat(metricData.overall_score) : 0
+      return {
+        subject: label,
+        A: Math.max(0, Math.min(100, score)), // 确保在0-100范围内
+        fullMark: 100,
+      }
+    })
   }, [data])
 
   // 使用useMemo缓存渲染状态判断
@@ -71,121 +66,45 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(({ data, loadi
         <div className="flex items-center justify-center h-[400px]">
           <div className="text-center">
             <p className="text-red-500 text-sm mb-2">加载失败</p>
-            <p className="text-gray-500 text-xs">{error}</p>
+            <p className="text-gray-500 text-xs">{error || '未知错误'}</p>
           </div>
         </div>
       )}
 
-      {/* 图表容器 */}
+      {/* 雷达图 */}
       {renderState === 'normal' && (
-        <div className="relative w-full h-[400px] flex items-center justify-center">
-          {/* 六边形图层 - 从外到内 */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            {/* 最外层六边形 */}
-            <div className="relative w-[294px] h-[294px]">
-              <Image
-                src="/images/Polygon2.svg"
-                alt="Outer polygon"
-                fill
-                className="object-contain opacity-20"
-                loading="lazy"
-                sizes="(max-width: 768px) 250px, 294px"
+        <div className="h-[400px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <RadarChart data={radarData}>
+              <PolarGrid stroke="#e0e7ff" />
+              <PolarAngleAxis 
+                dataKey="subject" 
+                tick={{ fontSize: 12, fill: '#374151' }}
+                className="text-xs"
               />
-            </div>
-          </div>
-
-          <div className="absolute inset-0 flex items-center justify-center">
-            {/* 第二层六边形 */}
-            <div className="relative w-[235px] h-[235px]">
-              <Image
-                src="/images/Polygon3.svg"
-                alt="Second polygon"
-                fill
-                className="object-contain opacity-40"
-                loading="lazy"
-                sizes="(max-width: 768px) 200px, 235px"
+              <PolarRadiusAxis 
+                angle={90} 
+                domain={[0, 100]} 
+                tick={false}
+                axisLine={false}
               />
-            </div>
-          </div>
-
-          <div className="absolute inset-0 flex items-center justify-center">
-            {/* 第三层六边形 */}
-            <div className="relative w-[164px] h-[164px]">
-              <Image
-                src="/images/Polygon4.svg"
-                alt="Third polygon"
-                fill
-                className="object-contain opacity-60"
-                loading="lazy"
-                sizes="(max-width: 768px) 140px, 164px"
+              <Radar
+                name="在AI中出现频率"
+                dataKey="A"
+                stroke="#3b82f6"
+                fill="#3b82f6"
+                fillOpacity={0.3}
+                strokeWidth={2}
+                dot={{ r: 4, fill: '#3b82f6' }}
               />
-            </div>
-          </div>
-
-          <div className="absolute inset-0 flex items-center justify-center">
-            {/* 最内层六边形 */}
-            <div className="relative w-[150px] h-[150px]">
-              <Image
-                src="/images/Polygon5.svg"
-                alt="Inner polygon"
-                fill
-                className="object-contain opacity-80"
-                loading="lazy"
-                sizes="(max-width: 768px) 130px, 150px"
+              <Legend 
+                wrapperStyle={{ 
+                  paddingTop: '20px',
+                  fontSize: '12px'
+                }}
               />
-            </div>
-          </div>
-
-          {/* 连接线 */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="relative w-[326px] h-[301px]">
-              <Image
-                src="/images/Polygon6.svg"
-                alt="Connection lines"
-                fill
-                className="object-contain"
-                loading="lazy"
-                sizes="(max-width: 768px) 280px, 326px"
-              />
-            </div>
-          </div>
-
-          {/* 数据点 */}
-          {dataPoints.map((point, index) => (
-            <div
-              key={index}
-              className="absolute w-[8px] h-[8px] group cursor-pointer"
-              style={{ left: point.x, top: point.y, transform: 'translate(-50%, -50%)' }}
-            >
-              <div 
-                className={`w-full h-full rounded-full ${
-                  point.value > 0.7 ? 'bg-green-500' :
-                  point.value > 0.4 ? 'bg-yellow-500' : 'bg-red-500'
-                }`}
-              />
-              
-              {/* 悬停提示 */}
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
-                {point.label}: {(point.value * 100).toFixed(1)}%
-              </div>
-            </div>
-          ))}
-
-          {/* 标签 */}
-          {dataPoints.map((point, index) => (
-            <div
-              key={`label-${index}`}
-              className="absolute text-xs text-gray-600 font-medium"
-              style={{ 
-                left: point.x, 
-                top: point.y,
-                transform: 'translate(-50%, -50%)',
-                marginTop: index % 2 === 0 ? '20px' : '-20px'
-              }}
-            >
-              {point.label}
-            </div>
-          ))}
+            </RadarChart>
+          </ResponsiveContainer>
         </div>
       )}
     </div>

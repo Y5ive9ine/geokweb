@@ -1,6 +1,7 @@
 'use client'
 
-import Image from 'next/image'
+import React, { useMemo } from 'react'
+import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts'
 import { AIVisibilityStats } from '@/services/ai-visibility'
 
 interface BrandSearchRateCardProps {
@@ -11,35 +12,65 @@ interface BrandSearchRateCardProps {
 
 export function BrandSearchRateCard({ data, loading, error }: BrandSearchRateCardProps) {
   // 从API数据计算搜索率
-  const getSearchRateData = () => {
-    if (!data) {
+  const { searchData, chartData } = useMemo(() => {
+    if (!data || !data.brand_first_choice_rate || data.brand_first_choice_rate.length === 0) {
       return {
-        currentRate: '0%',
-        totalSearches: 0,
-        metrics: ['0%', '0%'],
-        trend: '无数据'
+        searchData: {
+          currentRate: '0%',
+          totalSearches: 0,
+          metrics: ['0%', '0%'],
+          trend: '无数据'
+        },
+        chartData: [
+          { name: '1月', value: 20 },
+          { name: '2月', value: 32 },
+          { name: '3月', value: 28 },
+          { name: '4月', value: 45 },
+          { name: '5月', value: 38 },
+          { name: '6月', value: 62 },
+          { name: '7月', value: 55 }
+        ]
       }
     }
 
-    // 基于可见性数据计算搜索率
-    const totalSearches = data.total_searches || 0
-    const mentionCount = data.mention_count || 0
-    const visibilityScore = data.total_visibility_score || 0
+    // 基于品牌首选率数据计算搜索率
+    const brandRates = data.brand_first_choice_rate
+    const totalRate = brandRates.reduce((sum, item) => sum + item.rate, 0)
+    const currentBrandRate = brandRates.find(item => 
+      item.brand === '当前品牌' || 
+      item.brand.includes('当前') || 
+      brandRates.indexOf(item) === 0
+    )?.rate || 0
     
-    // 计算搜索率（示例计算逻辑）
-    const searchRate = totalSearches > 0 ? ((mentionCount / totalSearches) * 100) : 0
-    const weeklyGrowth = visibilityScore * 50 // 模拟周增长
-    const monthlyGrowth = visibilityScore * 20 // 模拟月增长
+    // 计算搜索率（基于当前品牌在总数中的占比）
+    const searchRate = totalRate > 0 ? (currentBrandRate / totalRate) * 100 : 0
+    const weeklyGrowth = Math.min(searchRate * 1.1, 100) // 模拟周增长
+    const monthlyGrowth = Math.min(searchRate * 0.9, 100) // 模拟月增长
     
-    return {
+    const searchResult = {
       currentRate: `${searchRate.toFixed(1)}%`,
-      totalSearches,
+      totalSearches: totalRate,
       metrics: [`${weeklyGrowth.toFixed(0)}%`, `${monthlyGrowth.toFixed(0)}%`],
-      trend: searchRate > 100 ? '增长趋势' : searchRate > 50 ? '平稳增长' : '待提升'
+      trend: searchRate > 60 ? '增长趋势' : searchRate > 30 ? '平稳增长' : '待提升'
     }
-  }
 
-  const searchData = getSearchRateData()
+    // 基于品牌评分生成图表数据
+    const baseValue = currentBrandRate / 10 // 缩放到合适的图表范围
+    const chartResult = [
+      { name: '1月', value: Math.max(10, baseValue * 0.6) },
+      { name: '2月', value: Math.max(15, baseValue * 0.7) },
+      { name: '3月', value: Math.max(12, baseValue * 0.5) },
+      { name: '4月', value: Math.max(20, baseValue * 0.8) },
+      { name: '5月', value: Math.max(18, baseValue * 0.6) },
+      { name: '6月', value: Math.max(25, baseValue * 1.1) },
+      { name: '7月', value: Math.max(22, baseValue) }
+    ]
+
+    return {
+      searchData: searchResult,
+      chartData: chartResult
+    }
+  }, [data])
 
   return (
     <div className="bg-white rounded-2xl border border-gray-300 p-8 h-[326px]">
@@ -60,14 +91,14 @@ export function BrandSearchRateCard({ data, loading, error }: BrandSearchRateCar
 
       {/* 加载状态 */}
       {loading && (
-        <div className="flex items-center justify-center h-[200px]">
+        <div className="flex items-center justify-center h-[180px]">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
       )}
 
       {/* 错误状态 */}
       {error && !loading && (
-        <div className="flex items-center justify-center h-[200px]">
+        <div className="flex items-center justify-center h-[180px]">
           <div className="text-center">
             <p className="text-red-500 text-xs mb-1">数据加载失败</p>
             <p className="text-gray-500 text-xs">{error}</p>
@@ -90,45 +121,46 @@ export function BrandSearchRateCard({ data, loading, error }: BrandSearchRateCar
             </div>
           </div>
 
-          {/* 图表区域 */}
-          <div className="relative h-[183px] w-full">
-            {/* 主要图表 */}
-            <div className="absolute inset-0">
-              <Image
-                src="/images/Vector12.svg"
-                alt="Brand search rate chart background"
-                fill
-                className="object-contain"
-              />
-            </div>
-            
-            {/* 前景图表线条 */}
-            <div className="absolute inset-0 top-[-3px]">
-              <Image
-                src="/images/Vector1.svg"
-                alt="Brand search rate chart line"
-                fill
-                className="object-contain"
-              />
-            </div>
-
-            {/* 数据点覆盖 */}
-            {data && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-sm font-medium text-gray-700">
-                    提及次数: {data.mention_count || 0}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    平均位置: {data.average_position?.toFixed(1) || 'N/A'}
-                  </div>
-                </div>
-              </div>
-            )}
+          {/* 面积图 */}
+          <div className="h-[120px] mb-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#4285f4" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#4285f4" stopOpacity={0.1}/>
+                  </linearGradient>
+                </defs>
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 10, fill: '#9ca3af' }}
+                />
+                <YAxis hide />
+                <Tooltip 
+                  contentStyle={{
+                    background: 'rgba(0, 0, 0, 0.8)',
+                    border: 'none',
+                    borderRadius: '4px',
+                    color: 'white',
+                    fontSize: '12px'
+                  }}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke="#4285f4" 
+                  fillOpacity={1} 
+                  fill="url(#colorUv)"
+                  strokeWidth={2}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
 
           {/* 图表底部 */}
-          <div className="mt-4 flex justify-between text-xs text-gray-500">
+          <div className="flex justify-between text-xs text-gray-500">
             <span>过去7天</span>
             <span className={`font-medium ${
               searchData.trend === '增长趋势' ? 'text-green-600' :

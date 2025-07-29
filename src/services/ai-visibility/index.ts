@@ -92,12 +92,19 @@ export interface BatchCalculateResponse {
   results: any;
 }
 
+// 品牌首选率数据接口
+export interface BrandFirstChoiceRate {
+  brand: string;
+  rate: number;
+}
+
 // AI可见性统计接口
 export interface AIVisibilityStats {
-  total_metrics: number;
-  average_score: string;
-  brand_id?: string;
-  timestamp: string;
+  brand_id: string;
+  brand_first_choice_rate: BrandFirstChoiceRate[];
+  total_metrics?: number;
+  average_score?: string;
+  timestamp?: string;
 }
 
 // 专门的AI Visibility API方法
