@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { authApi, authUtils } from "@/services/auth";
 import { brandApi } from "@/services/brand";
+import { AvatarUpload } from "./settings/AvatarUpload";
 
 interface SettingsContentProps {
   activeTab?: string;
@@ -76,7 +77,13 @@ export function SettingsContent({
     confirmPassword: "1427677523777773",
   });
 
-  const accountSubTabs = ["账户信息", "电子邮件", "密码", "品牌设置"];
+  const accountSubTabs = [
+    "账户信息",
+    "电子邮件",
+    "密码",
+    "品牌设置",
+    "设置头像",
+  ];
 
   // 当activeTab变化时，重置子标签
   useEffect(() => {
@@ -906,6 +913,34 @@ export function SettingsContent({
                       {brandLoading ? "刷新中..." : "刷新品牌列表"}
                     </button>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* 图像上传标签页 */}
+            {activeSubTab === "设置头像" && (
+              <div className="bg-white rounded-lg p-6 md:p-8 border border-gray-200 max-w-2xl">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-gray-800 text-xl font-bold mb-4">
+                      设置头像
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-6">
+                      上传您的头像图片，支持 JPG、PNG、GIF、WebP
+                      格式，文件大小不超过 5MB。
+                    </p>
+                  </div>
+
+                  <AvatarUpload
+                    onSuccess={(url) => {
+                      showMessage("头像更新成功！", "success");
+                      // 可以在这里触发用户信息刷新
+                      fetchUserInfo();
+                    }}
+                    onError={(error) => {
+                      showMessage(error, "error");
+                    }}
+                  />
                 </div>
               </div>
             )}

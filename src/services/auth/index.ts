@@ -39,7 +39,7 @@ export const authApi = {
   }) => api.put("/api/auth/password", passwordData),
 
   // 更新头像
-  updateAvatar: (avatarData: { url: string }) =>
+  updateAvatar: (avatarData: { avatar_url: string }) =>
     api.put("/api/auth/avatar", avatarData),
 
   // 登出

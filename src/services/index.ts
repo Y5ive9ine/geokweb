@@ -26,10 +26,20 @@ export {
   type DatabaseInfo,
 } from "./geo";
 
+// 文件上传服务
+export {
+  uploadApi,
+  uploadUtils,
+  type UploadResponse,
+  type UploadConfig,
+  type UploadProgressCallback,
+} from "./upload";
+
 // 默认导出所有API
 export default {
   auth: () => import("./auth").then((m) => m.authApi),
   brand: () => import("./brand").then((m) => m.brandApi),
   blog: () => import("./blog").then((m) => m.blogApi),
   geo: () => import("./geo"),
+  upload: () => import("./upload").then((m) => m.uploadApi),
 };

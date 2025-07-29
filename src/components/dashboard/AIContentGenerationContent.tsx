@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useMemo } from 'react'
-import { createPortal } from 'react-dom'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import { useBlogs } from '@/hooks/useBlogs'
-import { Blog } from '@/lib/types'
-import AIContentGenerator from '@/components/AIContentGenerator'
-import DocumentEditor from '@/components/DocumentEditor'
-import Pagination from '@/components/Pagination'
-import { AIContentGenerationResponse, blogApi } from '@/services/blog'
-import { useToast } from '@/hooks/useToast'
+import { useState, useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { useBlogs } from "@/hooks/useBlogs";
+import { Blog } from "@/lib/types";
+import AIContentGenerator from "@/components/AIContentGenerator";
+import DocumentEditor from "@/components/DocumentEditor";
+import Pagination from "@/components/Pagination";
+import { AIContentGenerationResponse, blogApi } from "@/services/blog";
+import { useToast } from "@/hooks/useToast";
 
 // 品牌文章弹窗组件
 const ArticleModal = ({
@@ -19,94 +19,94 @@ const ArticleModal = ({
   blog,
   onBlogUpdated,
 }: {
-  isOpen: boolean
-  onClose: () => void
-  blog?: Blog | null
-  onBlogUpdated?: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  blog?: Blog | null;
+  onBlogUpdated?: () => void;
 }) => {
-  const [mounted, setMounted] = useState(false)
-  const [isEditing, setIsEditing] = useState(false)
-  const [currentBlog, setCurrentBlog] = useState<Blog | null>(blog || null)
-  const [isLoadingBlog, setIsLoadingBlog] = useState(false)
-  const { success, error } = useToast()
+  const [mounted, setMounted] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentBlog, setCurrentBlog] = useState<Blog | null>(blog || null);
+  const [isLoadingBlog, setIsLoadingBlog] = useState(false);
+  const { success, error } = useToast();
 
   useEffect(() => {
-    setMounted(true)
-    return () => setMounted(false)
-  }, [])
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   // 同步blog数据
   useEffect(() => {
-    setCurrentBlog(blog || null)
-  }, [blog])
+    setCurrentBlog(blog || null);
+  }, [blog]);
 
   // 重置编辑状态当弹窗关闭时
   useEffect(() => {
     if (!isOpen) {
-      setIsEditing(false)
+      setIsEditing(false);
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   const handleEdit = () => {
-    setIsEditing(true)
-  }
+    setIsEditing(true);
+  };
 
   const reloadBlogData = async () => {
-    if (!currentBlog?.id) return
+    if (!currentBlog?.id) return;
 
-    console.log('重新加载博客数据，ID:', currentBlog.id)
-    setIsLoadingBlog(true)
+    console.log("重新加载博客数据，ID:", currentBlog.id);
+    setIsLoadingBlog(true);
     try {
-      const response = await blogApi.getBlog(currentBlog.id)
-      console.log('重新加载博客响应:', response)
+      const response = await blogApi.getBlog(currentBlog.id);
+      console.log("重新加载博客响应:", response);
       if (response.success && response.data) {
         // API返回的数据结构是 { data: { blog: {...} } }
-        const blogData = response.data.blog || response.data
-        console.log('设置新的博客数据:', blogData)
-        setCurrentBlog(blogData)
+        const blogData = response.data.blog || response.data;
+        console.log("设置新的博客数据:", blogData);
+        setCurrentBlog(blogData);
       } else {
-        console.error('重新加载博客失败:', response)
-        error('加载失败', response.error || '无法重新加载博客数据')
+        console.error("重新加载博客失败:", response);
+        error("加载失败", response.error || "无法重新加载博客数据");
       }
     } catch (err) {
-      console.error('重新加载博客数据失败:', err)
-      error('加载失败', '无法重新加载博客数据')
+      console.error("重新加载博客数据失败:", err);
+      error("加载失败", "无法重新加载博客数据");
     } finally {
-      setIsLoadingBlog(false)
+      setIsLoadingBlog(false);
     }
-  }
+  };
 
   const handleSave = async (title: string, content: string) => {
     if (!currentBlog?.id) {
-      throw new Error('博客ID不存在')
+      throw new Error("博客ID不存在");
     }
 
     try {
       const response = await blogApi.updateBlog(currentBlog.id, {
         title,
         content,
-      })
+      });
 
       if (response.success) {
-        setIsEditing(false)
-        onBlogUpdated?.()
-        success('保存成功', '文档已成功保存')
+        setIsEditing(false);
+        onBlogUpdated?.();
+        success("保存成功", "文档已成功保存");
         // 重新加载博客数据以显示最新内容
-        await reloadBlogData()
+        await reloadBlogData();
       } else {
-        throw new Error(response.error || '保存失败')
+        throw new Error(response.error || "保存失败");
       }
     } catch (error) {
-      console.error('保存博客失败:', error)
-      throw error
+      console.error("保存博客失败:", error);
+      throw error;
     }
-  }
+  };
 
   const handleCancelEdit = () => {
-    setIsEditing(false)
-  }
+    setIsEditing(false);
+  };
 
-  if (!isOpen || !mounted) return null
+  if (!isOpen || !mounted) return null;
 
   const modalContent = (
     <>
@@ -114,7 +114,7 @@ const ArticleModal = ({
       <div
         className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
         onClick={onClose}
-        style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)' }}
+        style={{ backgroundColor: "rgba(0, 0, 0, 0.2)" }}
       >
         <div
           className="bg-white rounded-xl md:rounded-[20px] w-full max-w-4xl h-full max-h-[90vh] md:h-[730px] relative shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4)] border border-gray-200 overflow-hidden"
@@ -154,15 +154,15 @@ const ArticleModal = ({
               {isEditing ? (
                 /* 编辑模式 */
                 <DocumentEditor
-                  initialTitle={currentBlog?.title || ''}
-                  initialContent={currentBlog?.content || ''}
+                  initialTitle={currentBlog?.title || ""}
+                  initialContent={currentBlog?.content || ""}
                   onSave={handleSave}
                   onCancel={handleCancelEdit}
                   isLoading={isLoadingBlog}
                 />
               ) : (
                 /* 查看模式 */
-                <div className="p-4 md:p-6 flex flex-col md:flex-row h-full relative">
+                <div className="p-4 md:p-6 flex flex-col md:flex-row h-full relative pr-0 md:pr-0">
                   {/* 加载指示器 */}
                   {isLoadingBlog && (
                     <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
@@ -195,11 +195,11 @@ const ArticleModal = ({
                   )}
 
                   {/* 文字内容 */}
-                  <div className="flex-1 md:pr-6">
+                  <div className="flex-1">
                     {/* 文章标题 */}
                     <h3 className="text-lg md:text-2xl font-black text-gray-800 leading-relaxed mb-4 md:mb-6">
                       {currentBlog?.title ||
-                        '千元级性能王者: 英特尔酷睿i5-14600KF全面解析'}
+                        "千元级性能王者: 英特尔酷睿i5-14600KF全面解析"}
                     </h3>
 
                     {/* 作者信息 */}
@@ -226,7 +226,7 @@ const ArticleModal = ({
                           />
                         </svg>
                         <span className="text-xs text-gray-500">
-                          {blog?.author?.name || 'Marco'}
+                          {blog?.author?.name || "Marco"}
                         </span>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -261,12 +261,12 @@ const ArticleModal = ({
                           {currentBlog?.published_at
                             ? new Date(
                                 currentBlog.published_at
-                              ).toLocaleDateString('zh-CN', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
+                              ).toLocaleDateString("zh-CN", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
                               })
-                            : '2025年6月10日'}
+                            : "2025年6月10日"}
                         </span>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -289,21 +289,15 @@ const ArticleModal = ({
                           />
                         </svg>
                         <span className="text-xs text-gray-500">
-                          {currentBlog?.category || '科技测评'}
+                          {currentBlog?.category || "科技测评"}
                         </span>
                       </div>
                     </div>
 
                     {/* 文章正文 */}
-                    <div className="text-sm text-gray-900 leading-relaxed overflow-y-auto flex-1">
-                      {currentBlog?.excerpt && (
-                        <p className="mb-4 font-medium text-gray-600">
-                          {currentBlog.excerpt}
-                        </p>
-                      )}
-
+                    <div className="text-sm text-gray-900 leading-relaxed overflow-y-scroll flex-1  h-[calc(100%-6rem)]">
                       {currentBlog?.content && (
-                        <div className="prose prose-sm max-w-none">
+                        <div className="prose prose-sm max-w-none ">
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
                             components={{
@@ -397,93 +391,96 @@ const ArticleModal = ({
         </div>
       </div>
     </>
-  )
+  );
 
   // 使用Portal将弹窗渲染到document.body下，绕过页面容器限制
-  return createPortal(modalContent, document.body)
-}
+  return createPortal(modalContent, document.body);
+};
 
 export function AIContentGenerationContent() {
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null)
-  const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
+  const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
 
   // 分页状态
-  const [currentPage, setCurrentPage] = useState(1)
-  const pageSize = 5
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
 
   // 使用useMemo稳定参数，避免无限重新渲染
   const blogParams = useMemo(
     () => ({
       page: currentPage,
       page_size: pageSize,
-      status: 'published' as const,
+      status: "published" as const,
     }),
     [currentPage]
-  )
+  );
 
   // 使用blogs hook获取数据
-  const { blogs, loading, error, refresh, pagination } = useBlogs(blogParams)
+  const { blogs, loading, error, refresh, pagination } = useBlogs(blogParams);
 
   // 添加调试信息
   useEffect(() => {
-    console.log('Blogs data updated:', {
+    console.log("Blogs data updated:", {
       blogsLength: blogs?.length,
       blogsArray: blogs,
       loading,
       error,
       blogsType: typeof blogs,
       isArray: Array.isArray(blogs),
-    })
-  }, [blogs, loading, error])
+    });
+  }, [blogs, loading, error]);
 
   const handleArticleClick = (blog?: Blog) => {
-    setSelectedBlog(blog || null)
-    setIsModalOpen(true)
-  }
+    setSelectedBlog(blog || null);
+    setIsModalOpen(true);
+  };
 
   const handleCloseModal = () => {
-    setIsModalOpen(false)
-    setSelectedBlog(null)
-  }
+    setIsModalOpen(false);
+    setSelectedBlog(null);
+  };
 
   const handleBlogUpdated = () => {
-    refresh() // 刷新博客列表
-  }
+    refresh(); // 刷新博客列表
+  };
 
   const handleOpenAIGenerator = () => {
-    setIsAIGeneratorOpen(true)
-  }
+    setIsAIGeneratorOpen(true);
+  };
 
   const handleCloseAIGenerator = () => {
-    setIsAIGeneratorOpen(false)
-  }
+    setIsAIGeneratorOpen(false);
+  };
 
   const handleContentGenerated = (content: AIContentGenerationResponse) => {
-    console.log('Generated content:', content)
+    console.log("Generated content:", content);
     // 可以在这里处理生成的内容，比如显示预览或直接创建博客
-  }
+  };
 
   const handleBlogCreated = () => {
     // 刷新博客列表
-    refresh()
-  }
+    refresh();
+  };
 
   // 分页处理函数
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-  }
+    setCurrentPage(page);
+  };
 
   return (
     <div className="flex-1 overflow-auto bg-gray-50 p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        
         {/* 搜索和筛选区域 */}
         <div className="bg-white rounded-lg border border-gray-300 p-4 md:p-6">
           {/* Blogs数据库标题 */}
           <div className="mb-4">
-            <h1 className="text-lg md:text-xl font-bold text-gray-800">Blogs 数据库</h1>
-            <p className="text-xs md:text-sm font-medium text-gray-800">构建客户搜索内容数据库</p>
+            <h1 className="text-lg md:text-xl font-bold text-gray-800">
+              Blogs 数据库
+            </h1>
+            <p className="text-xs md:text-sm font-medium text-gray-800">
+              构建客户搜索内容数据库
+            </p>
           </div>
 
           {/* 按钮区域 */}
@@ -607,24 +604,24 @@ export function AIContentGenerationContent() {
                         </h3>
                         <div className="flex flex-col sm:flex-row sm:items-center mb-2 space-y-1 sm:space-y-0 sm:space-x-4">
                           <span className="text-gray-700 text-xs underline">
-                            {blog.author?.name || '未知作者'}
+                            {blog.author?.name || "未知作者"}
                           </span>
                           <span className="text-gray-700 text-xs underline">
                             {blog.published_at
                               ? new Date(blog.published_at).toLocaleDateString(
-                                  'zh-CN'
+                                  "zh-CN"
                                 )
                               : blog.created_at
                               ? new Date(blog.created_at).toLocaleDateString(
-                                  'zh-CN'
+                                  "zh-CN"
                                 )
-                              : '未知日期'}
+                              : "未知日期"}
                           </span>
                         </div>
                         <p className="text-gray-600 text-sm leading-normal">
                           {blog.excerpt ||
-                            blog.content?.substring(0, 100) + '...' ||
-                            '暂无描述'}
+                            blog.content?.substring(0, 100) + "..." ||
+                            "暂无描述"}
                         </p>
                       </div>
 
@@ -731,8 +728,7 @@ export function AIContentGenerationContent() {
           onContentGenerated={handleContentGenerated}
           onBlogCreated={handleBlogCreated}
         />
-
       </div>
     </div>
-  )
-} 
+  );
+}
