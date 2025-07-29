@@ -33,7 +33,7 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
 
       // 从API数据计算最近的可见性分数
       const recentData = data.trend.slice(-6); // 取最近6个数据点
-      const labels = ["价格", "质量", "性能", "性价比", "品牌", "产品"];
+      const labels = ["价格", "质量", "性能", "性价比", "品牌"];
 
       return labels.map((label, index) => {
         const metricData = recentData[index];

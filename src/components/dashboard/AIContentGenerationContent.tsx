@@ -11,6 +11,7 @@ import DocumentEditor from "@/components/DocumentEditor";
 import Pagination from "@/components/Pagination";
 import { AIContentGenerationResponse, blogApi } from "@/services/blog";
 import { useToast } from "@/hooks/useToast";
+import { authUtils } from "@/services/auth";
 
 // 品牌文章弹窗组件
 const ArticleModal = ({
@@ -401,35 +402,52 @@ export function AIContentGenerationContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
+  const [brand_id, setBrandId] = useState<string>("");
 
   // 分页状态
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
 
+  // 获取品牌ID
+  useEffect(() => {
+    const userInfo = authUtils.getUserInfo();
+    console.log("AIContentGeneration - 用户信息:", userInfo);
+    if (userInfo?.current_brand_id) {
+      console.log(
+        "AIContentGeneration - 设置品牌ID:",
+        userInfo.current_brand_id
+      );
+      setBrandId(userInfo.current_brand_id);
+    } else {
+      console.log("AIContentGeneration - 未找到品牌ID");
+    }
+  }, []);
+
   // 使用useMemo稳定参数，避免无限重新渲染
-  const blogParams = useMemo(
-    () => ({
+  const blogParams = useMemo(() => {
+    const params = {
       page: currentPage,
       page_size: pageSize,
       status: "published" as const,
-    }),
-    [currentPage]
+      brand_id,
+    };
+    console.log("AIContentGeneration - 博客参数:", params);
+    return params;
+  }, [currentPage, brand_id]);
+
+  // 只有当brand_id存在时才发起API请求
+  const shouldFetchData = Boolean(brand_id);
+  console.log(
+    "AIContentGeneration - 是否应该获取数据:",
+    shouldFetchData,
+    "brand_id:",
+    brand_id
   );
 
   // 使用blogs hook获取数据
-  const { blogs, loading, error, refresh, pagination } = useBlogs(blogParams);
-
-  // 添加调试信息
-  useEffect(() => {
-    console.log("Blogs data updated:", {
-      blogsLength: blogs?.length,
-      blogsArray: blogs,
-      loading,
-      error,
-      blogsType: typeof blogs,
-      isArray: Array.isArray(blogs),
-    });
-  }, [blogs, loading, error]);
+  const { blogs, loading, error, refresh, pagination } = useBlogs(
+    shouldFetchData ? blogParams : undefined
+  );
 
   const handleArticleClick = (blog?: Blog) => {
     setSelectedBlog(blog || null);
@@ -541,7 +559,13 @@ export function AIContentGenerationContent() {
 
           {/* 文章数据行容器 */}
           <div className="min-h-[500px]">
-            {loading ? (
+            {!shouldFetchData ? (
+              <div className="flex items-center justify-center h-96">
+                <div className="text-center text-gray-600">
+                  <div className="mb-2">正在获取品牌信息...</div>
+                </div>
+              </div>
+            ) : loading ? (
               <div className="flex items-center justify-center h-96">
                 <div className="flex items-center space-x-2 text-gray-600">
                   <svg
