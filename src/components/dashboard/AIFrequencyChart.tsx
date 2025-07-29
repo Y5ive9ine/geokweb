@@ -86,7 +86,7 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
             在AI中出现频率
           </h3>
           <p className="text-xs text-gray-600">
-            搜索关键词内容在人工智能中出现频率的三维度分析
+            搜索关键词内容在人工智能中出现频率的多维度分析
           </p>
         </div>
 
