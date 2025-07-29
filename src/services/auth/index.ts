@@ -47,6 +47,13 @@ export const authApi = {
 
   // 刷新token
   refresh: () => api.post("/api/auth/refresh"),
+
+  // 获取当前品牌
+  getCurrentBrand: () => api.get("/api/auth/current-brand"),
+
+  // 更新当前品牌
+  updateCurrentBrand: (brandData: { brand_id: string }) =>
+    api.put("/api/auth/current-brand", brandData),
 };
 
 // 认证相关的工具函数
