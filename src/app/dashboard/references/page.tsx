@@ -31,7 +31,7 @@ export default function ReferencesPage() {
   // 获取品牌ID
   useEffect(() => {
     const userInfo = authUtils.getUserInfo();
-    if (userInfo?.curren) {
+    if (userInfo?.current_brand_id) {
       setCurrentBrandId(userInfo.current_brand_id);
     } 
   }, []);

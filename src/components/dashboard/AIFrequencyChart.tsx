@@ -10,10 +10,10 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { AIVisibilityTrendResponse } from "@/services/ai-visibility";
+import { AIVisibilityStats } from "@/services/ai-visibility";
 
 interface AIFrequencyChartProps {
-  data: AIVisibilityTrendResponse | null;
+  data: AIVisibilityStats | null;
   loading: boolean;
   error: string | null;
 }
@@ -22,37 +22,37 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
   ({ data, loading, error }) => {
     // 使用useMemo缓存数据点计算，避免每次render都重新计算
     const radarData = useMemo(() => {
-      if (
-        !data ||
-        !data.trend ||
-        !Array.isArray(data.trend) ||
-        data.trend.length === 0
-      ) {
+      if (!data) {
         return [];
       }
 
-      // 从实际数据中提取可用的分数维度
-      const scoreMetrics = [
-        { key: 'overall_score', label: '总体分数' },
-        { key: 'frequency_score', label: '频率分数' },
-        { key: 'recommendation_score', label: '推荐分数' },
-        { key: 'search_rate_score', label: '搜索率分数' },
-        { key: 'first_choice_score', label: '首选分数' },
+      // 从真实数据中提取三个维度的平均值
+      const calculateAverageRate = (rateArray: Array<{ brand: string; rate: number }>) => {
+        if (!rateArray || rateArray.length === 0) return 0;
+        const totalRate = rateArray.reduce((sum, item) => sum + item.rate, 0);
+        return totalRate / rateArray.length;
+      };
+
+      const metrics = [
+        {
+          subject: '品牌首选率',
+          data: data.brand_first_choice_rate,
+        },
+        {
+          subject: '品牌推荐率',
+          data: data.brand_recommend_rate,
+        },
+        {
+          subject: '品牌搜索率',
+          data: data.brand_search_rate,
+        },
       ];
 
-      // 计算每个维度的平均分数
-      return scoreMetrics.map(({ key, label }) => {
-        const scores = data.trend
-          .map(item => parseFloat(item[key as keyof typeof item] as string || '0'))
-          .filter(score => !isNaN(score));
-        
-        const avgScore = scores.length > 0 
-          ? scores.reduce((sum, score) => sum + score, 0) / scores.length 
-          : 0;
-        
+      return metrics.map(({ subject, data: rateData }) => {
+        const avgRate = calculateAverageRate(rateData);
         return {
-          subject: label,
-          A: Math.max(0, Math.min(100, avgScore)), // 确保在0-100范围内
+          subject,
+          A: Math.max(0, Math.min(100, avgRate)), // 确保在0-100范围内
           fullMark: 100,
         };
       }).filter(item => item.A > 0); // 只保留有数据的维度

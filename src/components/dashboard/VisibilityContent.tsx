@@ -57,12 +57,12 @@ export function VisibilityContent() {
   const renderAIFrequencyChart = useCallback(
     () => (
       <AIFrequencyChart
-        data={trend}
-        loading={trendLoading}
-        error={trendError}
+        data={stats}
+        loading={statsLoading}
+        error={statsError}
       />
     ),
-    [trend, trendLoading, trendError]
+    [stats, statsLoading, statsError]
   );
 
   const renderBrandRecommendationCard = useCallback(
