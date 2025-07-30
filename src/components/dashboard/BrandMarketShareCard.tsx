@@ -2,10 +2,23 @@
 
 import React, { useMemo } from 'react'
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
-import { AIVisibilityStats } from '@/services/ai-visibility'
+import { AIVisibilityStats, BrandFirstChoiceRate } from '@/services/ai-visibility'
+
+// 支持实际API返回的数据结构
+interface APIVisibilityResponse {
+  brand_id: string;
+  data: {
+    keyword_frequency: any[];
+    brand_first_choice_rate: BrandFirstChoiceRate[];
+    brand_recommend_rate: BrandFirstChoiceRate[];
+    brand_search_rate: BrandFirstChoiceRate[];
+  };
+  days?: number;
+  timestamp?: string;
+}
 
 interface BrandMarketShareCardProps {
-  data: AIVisibilityStats | null
+  data: APIVisibilityResponse | AIVisibilityStats | null
   loading: boolean
   error: string | null
 }
@@ -13,7 +26,29 @@ interface BrandMarketShareCardProps {
 export function BrandMarketShareCard({ data, loading, error }: BrandMarketShareCardProps) {
   // 从API数据生成品牌首推率信息
   const brands = useMemo(() => {
-    if (!data || !data.brand_first_choice_rate || data.brand_first_choice_rate.length === 0) {
+    if (!data) {
+      return [
+        { name: '当前品牌', percentage: '35.6%', value: 35.6, color: '#4285F4' },
+        { name: '竞品A', percentage: '18.7%', value: 18.7, color: '#FF9800' },
+        { name: '竞品B', percentage: '12.2%', value: 12.2, color: '#4CAF50' },
+        { name: '竞品C', percentage: '8.3%', value: 8.3, color: '#FF5722' },
+        { name: '其他', percentage: '25.2%', value: 25.2, color: '#E91E63' },
+      ]
+    }
+
+    // 检查数据结构 - 支持两种可能的结构
+    let brandFirstChoiceRate: BrandFirstChoiceRate[] = [];
+    
+    // 如果数据有嵌套的data字段
+    if ('data' in data && data.data && 'brand_first_choice_rate' in data.data) {
+      brandFirstChoiceRate = data.data.brand_first_choice_rate;
+    } 
+    // 如果数据直接有brand_first_choice_rate字段
+    else if ('brand_first_choice_rate' in data) {
+      brandFirstChoiceRate = data.brand_first_choice_rate;
+    }
+
+    if (!brandFirstChoiceRate || brandFirstChoiceRate.length === 0) {
       return [
         { name: '当前品牌', percentage: '35.6%', value: 35.6, color: '#4285F4' },
         { name: '竞品A', percentage: '18.7%', value: 18.7, color: '#FF9800' },
@@ -24,7 +59,7 @@ export function BrandMarketShareCard({ data, loading, error }: BrandMarketShareC
     }
 
     // 使用品牌首推率数据
-    const brandRateData = data.brand_first_choice_rate
+    const brandRateData = brandFirstChoiceRate
     const total = brandRateData.reduce((sum, item) => sum + item.rate, 0)
     
     // 颜色映射

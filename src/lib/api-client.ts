@@ -33,6 +33,19 @@ const getAuthToken = (): string | null => {
   return null;
 };
 
+// 清除认证token并跳转到登录页面
+const handleUnauthorized = (): void => {
+  if (typeof window !== "undefined") {
+    // 清除存储的token
+    localStorage.removeItem("access_token");
+    // 可选：清除其他相关的用户信息
+    localStorage.removeItem("user_info");
+    
+    // 跳转到登录页面
+    window.location.href = "/auth/login";
+  }
+};
+
 // 封装的fetch请求
 export const apiRequest = async <T = any>(
   endpoint: string,
@@ -91,6 +104,19 @@ export const apiRequest = async <T = any>(
     }
 
     console.log(`API Response: ${response.status}`, data);
+
+    // 处理401未授权错误
+    if (response.status === 401) {
+      console.warn("API Response: 401 Unauthorized, redirecting to login...");
+      handleUnauthorized();
+      // 返回特殊的401错误响应
+      return {
+        success: false,
+        error: "Authentication required. Redirecting to login...",
+        message: "You are not logged in",
+        status: 401,
+      };
+    }
 
     const result: ApiResponse<T> = {
       success: response.ok && data?.success !== false,

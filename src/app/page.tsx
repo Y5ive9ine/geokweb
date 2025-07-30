@@ -121,7 +121,7 @@ export default function HomePage() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <span className="font-bold text-gray-800 text-base">品牌</span>
-                <span className="text-gray-600 text-sm">搜索内容XXXX在人工智能中出现频率</span>
+                <span className="text-gray-600 text-sm">搜索内容某品牌在人工智能中出现频率</span>
               </div>
             </div>
             

@@ -7,6 +7,8 @@ import { useSidebarState } from "@/hooks/useSidebarState";
 import { useBrandReferences } from "@/hooks/useReferences";
 import { authUtils } from "@/services/auth";
 import { referencesUtils } from "@/services/references";
+import { brandApi } from "@/services/brand";
+import { Brand } from "@/lib/types";
 import {
   DownloadIcon,
   ChevronDownIcon,
@@ -19,6 +21,8 @@ export default function ReferencesPage() {
   const [activeTab, setActiveTab] = useState("references");
   const [currentBrandId, setCurrentBrandId] = useState<string>("");
   const [days, setDays] = useState(7);
+  const [currentBrand, setCurrentBrand] = useState<Brand | null>(null);
+  const [availableBrands, setAvailableBrands] = useState<Brand[]>([]);
 
   const {
     sidebarCollapsed,
@@ -33,8 +37,56 @@ export default function ReferencesPage() {
     const userInfo = authUtils.getUserInfo();
     if (userInfo?.current_brand_id) {
       setCurrentBrandId(userInfo.current_brand_id);
-    } 
+    }
   }, []);
+
+  // 获取可用品牌列表（复用品牌设置的逻辑）
+  const fetchAvailableBrands = async () => {
+    try {
+      const response = await brandApi.list({
+        page: 1,
+        page_size: 10, // 获取更多品牌以确保包含当前品牌
+      });
+      if (response.success && response.data) {
+        let brands: Brand[] = [];
+        
+        // 检查数据结构
+        if (Array.isArray(response.data)) {
+          brands = response.data;
+        } else if (response.data.data && Array.isArray(response.data.data)) {
+          brands = response.data.data;
+        }
+        
+        setAvailableBrands(brands);
+      }
+    } catch (error) {
+      console.error("获取品牌列表异常:", error);
+    }
+  };
+
+  // 从品牌列表中更新当前品牌信息（复用品牌设置的逻辑）
+  const updateBrandData = (currentBrandId: string, availableBrands: Brand[]) => {
+    if (currentBrandId && availableBrands.length > 0) {
+      const currentBrandInfo = availableBrands.find(
+        (brand) => brand.id === currentBrandId
+      );
+      if (currentBrandInfo) {
+        setCurrentBrand(currentBrandInfo);
+      }
+    }
+  };
+
+  // 获取品牌列表
+  useEffect(() => {
+    if (currentBrandId) {
+      fetchAvailableBrands();
+    }
+  }, [currentBrandId]);
+
+  // 当品牌ID或品牌列表变化时更新当前品牌
+  useEffect(() => {
+    updateBrandData(currentBrandId, availableBrands);
+  }, [currentBrandId, availableBrands]);
 
   // 使用真实的API获取品牌引用数据
   const { references, loading, error, refresh } = useBrandReferences(
@@ -125,7 +177,7 @@ export default function ReferencesPage() {
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900">品牌</h2>
                     <p className="text-gray-600 mt-1">
-                      搜索内容XXXX在人工智能中出现频率
+                      搜索内容{currentBrand?.name || "XXXX"}在人工智能中出现频率
                     </p>
                   </div>
                   <div className="flex items-center space-x-4">

@@ -2,10 +2,23 @@
 
 import React, { useMemo } from 'react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts'
-import { AIVisibilityStats } from '@/services/ai-visibility'
+import { AIVisibilityStats, BrandFirstChoiceRate } from '@/services/ai-visibility'
+
+// 支持实际API返回的数据结构
+interface APIVisibilityResponse {
+  brand_id: string;
+  data: {
+    keyword_frequency: any[];
+    brand_first_choice_rate: BrandFirstChoiceRate[];
+    brand_recommend_rate: BrandFirstChoiceRate[];
+    brand_search_rate: BrandFirstChoiceRate[];
+  };
+  days?: number;
+  timestamp?: string;
+}
 
 interface BrandRecommendationCardProps {
-  data: AIVisibilityStats | null
+  data: APIVisibilityResponse | AIVisibilityStats | null
   loading: boolean
   error: string | null
 }
@@ -13,7 +26,31 @@ interface BrandRecommendationCardProps {
 export function BrandRecommendationCard({ data, loading, error }: BrandRecommendationCardProps) {
   // 从API数据生成品牌推荐率信息
   const { brands, currentBrandData } = useMemo(() => {
-    if (!data || !data.brand_recommend_rate || data.brand_recommend_rate.length === 0) {
+    if (!data) {
+      return {
+        brands: [
+          { name: '其它品牌1', color: '#ffb200', percentage: '20%', value: 20 },
+          { name: '其它品牌2', color: '#11ca9c', percentage: '25%', value: 25 },
+          { name: '其它品牌3', color: '#ff4d4d', percentage: '15%', value: 15 },
+          { name: '当前品牌', color: '#4285F4', percentage: '40%', value: 40 },
+        ],
+        currentBrandData: { name: '当前品牌', color: '#4285F4', percentage: '40%', value: 40 }
+      }
+    }
+
+    // 检查数据结构 - 支持两种可能的结构
+    let brandRecommendRate: BrandFirstChoiceRate[] = [];
+    
+    // 如果数据有嵌套的data字段
+    if ('data' in data && data.data && 'brand_recommend_rate' in data.data) {
+      brandRecommendRate = data.data.brand_recommend_rate;
+    } 
+    // 如果数据直接有brand_recommend_rate字段
+    else if ('brand_recommend_rate' in data) {
+      brandRecommendRate = data.brand_recommend_rate;
+    }
+
+    if (!brandRecommendRate || brandRecommendRate.length === 0) {
       return {
         brands: [
           { name: '其它品牌1', color: '#ffb200', percentage: '20%', value: 20 },
@@ -26,7 +63,7 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
     }
 
     // 使用API返回的实际数据 - 修正为品牌推荐率数据
-    const brandRateData = data.brand_recommend_rate
+    const brandRateData = brandRecommendRate
     const total = brandRateData.reduce((sum, item) => sum + item.rate, 0)
     
     // 颜色映射
@@ -35,7 +72,7 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
     const brandsData = brandRateData.map((item, index) => {
       const percentage = total > 0 ? ((item.rate / total) * 100) : 0
       return {
-        name: item.brand,
+        name: item.brand || `品牌${index + 1}`,
         color: colors[index % colors.length],
         percentage: `${percentage.toFixed(1)}%`,
         value: percentage
@@ -45,7 +82,7 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
     // 找到当前品牌数据（通常是第一个或者品牌名包含"当前"的）
     const currentBrand = brandsData.find(b => 
       b.name === '当前品牌' || 
-      b.name.includes('当前') || 
+      (b.name && b.name.includes('当前')) || 
       brandsData.indexOf(b) === 0
     ) || brandsData[0]
 
@@ -54,6 +91,26 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
       currentBrandData: currentBrand
     }
   }, [data])
+
+  // 计算统计数据用于底部显示
+  const statsData = useMemo(() => {
+    if (!data) return { count: 0, total: 0 };
+    
+    // 检查数据结构 - 支持两种可能的结构
+    let brandRecommendRate: BrandFirstChoiceRate[] = [];
+    
+    if ('data' in data && data.data && 'brand_recommend_rate' in data.data) {
+      brandRecommendRate = data.data.brand_recommend_rate;
+    } 
+    else if ('brand_recommend_rate' in data) {
+      brandRecommendRate = data.brand_recommend_rate;
+    }
+
+    return {
+      count: brandRecommendRate?.length || 0,
+      total: brandRecommendRate?.reduce((sum, item) => sum + item.rate, 0) || 0
+    };
+  }, [data]);
 
   // 根据数值大小分配不同的外半径
   const getOuterRadius = (value: number) => {
@@ -195,8 +252,8 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
           {/* API数据指标 */}
           {data && (
             <div className="absolute bottom-2 left-2 text-xs text-gray-500">
-              <div>品牌数: {data.brand_recommend_rate?.length || 0}</div>
-              <div>总评分: {data.brand_recommend_rate?.reduce((sum, item) => sum + item.rate, 0).toFixed(1) || 0}</div>
+              <div>品牌数: {statsData.count}</div>
+              <div>总评分: {statsData.total.toFixed(1) || 0}</div>
             </div>
           )}
         </div>
