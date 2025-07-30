@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { authApi, authUtils } from "@/services/auth";
 import { brandApi } from "@/services/brand";
 import { AvatarUpload } from "./settings/AvatarUpload";
@@ -1016,8 +1017,14 @@ export function SettingsContent({
                 <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
                   {/* 左侧插图 */}
                   <div className="flex-1 flex justify-center">
-                    <div className="w-full max-w-md h-64 bg-gray-100 rounded-lg flex items-center justify-center">
-                      <span className="text-gray-500">团队管理插图</span>
+                    <div className="w-full max-w-md h-64 relative rounded-lg overflow-hidden">
+                      <Image
+                        src="/images/leadership.png"
+                        alt="团队管理"
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 448px"
+                      />
                     </div>
                   </div>
 
