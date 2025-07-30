@@ -25,21 +25,22 @@ interface AIFrequencyChartProps {
 
 export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
   ({ data, loading, error }) => {
-    // 使用useMemo缓存数据点计算，避免每次render都重新计算
-    const radarData = useMemo(() => {
-      // 始终返回6个维度保持六边形
-      const maxKeywords = 6;
-      
-      if (!data) {
-        console.log("AIFrequencyChart: No data provided");
-        return {
-          data: Array.from({ length: maxKeywords }, (_, index) => ({
-            subject: `关键词${index + 1}`,
-            A: 0,
-          })),
-          maxValue: 100
-        };
-      }
+      // 使用useMemo缓存数据点计算，避免每次render都重新计算
+  const radarData = useMemo(() => {
+    // 始终返回6个维度保持六边形
+    const maxKeywords = 6;
+    
+    if (!data) {
+      console.log("AIFrequencyChart: No data provided");
+      return {
+        data: Array.from({ length: maxKeywords }, (_, index) => ({
+          subject: ``, // 空关键词标签
+          A: 1, // 最小值确保网格渲染
+        })),
+        maxValue: 100,
+        isEmpty: true
+      };
+    }
 
       // 检查数据结构 - 支持两种可能的结构
       let keywordFrequency: any[] = [];
@@ -53,16 +54,17 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
         console.log("AIFrequencyChart: Using flat data structure", keywordFrequency);
       }
 
-      if (!keywordFrequency || keywordFrequency.length === 0) {
-        console.log("AIFrequencyChart: No keyword_frequency data available");
-        return {
-          data: Array.from({ length: maxKeywords }, (_, index) => ({
-            subject: `关键词${index + 1}`,
-            A: 0,
-          })),
-          maxValue: 100
-        };
-      }
+      if (!keywordFrequency || !Array.isArray(keywordFrequency) || keywordFrequency.length === 0) {
+      console.log("AIFrequencyChart: No keyword_frequency data available");
+      return {
+        data: Array.from({ length: maxKeywords }, (_, index) => ({
+          subject: ``,  // 空关键词标签
+          A: 1, // 最小值确保网格渲染
+        })),
+        maxValue: 100,
+        isEmpty: true
+      };
+    }
 
       // 过滤、排序和取前6个关键词
       const validKeywords = keywordFrequency
@@ -89,8 +91,8 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
       // 如果关键词不足6个，用空关键词填充
       while (result.length < maxKeywords) {
         result.push({
-          subject: `关键词${result.length + 1}`,
-          A: 0,
+          subject: ``,  // 空关键词标签
+          A: 1, // 最小值
         });
       }
       
@@ -99,7 +101,8 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
       
       return {
         data: result,
-        maxValue: axisMaxValue
+        maxValue: axisMaxValue,
+        isEmpty: false
       };
     }, [data]);
 
@@ -143,37 +146,74 @@ export const AIFrequencyChart = React.memo<AIFrequencyChartProps>(
         {/* 雷达图 - 移除空数据状态检查 */}
         {renderState === "normal" && (
           <div className="h-[400px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <RadarChart data={radarData.data}>
-                <PolarGrid stroke="#e0e7ff" />
-                <PolarAngleAxis
-                  dataKey="subject"
-                  tick={{ fontSize: 12, fill: "#374151" }}
-                  className="text-xs"
-                />
-                <PolarRadiusAxis
-                  angle={90}
-                  domain={[0, radarData.maxValue]}
-                  tick={false}
-                  axisLine={false}
-                />
-                <Radar
-                  name="品牌AI可见性"
-                  dataKey="A"
-                  stroke="#3b82f6"
-                  fill="#3b82f6"
-                  fillOpacity={0.3}
-                  strokeWidth={2}
-                  dot={{ r: 4, fill: "#3b82f6" }}
-                />
-                <Legend
-                  wrapperStyle={{
-                    paddingTop: "20px",
-                    fontSize: "12px",
-                  }}
-                />
-              </RadarChart>
-            </ResponsiveContainer>
+            {radarData.isEmpty ? (
+              /* 空数据时显示手绘六边形网格 */
+              <div className="flex items-center justify-center h-full">
+                <svg width="400" height="350" viewBox="0 0 400 350" className="w-full h-full max-w-[400px] max-h-[350px]">
+                  {/* 外层六边形 */}
+                  <polygon 
+                    points="200,30 320,100 320,230 200,300 80,230 80,100" 
+                    fill="none" 
+                    stroke="#e0e7ff" 
+                    strokeWidth="1.5"
+                  />
+                  {/* 中层六边形 */}
+                  <polygon 
+                    points="200,80 280,125 280,205 200,250 120,205 120,125" 
+                    fill="none" 
+                    stroke="#e0e7ff" 
+                    strokeWidth="1.5"
+                  />
+                  {/* 内层六边形 */}
+                  <polygon 
+                    points="200,130 240,150 240,180 200,200 160,180 160,150" 
+                    fill="none" 
+                    stroke="#e0e7ff" 
+                    strokeWidth="1.5"
+                  />
+                  {/* 从中心到各顶点的连线 */}
+                  <line x1="200" y1="165" x2="200" y2="30" stroke="#e0e7ff" strokeWidth="1" />
+                  <line x1="200" y1="165" x2="320" y2="100" stroke="#e0e7ff" strokeWidth="1" />
+                  <line x1="200" y1="165" x2="320" y2="230" stroke="#e0e7ff" strokeWidth="1" />
+                  <line x1="200" y1="165" x2="200" y2="300" stroke="#e0e7ff" strokeWidth="1" />
+                  <line x1="200" y1="165" x2="80" y2="230" stroke="#e0e7ff" strokeWidth="1" />
+                  <line x1="200" y1="165" x2="80" y2="100" stroke="#e0e7ff" strokeWidth="1" />
+                </svg>
+              </div>
+            ) : (
+              /* 有数据时显示正常雷达图 */
+              <ResponsiveContainer width="100%" height="100%">
+                <RadarChart data={radarData.data}>
+                  <PolarGrid stroke="#e0e7ff" />
+                  <PolarAngleAxis
+                    dataKey="subject"
+                    tick={{ fontSize: 12, fill: "#374151" }}
+                    className="text-xs"
+                  />
+                  <PolarRadiusAxis
+                    angle={90}
+                    domain={[0, radarData.maxValue]}
+                    tick={false}
+                    axisLine={false}
+                  />
+                  <Radar
+                    name="品牌AI可见性"
+                    dataKey="A"
+                    stroke="#3b82f6"
+                    fill="#3b82f6"
+                    fillOpacity={0.3}
+                    strokeWidth={2}
+                    dot={{ r: 4, fill: "#3b82f6" }}
+                  />
+                  <Legend
+                    wrapperStyle={{
+                      paddingTop: "20px",
+                      fontSize: "12px",
+                    }}
+                  />
+                </RadarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         )}
       </div>

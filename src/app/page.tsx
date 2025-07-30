@@ -17,7 +17,7 @@ export default function HomePage() {
       <section className="relative max-w-7xl mx-auto px-8 py-16 text-center">
         {/* 主标题 */}
         <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-          让你的品牌被提及
+          让您的品牌被AI提及
         </h1>
         
         {/* GEOK Logo + 文字 - 调整为与顶部导航相同大小 */}
@@ -31,17 +31,52 @@ export default function HomePage() {
 
         {/* 副标题 */}
         <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-          深度追踪品牌在全网的表现，AI智能分析每一次提及，
+          触及数百万正在利用人工智能来发现
           <br />
-          助力品牌影响力的精准提升
+          新产品和新品牌的消费者群体
         </p>
 
         {/* CTA按钮 */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-          <Link href="/auth/login" className="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-700 transition-colors shadow-lg text-center">
+          <Link 
+            href="/auth/login" 
+            className="bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg flex items-center justify-center"
+            style={{
+              width: '144px',
+              height: '40px',
+              flexShrink: 0,
+              borderRadius: '10px',
+              color: '#FFF',
+              textAlign: 'center',
+              fontFamily: 'PingFang SC',
+              fontSize: '18px',
+              fontStyle: 'normal',
+              fontWeight: 400,
+              lineHeight: 'normal',
+              letterSpacing: '-0.308px'
+            }}
+          >
             获取演示版
           </Link>
-          <Link href="/auth/login" className="border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-50 transition-colors text-center">
+          <Link 
+            href="/auth/login" 
+            className="hover:bg-blue-50 transition-colors flex items-center justify-center"
+            style={{
+              width: '144px',
+              height: '40px',
+              flexShrink: 0,
+              borderRadius: '10px',
+              boxShadow: '0 0 12px 0 rgba(38, 99, 255, 0.26)',
+              color: 'rgba(38, 99, 255, 0.40)',
+              textAlign: 'center',
+              fontFamily: 'PingFang SC',
+              fontSize: '18px',
+              fontStyle: 'normal',
+              fontWeight: 400,
+              lineHeight: 'normal',
+              letterSpacing: '-0.308px'
+            }}
+          >
             开始使用
           </Link>
         </div>
@@ -51,7 +86,12 @@ export default function HomePage() {
       <section className="relative max-w-7xl mx-auto px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* 功能卡片1 - 追踪你的行踪 */}
-          <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
+          <div 
+            className="bg-white rounded-2xl p-8 hover:shadow-xl transition-shadow border border-gray-100"
+            style={{
+              boxShadow: '0 0 12px 0 rgba(38, 99, 255, 0.26)'
+            }}
+          >
             <div className="flex justify-start mb-6">
               <SearchIcon size={18} className="text-black" />
             </div>
@@ -59,12 +99,17 @@ export default function HomePage() {
               追踪你的行踪
             </h3>
             <p className="text-gray-600 text-left leading-relaxed">
-              实时监控品牌在各大平台的提及情况，不错过任何重要讨论
+              看看您的品牌在AI答案中出现的频率
             </p>
           </div>
 
           {/* 功能卡片2 - 分析人工智能响应 */}
-          <div className="bg-blue-600 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+          <div 
+            className="bg-blue-600 rounded-2xl p-8 hover:shadow-xl transition-shadow"
+            style={{
+              boxShadow: '0 0 12px 0 rgba(38, 99, 255, 0.26)'
+            }}
+          >
             <div className="flex justify-start mb-6">
               <AnalyticsIcon size={25} className="text-white" />
             </div>
@@ -72,12 +117,17 @@ export default function HomePage() {
               分析人工智能响应
             </h3>
             <p className="text-white text-left leading-relaxed">
-              AI智能分析每次品牌提及的情感倾向和影响力度
+              了解人工智能对您的品牌和主题的看法。
             </p>
           </div>
 
           {/* 功能卡片3 - 发现引文 */}
-          <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
+          <div 
+            className="bg-white rounded-2xl p-8 hover:shadow-xl transition-shadow border border-gray-100"
+            style={{
+              boxShadow: '0 0 12px 0 rgba(38, 99, 255, 0.26)'
+            }}
+          >
             <div className="flex justify-start mb-6">
               <FrameIcon size={24} className="text-black" />
             </div>
@@ -85,12 +135,17 @@ export default function HomePage() {
               发现引文
             </h3>
             <p className="text-gray-600 text-left leading-relaxed">
-              发现品牌被引用的具体内容和上下文，洞察用户真实想法
+              找出哪些网站可以驱动人工智能回答有关您的问题
             </p>
           </div>
 
           {/* 功能卡片4 - 采取行动 */}
-          <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
+          <div 
+            className="bg-white rounded-2xl p-8 hover:shadow-xl transition-shadow border border-gray-100"
+            style={{
+              boxShadow: '0 0 12px 0 rgba(38, 99, 255, 0.26)'
+            }}
+          >
             <div className="flex justify-start mb-6">
               <ActionIcon size={26} className="text-black" />
             </div>
@@ -104,255 +159,25 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 数据分析仪表板 */}
-      <section className="relative max-w-7xl mx-auto px-8 py-16">
-        <div 
-          className="bg-white rounded-[20px] p-6 mx-auto"
-          style={{
-            maxWidth: '1120px',
-            width: '100%',
-            height: '680px',
-            flexShrink: 0,
-            boxShadow: '0 0 12px 0 rgba(38, 99, 255, 0.26)'
-          }}
-        >
-          {/* 顶部标题栏 - 移除下拉列表 */}
-          <div className="flex items-center justify-between mb-6 bg-gray-50 rounded-lg border border-gray-200 p-4">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <span className="font-bold text-gray-800 text-base">品牌</span>
-                <span className="text-gray-600 text-sm">搜索内容某品牌在人工智能中出现频率</span>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-sm">
-                <span className="text-gray-600">最近7日</span>
-                <span className="text-gray-600">VS</span>
-                <span className="text-gray-600">前一个7日</span>
-              </div>
-              
-              <div className="flex items-center space-x-2 text-sm">
-                <span className="text-gray-600">排序方式：主题</span>
-                <span className="text-gray-400">|</span>
-                <span className="text-gray-600">区域选择</span>
-                <span className="text-gray-400">|</span>
-                <span className="text-gray-600">话题筛选</span>
-                <span className="text-gray-400">|</span>
-                <span className="text-gray-600">AI平台选择</span>
-              </div>
-              
-              <button className="bg-gray-400 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-500 transition-colors">
-                查询
-              </button>
-              
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm flex items-center space-x-2 hover:bg-blue-700 transition-colors">
-                <DownloadIcon size={16} className="text-white" />
-                <span>下载/导出</span>
-              </button>
-            </div>
-          </div>
-
-          {/* 数据展示区域 - 优化布局让所有卡片都在容器内 */}
-          <div className="grid grid-cols-2 gap-4 h-[520px]">
-            {/* 左上：在AI中出现频率 */}
-            <div className="bg-gray-50 rounded-xl border border-gray-200 p-5 shadow-sm">
-              <h3 className="font-semibold text-gray-800 text-base mb-1">在AI中出现频率</h3>
-              <p className="text-gray-600 text-xs mb-4">搜索关键词内容在人工智能中出现频率</p>
-              
-              <div className="relative h-36 flex items-center justify-center">
-                {/* 六边形雷达图 */}
-                <div className="relative w-32 h-32">
-                  {/* 六边形背景 */}
-                  <div className="absolute inset-0 border-2 border-gray-300" style={{
-                    clipPath: 'polygon(50% 0%, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%)'
-                  }}></div>
-                  <div className="absolute inset-4 border border-gray-300" style={{
-                    clipPath: 'polygon(50% 0%, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%)'
-                  }}></div>
-                  <div className="absolute inset-8 border border-gray-300" style={{
-                    clipPath: 'polygon(50% 0%, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%)'
-                  }}></div>
-                  
-                  {/* 数据区域 */}
-                  <div className="absolute inset-6 bg-gradient-to-br from-blue-400 to-blue-600 opacity-70" style={{
-                    clipPath: 'polygon(50% 15%, 85% 30%, 75% 75%, 50% 90%, 25% 75%, 15% 30%)'
-                  }}></div>
-                  
-                  {/* 标签 */}
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 text-xs text-gray-700 font-medium">价格</div>
-                  <div className="absolute top-6 -right-8 text-xs text-gray-700 font-medium">质量</div>
-                  <div className="absolute bottom-6 -right-8 text-xs text-gray-700 font-medium">性能</div>
-                  <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 text-xs text-gray-700 font-medium">性价比</div>
-                  <div className="absolute bottom-6 -left-8 text-xs text-gray-700 font-medium">品牌</div>
-                  <div className="absolute top-6 -left-8 text-xs text-gray-700 font-medium">产品</div>
-                </div>
-              </div>
-              
-              <p className="text-gray-600 text-xs text-center mt-3">
-                看看您的品牌关键词在 AI答案中出现的频率
-              </p>
-            </div>
-
-            {/* 右上：品牌推荐率 */}
-            <div className="bg-gray-50 rounded-xl border border-gray-200 p-5 shadow-sm">
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="font-semibold text-gray-800 text-base">品牌推荐率</h3>
-                <button className="text-blue-600 text-xs border border-blue-600 px-2 py-1 rounded hover:bg-blue-50 transition-colors">查看详情</button>
-              </div>
-              
-              <div className="flex justify-start items-center mb-4">
-                <div className="flex space-x-2">
-                  <div className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs">当月搜索量</div>
-                  <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs">当月流失量</div>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                {/* 使用用户提供的SVG饼图 - 缩小尺寸 */}
-                <div className="flex-shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 149 149" fill="none">
-                    <g filter="url(#filter0_d_513_62)">
-                      <path d="M109.79 90.5609C106.4 98.0344 100.756 104.26 93.6496 108.365C86.5435 112.47 78.331 114.248 70.1632 113.452L73.9809 74.3157L109.79 90.5609Z" fill="#FF4D4D"/>
-                      <path d="M104.68 40.902C112.249 47.858 117.231 57.1782 118.811 67.3358C120.39 77.4934 118.474 87.8864 113.375 96.8124L73.9783 74.3079L104.68 40.902Z" fill="#11CA9C"/>
-                      <path d="M38.4225 35.093C48.822 25.6624 62.5418 20.7492 76.5638 21.4342C90.5858 22.1193 103.761 28.3465 113.192 38.746L73.9808 74.3042L38.4225 35.093Z" fill="#FFB200"/>
-                      <path d="M74.3066 134.795C61.7038 134.795 49.4157 130.859 39.1583 123.537C28.901 116.214 21.1866 105.871 17.0926 93.9521C12.9986 82.0328 12.7293 69.1324 16.3225 57.0527C19.9157 44.973 27.1918 34.3171 37.1348 26.5731L74.3066 74.3003L74.3066 134.795Z" fill="#2663FF"/>
-                      <circle cx="73.9805" cy="74.3157" r="22.6856" fill="white"/>
-                    </g>
-                    <defs>
-                      <filter id="filter0_d_513_62" x="12.5163" y="21.3711" width="108.129" height="118.605" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
-                        <feFlood floodOpacity="0" result="BackgroundImageFix"/>
-                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-                        <feOffset dy="3.88571"/>
-                        <feGaussianBlur stdDeviation="0.647619"/>
-                        <feComposite in2="hardAlpha" operator="out"/>
-                        <feColorMatrix type="matrix" values="0 0 0 0 0.2 0 0 0 0 0.2 0 0 0 0 0.2 0 0 0 0.25 0"/>
-                        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_513_62"/>
-                        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_513_62" result="shape"/>
-                      </filter>
-                    </defs>
-                  </svg>
-                </div>
-                
-                {/* 图例 */}
-                <div className="ml-4 space-y-2 text-xs">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-2 bg-blue-600 rounded"></div>
-                    <span className="text-gray-700">品牌占比</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-2 bg-yellow-500 rounded"></div>
-                    <span className="text-gray-700">其它品牌1</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-2 bg-green-500 rounded"></div>
-                    <span className="text-gray-700">其它品牌2</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-2 bg-red-500 rounded"></div>
-                    <span className="text-gray-700">其它品牌3</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 左下：品牌搜索率 */}
-            <div className="bg-gray-50 rounded-xl border border-gray-200 p-5 shadow-sm">
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="font-semibold text-gray-800 text-base">品牌搜索率</h3>
-                <span className="text-gray-500 text-xs">总数据</span>
-              </div>
-              
-              <div className="text-2xl font-bold text-gray-800 mb-4">159.8%</div>
-              
-              <div className="relative h-32">
-                {/* 渐变背景 */}
-                <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-blue-100 to-blue-50 rounded-lg"></div>
-                
-                {/* 波浪线图表 */}
-                <svg className="absolute bottom-0 left-0 w-full h-24" viewBox="0 0 400 120" preserveAspectRatio="none">
-                  <path
-                    d="M0,90 Q100,30 200,60 T400,40"
-                    stroke="#2663ff"
-                    strokeWidth="3"
-                    fill="none"
-                  />
-                  <path
-                    d="M0,90 Q100,30 200,60 T400,40 L400,120 L0,120 Z"
-                    fill="url(#gradientChart)"
-                    opacity="0.4"
-                  />
-                  <defs>
-                    <linearGradient id="gradientChart" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#2663ff" stopOpacity="0.6"/>
-                      <stop offset="100%" stopColor="#2663ff" stopOpacity="0.1"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-                
-                {/* Y轴标签 */}
-                <div className="absolute left-0 top-1 text-xs text-gray-500">160%</div>
-                <div className="absolute left-0 bottom-12 text-xs text-gray-500">80%</div>
-              </div>
-            </div>
-
-            {/* 右下：品牌在AI市场的首推率 */}
-            <div className="bg-gray-50 rounded-xl border border-gray-200 p-5 shadow-sm">
-              <h3 className="font-semibold text-gray-800 text-base mb-1">品牌在AI市场的首推率</h3>
-              <p className="text-gray-500 text-xs mb-4">品牌的在各竞争对手产品中分布情况</p>
-              
-              <div className="flex items-center justify-between">
-                {/* 圆环图 */}
-                <div className="relative w-24 h-24">
-                  <div className="absolute inset-0 rounded-full" style={{
-                    background: 'conic-gradient(#2663ff 0% 72.5%, #ffb200 72.5% 88.2%, #11ca9c 88.2% 97.5%, #fa8919 97.5% 98.8%, #ff4d4d 98.8% 100%)'
-                  }}></div>
-                  <div className="absolute inset-4 bg-white rounded-full"></div>
-                </div>
-                
-                {/* 图例 */}
-                <div className="ml-4 space-y-2 text-xs">
-                  <div className="flex items-center justify-between w-28">
-                    <div className="flex items-center space-x-1">
-                      <div className="w-3 h-2 bg-blue-600 rounded"></div>
-                      <span className="text-gray-700">Intel</span>
-                    </div>
-                    <span className="font-semibold text-gray-800">72.5%</span>
-                  </div>
-                  <div className="flex items-center justify-between w-28">
-                    <div className="flex items-center space-x-1">
-                      <div className="w-3 h-2 bg-yellow-500 rounded"></div>
-                      <span className="text-gray-700">AMD</span>
-                    </div>
-                    <span className="font-semibold text-gray-800">15.7%</span>
-                  </div>
-                  <div className="flex items-center justify-between w-28">
-                    <div className="flex items-center space-x-1">
-                      <div className="w-3 h-2 bg-green-500 rounded"></div>
-                      <span className="text-gray-700">Apple</span>
-                    </div>
-                    <span className="font-semibold text-gray-800">9.3%</span>
-                  </div>
-                  <div className="flex items-center justify-between w-28">
-                    <div className="flex items-center space-x-1">
-                      <div className="w-3 h-2 bg-orange-500 rounded"></div>
-                      <span className="text-gray-700">Qualcomm</span>
-                    </div>
-                    <span className="font-semibold text-gray-800">1.3%</span>
-                  </div>
-                  <div className="flex items-center justify-between w-28">
-                    <div className="flex items-center space-x-1">
-                      <div className="w-3 h-2 bg-red-500 rounded"></div>
-                      <span className="text-gray-700">ARM Holdings</span>
-                    </div>
-                    <span className="font-semibold text-gray-800">1.2%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+            {/* 数据分析仪表板 */}
+       <section className="relative max-w-7xl mx-auto px-8 py-16">
+         <div 
+           className="bg-white rounded-[20px] p-6 w-full"
+           style={{
+             height: '680px',
+             flexShrink: 0,
+             boxShadow: '0 0 12px 0 rgba(38, 99, 255, 0.26)'
+           }}
+         >
+           <div className="flex items-center justify-center h-full">
+             <img 
+               src="/images/Group143.png" 
+               alt="数据分析仪表板" 
+               className="w-full h-full object-contain"
+             />
+           </div>
+         </div>
+       </section>
 
       {/* 赢得AI搜索与GEOK */}
       <section className="relative max-w-7xl mx-auto px-8 py-16">
@@ -548,166 +373,26 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* AI洞察部分 */}
-      <section className="relative max-w-7xl mx-auto px-8 py-16">
-        {/* 背景模糊效果 */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div 
-            className="absolute left-0 top-0"
-            style={{
-              width: '40vw',
-              maxWidth: '599px',
-              height: '40vw',
-              maxHeight: '599px',
-              borderRadius: '50%',
-              background: 'rgba(38, 74, 255, 0.50)',
-              filter: 'blur(250px)'
-            }}
-          />
-          <div 
-            className="absolute right-0 bottom-0"
-            style={{
-              width: '20vw',
-              maxWidth: '311px',
-              height: '20vw',
-              maxHeight: '311px',
-              background: 'rgba(17, 202, 156, 0.50)',
-              filter: 'blur(250px)'
-            }}
-          />
-        </div>
-
-        {/* 标题部分 */}
-        <div className="relative mb-16">
-          {/* 背景图标 */}
-          <div 
-            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 -z-10"
-            style={{
-              width: '30vw',
-              maxWidth: '452px',
-              height: '30vw',
-              maxHeight: '452px',
-              opacity: '0.1'
-            }}
-          >
-            <img src="/images/compass.svg" alt="" className="w-full h-full" />
-          </div>
-          
-          {/* 标题文字 */}
-          <h2 className="relative text-center font-['PingFang_SC'] text-[58px] font-normal leading-[80px] tracking-[-0.308px]">
-            <span className="text-[#2663FF]">洞察</span>
-            <span className="text-black"> AI 对品牌的认知</span>
-            <br />
-            <span className="text-black">并主动优化其呈现方向</span>
-          </h2>
-        </div>
-
-        {/* 数据展示区域 */}
-        <div className="grid grid-cols-2 gap-8">
-          {/* 品牌被提及率图表 */}
-          <div className="bg-white rounded-[20px] p-8 shadow-lg">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl text-gray-900">品牌被提及率</h3>
-              <span className="text-2xl font-medium text-gray-900">71.5%</span>
-              </div>
-            <div className="relative h-[200px] bg-white rounded-lg">
-              {/* 趋势图表 */}
-              <div className="absolute inset-0 flex items-end">
-                <div className="w-full h-[120px] relative">
-                  {/* 这里可以添加实际的趋势线图表 */}
-                  <div className="absolute bottom-0 left-0 right-0 h-[80px] bg-gradient-to-t from-blue-50 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-blue-600"></div>
-                  <div className="absolute bottom-0 left-[20%] right-0 h-[40px] bg-blue-600 opacity-20 rounded-t-lg"></div>
-            </div>
-              </div>
+              {/* AI洞察部分 */}
+        <section className="relative max-w-7xl mx-auto px-8 py-16">
+          <div className="relative flex items-center justify-center">
+            {/* 图片容器带渐变边缘 */}
+            <div className="relative">
+              <img 
+                src="/images/picture.png" 
+                alt="AI洞察" 
+                className="w-full h-auto object-contain max-w-full"
+              />
+              {/* 顶部渐变遮罩 */}
+              <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none"></div>
+              {/* 底部渐变遮罩 */}
+              <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none"></div>
+              {/* 左侧渐变遮罩 */}
+              <div className="absolute top-0 bottom-0 left-0 w-16 bg-gradient-to-r from-white via-white/80 to-transparent pointer-events-none"></div>
+              {/* 右侧渐变遮罩 */}
+              <div className="absolute top-0 bottom-0 right-0 w-16 bg-gradient-to-l from-white via-white/80 to-transparent pointer-events-none"></div>
             </div>
           </div>
-
-          {/* 品牌在AI市场的占比图表 */}
-          <div className="bg-white rounded-[20px] p-8 shadow-lg">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl text-gray-900">品牌在AI市场的占比</h3>
-              <span className="text-2xl font-medium text-gray-900">72.5%</span>
-              </div>
-            <div className="relative h-[200px] flex items-center justify-center">
-              <div className="relative">
-                <svg className="w-32 h-32" viewBox="0 0 120 120">
-                  <circle 
-                    cx="60" 
-                    cy="60" 
-                    r="54" 
-                    fill="none" 
-                    stroke="#E5E7EB" 
-                    strokeWidth="12"
-                  />
-                  <circle 
-                    cx="60" 
-                    cy="60" 
-                    r="54" 
-                    fill="none" 
-                    stroke="#2663FF" 
-                    strokeWidth="12" 
-                    strokeDasharray="339.292"
-                    strokeDashoffset="93.3053"
-                    transform="rotate(-90 60 60)"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-[#2663FF]">72.5%</span>
-            </div>
-              </div>
-            </div>
-          </div>
-
-          {/* GEO总得分图表 */}
-          <div className="bg-white rounded-[20px] p-8 shadow-lg">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl text-gray-900">GEO总得分</h3>
-              <div className="flex items-center space-x-3">
-                <span className="text-2xl font-medium text-gray-900">49.3%</span>
-                <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full w-[49.3%] bg-[#2663FF] rounded-full"></div>
-              </div>
-            </div>
-            </div>
-            <div className="relative h-[200px] bg-white rounded-lg">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-full max-w-[240px]">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-sm text-gray-600">品牌曝光率</span>
-                    <div className="w-32 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full w-[59.7%] bg-[#2663FF] rounded-full"></div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-sm text-gray-600">全局评分</span>
-                    <div className="w-32 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full w-[24.1%] bg-[#2663FF] rounded-full"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 品牌搜索率图表 */}
-          <div className="bg-white rounded-[20px] p-8 shadow-lg">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl text-gray-900">品牌搜索率</h3>
-              <span className="text-2xl font-medium text-gray-900">59.7%</span>
-            </div>
-            <div className="relative h-[200px] bg-white rounded-lg">
-              <div className="absolute inset-0 flex items-end">
-                <div className="w-full h-[120px] relative">
-                  {/* 这里可以添加实际的搜索率趋势图 */}
-                  <div className="absolute bottom-0 left-0 right-0 h-[80px] bg-gradient-to-t from-green-50 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-green-500"></div>
-                  <div className="absolute bottom-0 left-[40%] right-0 h-[60px] bg-green-500 opacity-20 rounded-t-lg"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* 未来展望部分 */}
         <div className="relative mt-32">

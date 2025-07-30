@@ -25,15 +25,18 @@ interface BrandMarketShareCardProps {
 
 export function BrandMarketShareCard({ data, loading, error }: BrandMarketShareCardProps) {
   // 从API数据生成品牌首推率信息
-  const brands = useMemo(() => {
+  const { brands, hasRealData } = useMemo(() => {
     if (!data) {
-      return [
-        { name: '当前品牌', percentage: '35.6%', value: 35.6, color: '#4285F4' },
-        { name: '竞品A', percentage: '18.7%', value: 18.7, color: '#FF9800' },
-        { name: '竞品B', percentage: '12.2%', value: 12.2, color: '#4CAF50' },
-        { name: '竞品C', percentage: '8.3%', value: 8.3, color: '#FF5722' },
-        { name: '其他', percentage: '25.2%', value: 25.2, color: '#E91E63' },
-      ]
+      return {
+        brands: [
+          { name: '当前品牌', percentage: '35.6%', value: 35.6, color: '#4285F4' },
+          { name: '竞品A', percentage: '18.7%', value: 18.7, color: '#FF9800' },
+          { name: '竞品B', percentage: '12.2%', value: 12.2, color: '#4CAF50' },
+          { name: '竞品C', percentage: '8.3%', value: 8.3, color: '#FF5722' },
+          { name: '其他', percentage: '25.2%', value: 25.2, color: '#E91E63' },
+        ],
+        hasRealData: false
+      }
     }
 
     // 检查数据结构 - 支持两种可能的结构
@@ -48,14 +51,17 @@ export function BrandMarketShareCard({ data, loading, error }: BrandMarketShareC
       brandFirstChoiceRate = data.brand_first_choice_rate;
     }
 
-    if (!brandFirstChoiceRate || brandFirstChoiceRate.length === 0) {
-      return [
-        { name: '当前品牌', percentage: '35.6%', value: 35.6, color: '#4285F4' },
-        { name: '竞品A', percentage: '18.7%', value: 18.7, color: '#FF9800' },
-        { name: '竞品B', percentage: '12.2%', value: 12.2, color: '#4CAF50' },
-        { name: '竞品C', percentage: '8.3%', value: 8.3, color: '#FF5722' },
-        { name: '其他', percentage: '25.2%', value: 25.2, color: '#E91E63' },
-      ]
+    if (!brandFirstChoiceRate || !Array.isArray(brandFirstChoiceRate) || brandFirstChoiceRate.length === 0) {
+      return {
+        brands: [
+          { name: '当前品牌', percentage: '35.6%', value: 35.6, color: '#4285F4' },
+          { name: '竞品A', percentage: '18.7%', value: 18.7, color: '#FF9800' },
+          { name: '竞品B', percentage: '12.2%', value: 12.2, color: '#4CAF50' },
+          { name: '竞品C', percentage: '8.3%', value: 8.3, color: '#FF5722' },
+          { name: '其他', percentage: '25.2%', value: 25.2, color: '#E91E63' },
+        ],
+        hasRealData: false
+      }
     }
 
     // 使用品牌首推率数据
@@ -75,7 +81,10 @@ export function BrandMarketShareCard({ data, loading, error }: BrandMarketShareC
       }
     })
 
-    return brandsData;
+    return {
+      brands: brandsData,
+      hasRealData: true
+    };
   }, [data])
 
   // 自定义图例组件
@@ -127,42 +136,55 @@ export function BrandMarketShareCard({ data, loading, error }: BrandMarketShareC
         </div>
       )}
 
-      {/* 正常显示 */}
+      {/* 正常显示或暂无数据状态 */}
       {!loading && !error && (
         <div className="flex items-center justify-between h-[180px]">
-          {/* 半圆图表 */}
-          <div className="flex-1">
-            <ResponsiveContainer width={300} height={180}>
-              <PieChart>
-                <Pie
-                  data={brands}
-                  cx="50%"
-                  cy="75%"
-                  startAngle={180}
-                  endAngle={0}
-                  outerRadius={85}
-                  innerRadius={55}
-                  fill="#8884d8"
-                  dataKey="value"
-                  strokeWidth={0}
-                >
-                  {brands.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+          {/* 检查是否有有效数据 */}
+          {hasRealData ? (
+            <>
+              {/* 半圆图表 */}
+              <div className="flex-1">
+                <ResponsiveContainer width={300} height={180}>
+                  <PieChart>
+                    <Pie
+                      data={brands}
+                      cx="50%"
+                      cy="75%"
+                      startAngle={180}
+                      endAngle={0}
+                      outerRadius={85}
+                      innerRadius={55}
+                      fill="#8884d8"
+                      dataKey="value"
+                      strokeWidth={0}
+                    >
+                      {brands.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
 
-          {/* 自定义图例 */}
-          <div className="flex-1">
-            <CustomLegend 
-              payload={brands.map(item => ({ 
-                value: item.name, 
-                color: item.color 
-              }))} 
-            />
-          </div>
+              {/* 自定义图例 */}
+              <div className="flex-1">
+                <CustomLegend 
+                  payload={brands.map(item => ({ 
+                    value: item.name, 
+                    color: item.color 
+                  }))} 
+                />
+              </div>
+            </>
+          ) : (
+            /* 暂无数据状态 */
+            <div className="flex items-center justify-center w-full h-full">
+              <div className="text-center">
+                <div className="text-gray-400 text-lg mb-2">暂无数据</div>
+                <div className="text-gray-500 text-sm">当前品牌暂无首推率数据</div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
