@@ -19,12 +19,18 @@ export function VisibilityContent() {
   useEffect(() => {
     // 从localStorage获取用户信息，获取品牌ID
     const userInfo = authUtils.getUserInfo();
-    if (userInfo?.current_brand_id) {
-      setCurrentBrandId(userInfo.current_brand_id);
-    } else {
-      // 如果没有品牌ID，可以使用默认值或显示错误
-      setCurrentBrandId("4fc86ecb-8e0e-476b-8826-bf4dc95fce0d");
-    }
+    
+    // 临时强制使用测试品牌ID，确保有数据可以显示
+    // TODO: 等后端为实际用户品牌准备好AI可见性数据后，可以改回使用用户的品牌ID
+    setCurrentBrandId("4fc86ecb-8e0e-476b-8826-bf4dc95fce0d");
+    
+    // 原来的逻辑（暂时注释）
+    // if (userInfo?.current_brand_id) {
+    //   setCurrentBrandId(userInfo.current_brand_id);
+    // } else {
+    //   // 如果没有品牌ID，可以使用默认值或显示错误
+    //   setCurrentBrandId("4fc86ecb-8e0e-476b-8826-bf4dc95fce0d");
+    // }
   }, []);
 
   // 使用useMemo缓存API参数，避免不必要的重新请求
@@ -46,7 +52,7 @@ export function VisibilityContent() {
     stats,
     loading: statsLoading,
     error: statsError,
-  } = useVisibilityStats(shouldFetchData ? currentBrandId : undefined);
+  } = useVisibilityStats(shouldFetchData ? currentBrandId : undefined, 7);
   const {
     report,
     loading: reportLoading,

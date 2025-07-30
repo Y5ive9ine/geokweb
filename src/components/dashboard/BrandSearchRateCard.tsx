@@ -2,10 +2,23 @@
 
 import React, { useMemo } from 'react'
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts'
-import { AIVisibilityStats } from '@/services/ai-visibility'
+import { AIVisibilityStats, BrandFirstChoiceRate } from '@/services/ai-visibility'
+
+// 支持实际API返回的数据结构
+interface APIVisibilityResponse {
+  brand_id: string;
+  data: {
+    keyword_frequency: any[];
+    brand_first_choice_rate: BrandFirstChoiceRate[];
+    brand_recommend_rate: BrandFirstChoiceRate[];
+    brand_search_rate: any[]; // 搜索率数据可能有特殊结构
+  };
+  days?: number;
+  timestamp?: string;
+}
 
 interface BrandSearchRateCardProps {
-  data: AIVisibilityStats | null
+  data: APIVisibilityResponse | AIVisibilityStats | null
   loading: boolean
   error: string | null
 }
@@ -13,63 +26,92 @@ interface BrandSearchRateCardProps {
 export function BrandSearchRateCard({ data, loading, error }: BrandSearchRateCardProps) {
   // 从API数据计算搜索率
   const { searchData, chartData } = useMemo(() => {
-    if (!data || !data.brand_search_rate || data.brand_search_rate.length === 0) {
+    if (!data) {
       return {
         searchData: {
           currentRate: '0%',
-          totalSearches: 0,
-          metrics: ['0%', '0%'],
-          trend: '无数据'
+          totalSearches: 0
         },
         chartData: [
-          { name: '1月', value: 20 },
-          { name: '2月', value: 32 },
-          { name: '3月', value: 28 },
-          { name: '4月', value: 45 },
-          { name: '5月', value: 38 },
-          { name: '6月', value: 62 },
-          { name: '7月', value: 55 }
+          { name: '1', value: 20 },
+          { name: '2', value: 32 },
+          { name: '3', value: 28 },
+          { name: '4', value: 45 },
+          { name: '5', value: 38 },
+          { name: '6', value: 62 },
+          { name: '7', value: 55 }
         ]
       }
     }
 
-    // 基于品牌搜索率数据计算搜索率 - 修正为品牌搜索率数据
-    const brandRates = data.brand_search_rate
-    const totalRate = brandRates.reduce((sum, item) => sum + item.rate, 0)
-    const currentBrandRate = brandRates.find(item => 
-      item.brand === '当前品牌' || 
-      item.brand.includes('当前') || 
-      brandRates.indexOf(item) === 0
-    )?.rate || 0
+    // 检查数据结构 - 支持两种可能的结构
+    let brandSearchRate: any[] = [];
     
-    // 计算搜索率（基于当前品牌在总数中的占比）
-    const searchRate = totalRate > 0 ? (currentBrandRate / totalRate) * 100 : 0
-    const weeklyGrowth = Math.min(searchRate * 1.1, 100) // 模拟周增长
-    const monthlyGrowth = Math.min(searchRate * 0.9, 100) // 模拟月增长
+    // 如果数据有嵌套的data字段
+    if ('data' in data && data.data && 'brand_search_rate' in data.data) {
+      brandSearchRate = data.data.brand_search_rate;
+    } 
+    // 如果数据直接有brand_search_rate字段
+    else if ('brand_search_rate' in data) {
+      brandSearchRate = data.brand_search_rate;
+    }
+
+    if (!brandSearchRate || brandSearchRate.length === 0) {
+      return {
+        searchData: {
+          currentRate: '0%',
+          totalSearches: 0
+        },
+        chartData: [
+          { name: '1', value: 20 },
+          { name: '2', value: 32 },
+          { name: '3', value: 28 },
+          { name: '4', value: 45 },
+          { name: '5', value: 38 },
+          { name: '6', value: 62 },
+          { name: '7', value: 55 }
+        ]
+      }
+    }
+
+    // 解析嵌套数据结构，计算每天的总和
+    const dailyData = brandSearchRate.map((dayItem, index) => {
+      // 从data字段中提取各个维度的数值
+      const dayData = dayItem.data || {};
+      
+      // 计算四个维度的总和：机械搜索 + 相关搜索 + 竞品对比 + 行业搜索
+      const directSearch = dayData['机械搜索'] || dayData['直接搜索'] || 0;
+      const relatedSearch = dayData['相关搜索'] || 0;
+      const competitorCompare = dayData['竞品对比'] || 0;
+      const industrySearch = dayData['行业搜索'] || 0;
+      
+      const totalValue = directSearch + relatedSearch + competitorCompare + industrySearch;
+      
+      return {
+        day: index + 1,
+        name: `${index + 1}`,
+        value: totalValue,
+        date: dayItem.date
+      };
+    });
+
+    // 计算搜索率：第7天总和 / 第1天总和
+    const day1Total = dailyData[0]?.value || 1;
+    const day7Total = dailyData[6]?.value || 0;
+    const searchRate = day1Total > 0 ? ((day7Total / day1Total) * 100) : 0;
+    
+    // 计算总搜索数（所有天数的总和）
+    const totalSearches = dailyData.reduce((sum, day) => sum + day.value, 0);
     
     const searchResult = {
       currentRate: `${searchRate.toFixed(1)}%`,
-      totalSearches: totalRate,
-      metrics: [`${weeklyGrowth.toFixed(0)}%`, `${monthlyGrowth.toFixed(0)}%`],
-      trend: searchRate > 60 ? '增长趋势' : searchRate > 30 ? '平稳增长' : '待提升'
-    }
-
-    // 基于品牌评分生成图表数据
-    const baseValue = currentBrandRate / 10 // 缩放到合适的图表范围
-    const chartResult = [
-      { name: '1月', value: Math.max(10, baseValue * 0.6) },
-      { name: '2月', value: Math.max(15, baseValue * 0.7) },
-      { name: '3月', value: Math.max(12, baseValue * 0.5) },
-      { name: '4月', value: Math.max(20, baseValue * 0.8) },
-      { name: '5月', value: Math.max(18, baseValue * 0.6) },
-      { name: '6月', value: Math.max(25, baseValue * 1.1) },
-      { name: '7月', value: Math.max(22, baseValue) }
-    ]
+      totalSearches: totalSearches
+    };
 
     return {
       searchData: searchResult,
-      chartData: chartResult
-    }
+      chartData: dailyData
+    };
   }, [data])
 
   return (
@@ -109,20 +151,8 @@ export function BrandSearchRateCard({ data, loading, error }: BrandSearchRateCar
       {/* 正常显示 */}
       {!loading && !error && (
         <>
-          {/* 数据指标 */}
-          <div className="space-y-2 mb-6">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">周增长</span>
-              <div className="text-base font-bold text-blue-600">{searchData.metrics[0]}</div>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">月增长</span>
-              <div className="text-base font-bold text-green-600">{searchData.metrics[1]}</div>
-            </div>
-          </div>
-
           {/* 面积图 */}
-          <div className="h-[120px] mb-4">
+          <div className="h-[120px] mt-8 mb-4">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
                 <defs>
@@ -159,16 +189,7 @@ export function BrandSearchRateCard({ data, loading, error }: BrandSearchRateCar
             </ResponsiveContainer>
           </div>
 
-          {/* 图表底部 */}
-          <div className="flex justify-between text-xs text-gray-500">
-            <span>过去7天</span>
-            <span className={`font-medium ${
-              searchData.trend === '增长趋势' ? 'text-green-600' :
-              searchData.trend === '平稳增长' ? 'text-blue-600' : 'text-orange-600'
-            }`}>
-              {searchData.trend}
-            </span>
-          </div>
+          
         </>
       )}
     </div>

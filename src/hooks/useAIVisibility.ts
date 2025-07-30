@@ -235,7 +235,7 @@ export const useBrandVisibilityReport = (brandId: string) => {
 };
 
 // 可见性统计Hook - 优化版本
-export const useVisibilityStats = (brandId?: string) => {
+export const useVisibilityStats = (brandId?: string, days: number = 7) => {
   const [stats, setStats] = useState<AIVisibilityStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -249,8 +249,8 @@ export const useVisibilityStats = (brandId?: string) => {
   // 生成缓存key
   const cacheKey = useMemo(() => {
     if (!debouncedBrandId) return "";
-    return `stats-${debouncedBrandId}`;
-  }, [debouncedBrandId]);
+    return `stats-${debouncedBrandId}-${days}`;
+  }, [debouncedBrandId, days]);
 
   const fetchStats = useCallback(async () => {
     if (!debouncedBrandId || !cacheKey) return;
@@ -274,7 +274,8 @@ export const useVisibilityStats = (brandId?: string) => {
 
     try {
       const response = await aiVisibilityApi.getVisibilityStats(
-        debouncedBrandId
+        debouncedBrandId,
+        days
       );
 
       if (response.success && response.data) {
@@ -301,25 +302,27 @@ export const useVisibilityStats = (brandId?: string) => {
     } finally {
       setLoading(false);
     }
-  }, [debouncedBrandId, cacheKey]);
+  }, [debouncedBrandId, days, cacheKey]);
 
-  useEffect(() => {
-    if (debouncedBrandId && cacheKey) {
+  // 刷新函数
+  const refresh = useCallback(() => {
+    if (cacheKey) {
+      statsCache.delete(cacheKey);
       fetchStats();
     }
+  }, [cacheKey, fetchStats]);
 
-    // 清理函数
+  // 清理函数
+  useEffect(() => {
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
     };
-  }, [fetchStats]);
+  }, []);
 
-  const refresh = useCallback(() => {
+  useEffect(() => {
     if (cacheKey) {
-      // 清除缓存后重新获取
-      statsCache.delete(cacheKey);
       fetchStats();
     }
   }, [cacheKey, fetchStats]);

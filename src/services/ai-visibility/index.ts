@@ -194,14 +194,13 @@ export const aiVisibilityApi = {
    * 获取可见性指标统计
    * GET /ai-visibility/stats
    */
-  getVisibilityStats: (brandId?: string) => {
+  getVisibilityStats: (brandId?: string, days: number = 7) => {
     const searchParams = new URLSearchParams();
     if (brandId) searchParams.append("brand_id", brandId);
+    searchParams.append("days", days.toString());
     
     const queryString = searchParams.toString();
-    const endpoint = queryString 
-      ? `/api/ai-visibility/stats?${queryString}`
-      : "/api/ai-visibility/stats";
+    const endpoint = `/api/ai-visibility/stats?${queryString}`;
     
     return api.get<AIVisibilityStats>(endpoint);
   },
