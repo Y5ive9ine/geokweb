@@ -2,7 +2,11 @@
 
 import Image from 'next/image'
 
-export function SearchSection() {
+interface SearchSectionProps {
+  brandName?: string;
+}
+
+export function SearchSection({ brandName }: SearchSectionProps = {}) {
   const filterOptions = [
     { label: '最近7日', value: 'recent7' },
     { label: '前一个7日', value: 'previous7' },
@@ -18,7 +22,7 @@ export function SearchSection() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 space-y-4 md:space-y-0">
         <div className="flex-1">
           <h2 className="text-lg font-bold text-gray-800 mb-1">品牌</h2>
-          <p className="text-xs text-gray-600">搜索内容XXXX在人工智能中出现频率</p>
+          <p className="text-xs text-gray-600">搜索内容{brandName || "XXXX"}在人工智能中出现频率</p>
         </div>
         
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
