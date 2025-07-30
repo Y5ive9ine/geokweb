@@ -25,7 +25,7 @@ interface BrandSearchRateCardProps {
 
 export function BrandSearchRateCard({ data, loading, error }: BrandSearchRateCardProps) {
   // 从API数据计算搜索率
-  const { searchData, chartData } = useMemo(() => {
+  const { searchData, chartData, statsData } = useMemo(() => {
     if (!data) {
       return {
         searchData: {
@@ -33,14 +33,17 @@ export function BrandSearchRateCard({ data, loading, error }: BrandSearchRateCar
           totalSearches: 0
         },
         chartData: [
-          { name: '1', value: 20 },
-          { name: '2', value: 32 },
-          { name: '3', value: 28 },
-          { name: '4', value: 45 },
-          { name: '5', value: 38 },
-          { name: '6', value: 62 },
-          { name: '7', value: 55 }
-        ]
+          { name: '1', value: 0 },
+          { name: '2', value: 0 },
+          { name: '3', value: 0 },
+          { name: '4', value: 0 },
+          { name: '5', value: 0 },
+          { name: '6', value: 0 },
+          { name: '7', value: 0 }
+        ],
+        statsData: {
+          totalSearches: 0
+        }
       }
     }
 
@@ -56,21 +59,24 @@ export function BrandSearchRateCard({ data, loading, error }: BrandSearchRateCar
       brandSearchRate = data.brand_search_rate;
     }
 
-    if (!brandSearchRate || brandSearchRate.length === 0) {
+    if (!brandSearchRate || !Array.isArray(brandSearchRate) || brandSearchRate.length === 0) {
       return {
         searchData: {
           currentRate: '0%',
           totalSearches: 0
         },
         chartData: [
-          { name: '1', value: 20 },
-          { name: '2', value: 32 },
-          { name: '3', value: 28 },
-          { name: '4', value: 45 },
-          { name: '5', value: 38 },
-          { name: '6', value: 62 },
-          { name: '7', value: 55 }
-        ]
+          { name: '1', value: 0 },
+          { name: '2', value: 0 },
+          { name: '3', value: 0 },
+          { name: '4', value: 0 },
+          { name: '5', value: 0 },
+          { name: '6', value: 0 },
+          { name: '7', value: 0 }
+        ],
+        statsData: {
+          totalSearches: 0
+        }
       }
     }
 
@@ -110,7 +116,10 @@ export function BrandSearchRateCard({ data, loading, error }: BrandSearchRateCar
 
     return {
       searchData: searchResult,
-      chartData: dailyData
+      chartData: dailyData,
+      statsData: {
+        totalSearches: totalSearches
+      }
     };
   }, [data])
 
@@ -128,7 +137,7 @@ export function BrandSearchRateCard({ data, loading, error }: BrandSearchRateCar
             <div className="text-3xl font-bold text-gray-800">{searchData.currentRate}</div>
           )}
         </div>
-        <div className="text-xs font-bold text-gray-500">总搜索: {searchData.totalSearches}</div>
+        <div className="text-xs font-bold text-gray-500">总搜索: {statsData.totalSearches}</div>
       </div>
 
       {/* 加载状态 */}
@@ -148,13 +157,13 @@ export function BrandSearchRateCard({ data, loading, error }: BrandSearchRateCar
         </div>
       )}
 
-      {/* 正常显示 */}
+      {/* 正常显示或仅坐标轴 */}
       {!loading && !error && (
         <>
-          {/* 面积图 */}
+          {/* 面积图或空图表 */}
           <div className="h-[120px] mt-8 mb-4">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
+              <AreaChart data={data && statsData.totalSearches > 0 ? chartData : []}>
                 <defs>
                   <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#4285f4" stopOpacity={0.8}/>
@@ -168,28 +177,31 @@ export function BrandSearchRateCard({ data, loading, error }: BrandSearchRateCar
                   tick={{ fontSize: 10, fill: '#9ca3af' }}
                 />
                 <YAxis hide />
-                <Tooltip 
-                  contentStyle={{
-                    background: 'rgba(0, 0, 0, 0.8)',
-                    border: 'none',
-                    borderRadius: '4px',
-                    color: 'white',
-                    fontSize: '12px'
-                  }}
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="value" 
-                  stroke="#4285f4" 
-                  fillOpacity={1} 
-                  fill="url(#colorUv)"
-                  strokeWidth={2}
-                />
+                {/* 只有在有数据时才显示 Tooltip 和 Area */}
+                {data && statsData.totalSearches > 0 && (
+                  <>
+                    <Tooltip 
+                      contentStyle={{
+                        background: 'rgba(0, 0, 0, 0.8)',
+                        border: 'none',
+                        borderRadius: '4px',
+                        color: 'white',
+                        fontSize: '12px'
+                      }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="#4285f4" 
+                      fillOpacity={1} 
+                      fill="url(#colorUv)"
+                      strokeWidth={2}
+                    />
+                  </>
+                )}
               </AreaChart>
             </ResponsiveContainer>
           </div>
-
-          
         </>
       )}
     </div>

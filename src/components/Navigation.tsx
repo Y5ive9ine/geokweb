@@ -9,18 +9,16 @@ const Navigation: React.FC = () => {
   const [isPlatformOpen, setIsPlatformOpen] = useState(false);
 
   const platformItems = [
-    { name: 'AI搜索监控', href: '/platform/ai-search' },
-    { name: '品牌分析', href: '/platform/brand-analysis' },
-    { name: '竞争对手分析', href: '/platform/competitor-analysis' },
-    { name: 'API接口', href: '/platform/api' },
+    { name: 'AI数据洞察', href: '/platform/ai-search' },
+    { name: 'AI爬虫分析', href: '/platform/brand-analysis' },
+    { name: '数据对比分析', href: '/platform/competitor-analysis' },
+    { name: 'AI购物可见性分析', href: '/platform/api' },
   ];
 
   const resourceItems = [
-    { name: '帮助中心', href: '/resources/help' },
+    { name: '客户案例', href: '/resources/help' },
     { name: '博客文章', href: '/resources/blog' },
-    { name: '案例研究', href: '/resources/case-studies' },
-    { name: '白皮书', href: '/resources/whitepapers' },
-    { name: '开发者文档', href: '/resources/docs' },
+    { name: '使用指南', href: '/resources/case-studies' },
   ];
 
   return (
