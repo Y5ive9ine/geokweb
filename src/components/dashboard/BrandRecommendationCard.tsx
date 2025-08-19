@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useMemo } from 'react'
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts'
+import React, { useMemo, useState, useCallback } from 'react'
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts'
 import { AIVisibilityStats, BrandFirstChoiceRate } from '@/services/ai-visibility'
 
 // 支持实际API返回的数据结构
@@ -95,6 +95,26 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
     }
   }, [data])
 
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null)
+  const [pinnedIndex, setPinnedIndex] = useState<number | null>(null)
+  const activeIndex = pinnedIndex !== null ? pinnedIndex : hoverIndex
+  const MIN_LABEL = 8
+
+  const handleSliceClick = useCallback((index: number) => {
+    setPinnedIndex(prev => (prev === index ? null : index))
+  }, [])
+
+  const CustomTooltip = ({ active }: any) => {
+    if (!active || hoverIndex === null || !brands[hoverIndex]) return null
+    const hoveredBrand = brands[hoverIndex]
+    return (
+      <div className="bg-white border border-gray-200 rounded-lg shadow-xl px-3 py-2 text-xs text-gray-800">
+        <div className="font-medium mb-0.5">{hoveredBrand.name}</div>
+        <div className="text-gray-600">{hoveredBrand.value.toFixed(1)}%</div>
+      </div>
+    )
+  }
+
   // 计算统计数据用于底部显示
   const statsData = useMemo(() => {
     if (!data) return { count: 0, total: 0 };
@@ -116,12 +136,10 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
   }, [data]);
 
   // 根据数值大小分配不同的外半径
-  const getOuterRadius = (value: number) => {
-    if (value >= 40) return 80;      // 最大扇形 (40%+)
-    if (value >= 25) return 70;       // 较大扇形 (25%-40%)
-    if (value >= 15) return 60;       // 中等扇形 (15%-25%)
-    return 50;                        // 最小扇形 (<15%)
-  };
+  const getOuterRadius = (value: number, index?: number) => {
+    const base = value >= 40 ? 80 : value >= 25 ? 70 : value >= 15 ? 60 : 50
+    return activeIndex === index ? base + 8 : base
+  }
 
   return (
     <div className="bg-white rounded-2xl border border-gray-300 p-6 h-[326px]">
@@ -166,20 +184,27 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
           {/* 检查是否有有效数据 */}
           {hasRealData ? (
             <>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  {/* 为每个数据项创建单独的Pie，实现不同半径的突出效果 */}
+              <div className="h-full" style={{ outline: 'none' }} onFocus={(e) => e.preventDefault()}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    {pinnedIndex === null && (
+                      <Tooltip 
+                        content={<CustomTooltip />} 
+                        wrapperStyle={{ outline: 'none', border: 'none', boxShadow: 'none', zIndex: 50 }} 
+                      />
+                    )}
                   {brands.map((item, index) => {
-                    const outerRadius = getOuterRadius(item.value);
-                    const innerRadius = 45;
-                    
-                    // 计算这个扇形的起始和结束角度
-                    let startAngle = 90; // 从顶部开始
+                    const outerRadius = getOuterRadius(item.value, index)
+                    const innerRadius = 45
+
+                    let startAngle = 90
                     for (let i = 0; i < index; i++) {
-                      startAngle -= (brands[i].value / 100) * 360;
+                      startAngle -= (brands[i].value / 100) * 360
                     }
-                    const endAngle = startAngle - (item.value / 100) * 360;
-                    
+                    const endAngle = startAngle - (item.value / 100) * 360
+
+                    const showLabel = item.value >= MIN_LABEL
+
                     return (
                       <Pie
                         key={`pie-${index}`}
@@ -190,67 +215,51 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
                         innerRadius={innerRadius}
                         fill={item.color}
                         dataKey="value"
-                        strokeWidth={0}
+                        stroke="#fff"
+                        strokeWidth={2}
                         startAngle={startAngle}
                         endAngle={endAngle}
-                        labelLine={false}
-                        label={(entry) => {
-                          const RADIAN = Math.PI / 180;
-                          const midAngle = (startAngle + endAngle) / 2;
-                          const radius = outerRadius + 15;
-                          const x = entry.cx + radius * Math.cos(-midAngle * RADIAN);
-                          const y = entry.cy + radius * Math.sin(-midAngle * RADIAN);
-
+                        isAnimationActive={false}
+                        onClick={() => handleSliceClick(index)}
+                        onMouseEnter={() => setHoverIndex(index)}
+                        onMouseLeave={() => setHoverIndex(null)}
+                        labelLine={showLabel}
+                        label={showLabel ? (entry) => {
+                          const RADIAN = Math.PI / 180
+                          const midAngle = (startAngle + endAngle) / 2
+                          const radius = outerRadius + 15
+                          const x = entry.cx + radius * Math.cos(-midAngle * RADIAN)
+                          const y = entry.cy + radius * Math.sin(-midAngle * RADIAN)
                           return (
                             <g>
-                              <line
-                                x1={entry.cx + (outerRadius + 3) * Math.cos(-midAngle * RADIAN)}
-                                y1={entry.cy + (outerRadius + 3) * Math.sin(-midAngle * RADIAN)}
-                                x2={x - (x > entry.cx ? 10 : -10)}
-                                y2={y}
-                                stroke="#ccc"
-                                strokeWidth={1}
-                              />
-                              <text
-                                x={x}
-                                y={y - 3}
-                                fill="#666"
-                                textAnchor={x > entry.cx ? 'start' : 'end'}
-                                dominantBaseline="central"
-                                fontSize="10"
-                                className="font-medium"
-                              >
+                              <text x={x} y={y - 3} fill="#666" textAnchor={x > entry.cx ? 'start' : 'end'} dominantBaseline="central" fontSize="10" className="font-medium">
                                 {entry.name}
                               </text>
-                              <text
-                                x={x}
-                                y={y + 8}
-                                fill="#999"
-                                textAnchor={x > entry.cx ? 'start' : 'end'}
-                                dominantBaseline="central"
-                                fontSize="9"
-                              >
+                              <text x={x} y={y + 8} fill="#999" textAnchor={x > entry.cx ? 'start' : 'end'} dominantBaseline="central" fontSize="9">
                                 {(entry.value || 0).toFixed(1)}%
                               </text>
                             </g>
-                          );
-                        }}
+                          )
+                        } : undefined}
                       >
                         <Cell fill={item.color} />
                       </Pie>
-                    );
+                    )
                   })}
-                </PieChart>
-              </ResponsiveContainer>
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
 
               {/* 中心显示当前品牌推荐率 */}
-              <div className="absolute left-[50%] top-[50%] transform -translate-x-1/2 -translate-y-1/2">
-                <div className="text-center bg-white rounded-full w-16 h-16 flex items-center justify-center shadow-sm">
+              <div className="absolute left-[50%] top-[50%] transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                <div className="text-center bg-white rounded-full w-20 h-20 flex items-center justify-center shadow-sm">
                   <div>
                     <div className="text-sm font-bold text-gray-800">
-                      {currentBrandData?.percentage || '0%'}
+                      {(activeIndex != null ? brands[activeIndex]?.percentage : currentBrandData?.percentage) || '0%'}
                     </div>
-                    <div className="text-xs text-gray-600">推荐率</div>
+                    <div className="text-[10px] text-gray-600">
+                      {activeIndex != null ? brands[activeIndex]?.name : '推荐率'}
+                    </div>
                   </div>
                 </div>
               </div>

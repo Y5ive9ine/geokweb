@@ -155,7 +155,7 @@ export function VisibilityContent() {
   return (
     <div className="flex-1 overflow-auto bg-gray-50 p-4 md:p-6">
       {/* 搜索区域 */}
-      <SearchSection brandName={currentBrand?.name} />
+      <SearchSection brandName={currentBrand?.name} brandId={currentBrandId} onBrandChange={setCurrentBrandId} />
 
       {/* 主要内容网格 - 响应式优化 */}
       <div className="mt-6 space-y-6">

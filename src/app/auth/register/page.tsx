@@ -57,7 +57,7 @@ export default function RegisterPage() {
   return (
     <div className="flex min-h-screen bg-white">
       {/* 左侧注册表单 */}
-      <div className="relative w-[900px]">
+      <div className="relative z-10 w-[900px]">
         <div className="absolute inset-0 flex flex-col justify-center px-[120px]">
           <div className="mb-[60px] text-center">
             <h1 className="text-[36px] text-black font-normal leading-[44px] font-['PingFang_SC']">
@@ -87,7 +87,8 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-[4px] bg-[#2663FF] py-[12px] text-[14px] font-medium text-white hover:bg-[#1947B8] focus:outline-none disabled:opacity-50"
+              className="w-full rounded-[4px] bg-[#2663FF] py-[12px] text-[14px] font-medium text-white hover:bg-[#1947B8] focus:outline-none"
+              style={{ minHeight: 44 }}
             >
               {loading ? "注册中..." : "使用电子邮件注册"}
             </button>

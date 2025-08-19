@@ -234,7 +234,8 @@ function RegisterFormContent() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 text-white py-4 px-4 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed"
+              className="w-full bg-blue-600 text-white py-4 px-4 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+              style={{ minHeight: 48 }}
             >
               {loading ? "创建中..." : "创建您的账户"}
             </button>

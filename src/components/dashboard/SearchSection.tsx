@@ -1,12 +1,15 @@
 'use client'
 
 import Image from 'next/image'
+import { BrandSelector } from './BrandSelector'
 
 interface SearchSectionProps {
   brandName?: string;
+  brandId?: string;
+  onBrandChange?: (id: string) => void;
 }
 
-export function SearchSection({ brandName }: SearchSectionProps = {}) {
+export function SearchSection({ brandName, brandId, onBrandChange }: SearchSectionProps = {}) {
   const filterOptions = [
     { label: '最近7日', value: 'recent7' },
     { label: '前一个7日', value: 'previous7' },
@@ -25,7 +28,14 @@ export function SearchSection({ brandName }: SearchSectionProps = {}) {
           <p className="text-xs text-gray-600">搜索内容{brandName || "XXXX"}在人工智能中出现频率</p>
         </div>
         
-        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 items-center">
+          {/* 品牌切换放在查询按钮左侧，样式与按钮组保持一致 */}
+          <div className="w-full sm:w-auto">
+            <div className="border border-gray-300 rounded-lg px-3 py-2 bg-white">
+              <BrandSelector value={brandId} onChange={onBrandChange} />
+            </div>
+          </div>
+
           {/* 查询按钮 */}
           <button className="bg-gray-400 hover:bg-gray-500 text-white px-4 md:px-6 py-3 rounded-lg text-sm font-medium transition-colors w-full sm:w-auto">
             查询

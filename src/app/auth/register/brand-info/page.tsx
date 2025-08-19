@@ -14,6 +14,8 @@ enum VerificationStatus {
   ERROR = "error",
 }
 
+type VerificationMethod = "domain" | "file" | "dns" | "meta";
+
 export default function BrandInfoPage() {
   const [brandName, setBrandName] = useState("");
   const [brandDomain, setBrandDomain] = useState("");
@@ -21,6 +23,7 @@ export default function BrandInfoPage() {
   const [verificationStatus, setVerificationStatus] =
     useState<VerificationStatus>(VerificationStatus.IDLE);
   const [error, setError] = useState("");
+  const [verificationMethod, setVerificationMethod] = useState<VerificationMethod>("domain");
   const router = useRouter();
 
   // Zustand store
@@ -49,6 +52,11 @@ export default function BrandInfoPage() {
 
   const handleNext = () => {
     router.push("/auth/register/add-prompts");
+  };
+
+  const handleReverify = () => {
+    setVerified(false);
+    setVerificationStatus(VerificationStatus.IDLE);
   };
 
   const validateForm = () => {
@@ -96,7 +104,7 @@ export default function BrandInfoPage() {
     setBrandData(newBrandData);
     setCurrentStep("verification");
 
-    // 模拟验证过程（2秒后验证成功）
+    // TODO: 根据 verificationMethod 调用不同接口（占位模拟）
     setTimeout(() => {
       setVerificationStatus(VerificationStatus.SUCCESS);
       setVerified(true);
@@ -217,6 +225,41 @@ export default function BrandInfoPage() {
           <h2 className="text-[#333333] text-[18px] font-semibold mb-8">
             告诉我们您的品牌。这有助于我们个性化您的AI搜索监控设置
           </h2>
+
+          {/* 验证方式切换 */}
+          <div className="mb-8">
+            <div className="inline-flex rounded border border-[#CCCCCC] overflow-hidden">
+              {[
+                { key: "domain", label: "网站验证" },
+                { key: "file", label: "上传文件" },
+                { key: "dns", label: "DNS 记录" },
+                { key: "meta", label: "Meta 标签" },
+              ].map((m) => (
+                <button
+                  key={m.key}
+                  onClick={() => setVerificationMethod(m.key as VerificationMethod)}
+                  disabled={verificationStatus !== VerificationStatus.IDLE}
+                  className={`${
+                    verificationMethod === (m.key as VerificationMethod)
+                      ? "bg-[#2663FF] text-white"
+                      : "bg-white text-[#333333]"
+                  } px-4 py-2 text-sm ${
+                    verificationStatus !== VerificationStatus.IDLE
+                      ? "opacity-60 cursor-not-allowed"
+                      : ""
+                  }`}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
+            <div className="text-xs text-gray-500 mt-2">
+              {verificationMethod === "domain" && "我们会访问您的域名进行自动验证。"}
+              {verificationMethod === "file" && "下载验证文件并上传至您站点的根目录后点击验证。"}
+              {verificationMethod === "dns" && "在域名服务商处添加指定的 TXT 记录后点击验证。"}
+              {verificationMethod === "meta" && "在首页 <head> 中加入我们提供的 meta 标签后点击验证。"}
+            </div>
+          </div>
 
           {/* 表单输入区域 */}
           <div className="space-y-[91px] mb-16 max-w-[540px]">
@@ -339,19 +382,27 @@ export default function BrandInfoPage() {
 
             {/* 下一步按钮 */}
             {verificationStatus === VerificationStatus.SUCCESS ? (
-              <button
-                onClick={handleNext}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-[6px] rounded text-[16px] font-normal hover:from-blue-700 hover:to-purple-700 transition-all duration-200 leading-[44px] shadow-lg"
-              >
-                下一步
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleNext}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-[6px] rounded text-[16px] font-normal hover:from-blue-700 hover:to-purple-700 transition-all duration-200 leading-[44px] shadow-lg"
+                >
+                  下一步
+                </button>
+                <button
+                  onClick={handleReverify}
+                  className="bg-white border border-[#CCCCCC] text-[#333333] px-8 py-[6px] rounded text-[16px] font-normal hover:bg-gray-50 leading-[44px]"
+                >
+                  重新验证/编辑信息
+                </button>
+              </div>
             ) : (
               /* 跳过按钮 */
               <button
                 onClick={handleSkip}
-                disabled={verificationStatus !== VerificationStatus.IDLE}
+                disabled={verificationStatus === VerificationStatus.VERIFYING}
                 className={`text-[14px] font-normal transition-colors leading-[44px] ${
-                  verificationStatus !== VerificationStatus.IDLE
+                  verificationStatus === VerificationStatus.VERIFYING
                     ? "text-gray-400 cursor-not-allowed"
                     : "text-[#333333] hover:text-gray-600"
                 }`}
