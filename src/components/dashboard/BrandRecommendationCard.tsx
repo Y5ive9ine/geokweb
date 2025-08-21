@@ -42,12 +42,12 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
     if (!data) {
       return {
         brands: [
-          { name: '其它品牌1', color: '#ffb200', percentage: '20%', value: 20 },
-          { name: '其它品牌2', color: '#11ca9c', percentage: '25%', value: 25 },
-          { name: '其它品牌3', color: '#ff4d4d', percentage: '15%', value: 15 },
-          { name: '当前品牌', color: '#4285F4', percentage: '40%', value: 40 },
+          { name: '其它品牌1', color: '#ffb200', percentage: '20%', value: 20, count: 20 },
+          { name: '其它品牌2', color: '#11ca9c', percentage: '25%', value: 25, count: 25 },
+          { name: '其它品牌3', color: '#ff4d4d', percentage: '15%', value: 15, count: 15 },
+          { name: '当前品牌', color: '#4285F4', percentage: '40%', value: 40, count: 40 },
         ],
-        currentBrandData: { name: '当前品牌', color: '#4285F4', percentage: '40%', value: 40 },
+        currentBrandData: { name: '当前品牌', color: '#4285F4', percentage: '40%', value: 40, count: 40 },
         hasRealData: false
       }
     }
@@ -67,12 +67,12 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
     if (!brandRecommendRate || !Array.isArray(brandRecommendRate) || brandRecommendRate.length === 0) {
       return {
         brands: [
-          { name: '其它品牌1', color: '#ffb200', percentage: '20%', value: 20 },
-          { name: '其它品牌2', color: '#11ca9c', percentage: '25%', value: 25 },
-          { name: '其它品牌3', color: '#ff4d4d', percentage: '15%', value: 15 },
-          { name: '当前品牌', color: '#4285F4', percentage: '40%', value: 40 },
+          { name: '其它品牌1', color: '#ffb200', percentage: '20%', value: 20, count: 20 },
+          { name: '其它品牌2', color: '#11ca9c', percentage: '25%', value: 25, count: 25 },
+          { name: '其它品牌3', color: '#ff4d4d', percentage: '15%', value: 15, count: 15 },
+          { name: '当前品牌', color: '#4285F4', percentage: '40%', value: 40, count: 40 },
         ],
-        currentBrandData: { name: '当前品牌', color: '#4285F4', percentage: '40%', value: 40 },
+        currentBrandData: { name: '当前品牌', color: '#4285F4', percentage: '40%', value: 40, count: 40 },
         hasRealData: false
       }
     }
@@ -90,7 +90,8 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
         name: item.brand || `品牌${index + 1}`,
         color: colors[index % colors.length],
         percentage: `${percentage.toFixed(1)}%`,
-        value: percentage
+        value: percentage,
+        count: item.rate  // 保存原始次数
       }
     })
 
@@ -280,7 +281,7 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
               {/* API数据指标 */}
               <div className="absolute bottom-2 left-2 text-xs text-gray-500">
                 <div>品牌数: {statsData.count}</div>
-                <div>总评分: {statsData.total.toFixed(1) || 0}</div>
+                <div>总次数: {statsData.total.toFixed(1) || 0}</div>
               </div>
             </>
           ) : (
@@ -353,8 +354,8 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
                         <div className="text-sm text-gray-600 mt-1">当前推荐率</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-2xl font-bold text-gray-800">{brands.length}</div>
-                        <div className="text-sm text-gray-600 mt-1">品牌总数</div>
+                        <div className="text-2xl font-bold text-orange-600">{currentBrandData?.count || 0}</div>
+                        <div className="text-sm text-gray-600 mt-1">推荐次数</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold text-green-600">
@@ -364,7 +365,7 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold text-purple-600">{statsData.total.toFixed(1)}</div>
-                        <div className="text-sm text-gray-600 mt-1">总评分</div>
+                        <div className="text-sm text-gray-600 mt-1">总次数</div>
                       </div>
                     </div>
                   </div>
@@ -388,6 +389,10 @@ export function BrandRecommendationCard({ data, loading, error }: BrandRecommend
                             </span>
                           </div>
                           <div className="flex items-center gap-4">
+                            <div className="text-right">
+                              <div className="font-bold text-gray-800">{brand.count || 0}</div>
+                              <div className="text-xs text-gray-500">次数</div>
+                            </div>
                             <div className="text-right">
                               <div className="font-bold text-gray-800">{brand.percentage}</div>
                               <div className="text-xs text-gray-500">推荐率</div>

@@ -80,34 +80,39 @@ export function BrandSearchRateCard({ data, loading, error }: BrandSearchRateCar
       }
     }
 
-    // 解析嵌套数据结构，计算每天的总和
+    // 解析嵌套数据结构，计算每天的搜索率
     const dailyData = brandSearchRate.map((dayItem, index) => {
       // 从data字段中提取各个维度的数值
       const dayData = dayItem.data || {};
       
-      // 计算四个维度的总和：机械搜索 + 相关搜索 + 竞品对比 + 行业搜索
+      // 获取各维度数据
       const directSearch = dayData['机械搜索'] || dayData['直接搜索'] || 0;
       const relatedSearch = dayData['相关搜索'] || 0;
       const competitorCompare = dayData['竞品对比'] || 0;
       const industrySearch = dayData['行业搜索'] || 0;
       
+      // 计算总和
       const totalValue = directSearch + relatedSearch + competitorCompare + industrySearch;
+      
+      // 计算当天的搜索率：(直接搜索 + 相关搜索) / 总和 * 100%
+      const searchRateValue = totalValue > 0 ? ((directSearch + relatedSearch) / totalValue * 100) : 0;
       
       return {
         day: index + 1,
         name: `${index + 1}`,
-        value: totalValue,
-        date: dayItem.date
+        value: searchRateValue,
+        date: dayItem.date,
+        totalValue: totalValue // 保留总值用于统计
       };
     });
 
-    // 计算搜索率：第7天总和 / 第1天总和
-    const day1Total = dailyData[0]?.value || 1;
-    const day7Total = dailyData[6]?.value || 0;
-    const searchRate = day1Total > 0 ? ((day7Total / day1Total) * 100) : 0;
+    // 计算主搜索率：第7天搜索率 / 第1天搜索率 * 100%
+    const day1SearchRate = dailyData[0]?.value || 1;
+    const day7SearchRate = dailyData[6]?.value || 0;
+    const searchRate = day1SearchRate > 0 ? ((day7SearchRate / day1SearchRate) * 100) : 0;
     
-    // 计算总搜索数（所有天数的总和）
-    const totalSearches = dailyData.reduce((sum, day) => sum + day.value, 0);
+    // 计算总搜索数（所有天数的总数之和）
+    const totalSearches = dailyData.reduce((sum, day) => sum + (day.totalValue || 0), 0);
     
     const searchResult = {
       currentRate: `${searchRate.toFixed(1)}%`,
@@ -188,6 +193,7 @@ export function BrandSearchRateCard({ data, loading, error }: BrandSearchRateCar
                         color: 'white',
                         fontSize: '12px'
                       }}
+                      formatter={(value: number) => [`${value.toFixed(1)}%`, '搜索率']}
                     />
                     <Area 
                       type="monotone" 
