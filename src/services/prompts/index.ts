@@ -15,23 +15,53 @@ export interface PromptsListParams {
 export interface Prompt {
   id?: string;
   brand_id?: string;
+  ai_search_id?: string;
   title?: string;
   content?: string;
+  prompt?: string; // 兼容旧字段
   description?: string;
   category?: string;
-  usage_count?: number;
+  score?: number;
+  ranking?: number;
+  ranking_tier?: string;
+  share_rate?: number;
+  click_count?: number;
+  view_count?: number;
+  share_count?: number;
+  reference_count?: number;
+  engagement_rate?: number;
+  conversion_rate?: number;
+  main_keywords?: Record<string, number>;
+  keyword_frequency?: Record<string, number>;
+  keyword_density?: number;
+  quality_score?: number;
+  relevance_score?: number;
+  originality_score?: number;
+  region?: string;
+  platform?: string;
+  language?: string;
+  status?: string;
+  priority?: number;
+  is_featured?: boolean;
+  is_public?: boolean;
   is_favorite?: boolean;
+  usage_count?: number;
   created_at?: string;
   updated_at?: string;
+  brand?: any;
+  ai_search?: any;
 }
 
 // 创建提示词请求接口
 export interface CreatePromptRequest {
-  brand_id: string;
-  title: string;
-  content: string;
+  brand_id?: string;
+  title?: string;
+  content?: string;
+  prompt?: string; // 兼容字段
   description?: string;
   category?: string;
+  is_public?: boolean;
+  metadata?: any;
 }
 
 // 更新提示词请求接口
@@ -49,12 +79,25 @@ export interface TopPromptsParams {
 
 // 提示词响应接口
 export interface PromptsResponse {
-  prompts: Prompt[];
+  prompts?: Prompt[];
+  data?: {
+    prompts?: Prompt[];
+    brand_id?: string | null;
+    count?: number;
+    pagination?: {
+      page: number;
+      page_size: number;
+      total: number;
+      total_pages: number;
+    };
+  };
   pagination?: {
     current_page: number;
     page_size: number;
     total_items: number;
     total_pages: number;
+    page?: number;
+    total?: number;
   };
 }
 

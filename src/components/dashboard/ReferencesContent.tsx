@@ -47,7 +47,7 @@ export function ReferencesContent() {
 
   // 按域名分组引用
   const groupedByDomain = references.reduce((acc, ref) => {
-    const domain = referencesUtils.extractDomain(ref.url);
+    const domain = referencesUtils.extractDomain(ref.url || '');
     if (!acc[domain]) {
       acc[domain] = [];
     }
@@ -115,7 +115,7 @@ export function ReferencesContent() {
               <div className="space-y-3">
                 {topReferences.slice(0, 5).map((ref, index) => (
                   <div
-                    key={ref.id}
+                    key={ref.id || `top-ref-${index}`}
                     className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                   >
                     <div className="flex-1">
@@ -124,17 +124,17 @@ export function ReferencesContent() {
                           #{index + 1}
                         </span>
                         <a
-                          href={ref.url}
+                          href={ref.url && ref.url.startsWith('http') ? ref.url : `https://${ref.url || ''}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-sm text-blue-600 hover:underline truncate max-w-md"
                         >
-                          {ref.title || ref.url}
+                          {ref.title || ref.url || ''}
                         </a>
                       </div>
                       <div className="flex items-center gap-4 mt-1">
                         <span className="text-xs text-gray-500">
-                          域名: {referencesUtils.extractDomain(ref.url)}
+                          域名: {referencesUtils.extractDomain(ref.url || '')}
                         </span>
                         <span className="text-xs text-gray-500">
                           引用次数: {ref.citation_count || 0}
@@ -165,21 +165,21 @@ export function ReferencesContent() {
               <div className="h-40 bg-gray-100 animate-pulse rounded"></div>
             ) : brandReferences && brandReferences.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {brandReferences.slice(0, 6).map((ref) => (
+                {brandReferences.slice(0, 6).map((ref, index) => (
                   <div
-                    key={ref.id}
+                    key={ref.id || `brand-ref-${index}`}
                     className="p-4 border rounded-lg hover:shadow-md transition-shadow"
                   >
                     <a
-                      href={ref.url}
+                      href={ref.url && ref.url.startsWith('http') ? ref.url : `https://${ref.url || ''}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm font-medium text-blue-600 hover:underline line-clamp-1"
                     >
-                      {ref.title || ref.url}
+                      {ref.title || ref.url || ''}
                     </a>
                     <p className="text-xs text-gray-500 mt-2">
-                      {referencesUtils.extractDomain(ref.url)}
+                      {referencesUtils.extractDomain(ref.url || '')}
                     </p>
                     {ref.snippet && (
                       <p className="text-xs text-gray-600 mt-2 line-clamp-2">
@@ -230,18 +230,18 @@ export function ReferencesContent() {
                           </span>
                         </div>
                         <div className="space-y-2">
-                          {refs.slice(0, 3).map((ref) => (
+                          {refs.slice(0, 3).map((ref, refIndex) => (
                             <div
-                              key={ref.id}
+                              key={ref.id || `${domain}-ref-${refIndex}`}
                               className="flex items-center justify-between py-2 border-t"
                             >
                               <a
-                                href={ref.url}
+                                href={ref.url && ref.url.startsWith('http') ? ref.url : `https://${ref.url || ''}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-sm text-blue-600 hover:underline truncate flex-1 mr-4"
                               >
-                                {ref.title || ref.url}
+                                {ref.title || ref.url || ''}
                               </a>
                               <Button
                                 size="sm"

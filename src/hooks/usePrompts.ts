@@ -34,12 +34,27 @@ export const usePrompts = (initialParams?: PromptsListParams) => {
     try {
       const response = await promptsApi.getPrompts(params);
       
-      if (response.success && response.data) {
-        const prompts = Array.isArray(response.data.prompts) ? response.data.prompts : [];
-        setPrompts(prompts);
-        
-        if (response.data.pagination) {
-          setPagination(response.data.pagination);
+      if (response.success) {
+        // 处理不同的响应格式
+        if (response.data?.prompts) {
+          // 新格式：data.prompts
+          setPrompts(response.data.prompts);
+          if (response.data.pagination) {
+            setPagination({
+              current_page: response.data.pagination.page || response.data.pagination.current_page || 1,
+              page_size: response.data.pagination.page_size || 10,
+              total_items: response.data.pagination.total || response.data.pagination.total_items || 0,
+              total_pages: response.data.pagination.total_pages || 0,
+            });
+          }
+        } else if (response.prompts) {
+          // 旧格式：直接prompts
+          setPrompts(response.prompts);
+          if (response.pagination) {
+            setPagination(response.pagination);
+          }
+        } else {
+          setPrompts([]);
         }
       } else {
         setError(response.error || response.message || "Failed to fetch prompts");
@@ -99,9 +114,17 @@ export const useBrandPrompts = (brandId: string, category?: string) => {
     try {
       const response = await promptsApi.getBrandPrompts(brandId, category);
       
-      if (response.success && response.data) {
-        const prompts = Array.isArray(response.data.prompts) ? response.data.prompts : [];
-        setPrompts(prompts);
+      if (response.success) {
+        // 处理不同的响应格式
+        if (response.data?.prompts) {
+          // 新格式：data.prompts
+          setPrompts(response.data.prompts);
+        } else if (response.prompts) {
+          // 旧格式：直接prompts
+          setPrompts(response.prompts);
+        } else {
+          setPrompts([]);
+        }
       } else {
         setError(response.error || response.message || "Failed to fetch brand prompts");
       }
@@ -246,9 +269,17 @@ export const useTopPrompts = (limit?: number) => {
     try {
       const response = await promptsApi.getTopPrompts({ limit });
       
-      if (response.success && response.data) {
-        const prompts = Array.isArray(response.data.prompts) ? response.data.prompts : [];
-        setPrompts(prompts);
+      if (response.success) {
+        // 处理不同的响应格式
+        if (response.data?.prompts) {
+          // 新格式：data.prompts
+          setPrompts(response.data.prompts);
+        } else if (response.prompts) {
+          // 旧格式：直接prompts
+          setPrompts(response.prompts);
+        } else {
+          setPrompts([]);
+        }
       } else {
         setError(response.error || response.message || "Failed to fetch top prompts");
       }

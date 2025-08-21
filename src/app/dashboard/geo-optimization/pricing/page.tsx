@@ -396,9 +396,6 @@ export default function PricingPage() {
                           <button className="bg-blue-600 h-6 px-3 rounded text-white text-xs">
                             当月搜索量
                           </button>
-                          <button className="bg-blue-100 h-6 px-3 rounded text-blue-600 text-xs">
-                            当月流失量
-                          </button>
                         </div>
                         <button className="text-xs text-blue-600 border border-blue-600 rounded px-3 py-1 hover:bg-blue-50 transition-colors">
                           查看详情

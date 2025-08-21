@@ -19,8 +19,6 @@ const nextConfig: NextConfig = {
   trailingSlash: false,
   // 优化静态资源
   assetPrefix: "",
-  // 确保页面预渲染
-  generateStaticParams: true,
   // 实验性功能 - 确保standalone模式下的客户端路由
   experimental: {
     // 优化客户端导航

@@ -315,12 +315,12 @@ export default function ReferencesPage() {
                                 </div>
                               )}
                               <a
-                                href={item.domain}
+                                href={item.domain && item.domain.startsWith('http') ? item.domain : `https://${item.domain || ''}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-gray-700 hover:text-blue-600 flex items-center space-x-1"
                               >
-                                <span className="text-sm">{item.domain}</span>
+                                <span className="text-sm">{item.domain || ''}</span>
                                 <ExternalLinkIcon className="w-3 h-3" />
                               </a>
                             </div>

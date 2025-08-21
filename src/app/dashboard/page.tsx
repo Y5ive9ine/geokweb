@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { Sidebar } from '@/components/dashboard/Sidebar'
 import { TopNavigation } from '@/components/dashboard/TopNavigation'
 import { MainContent } from '@/components/dashboard/MainContent'
@@ -9,6 +10,7 @@ import AuthGuard from '@/components/auth/AuthGuard'
 import { useSidebarState } from '@/hooks/useSidebarState'
 
 export default function DashboardPage() {
+  const pathname = usePathname()
   const [activeTab, setActiveTab] = useState('visibility')
   const { 
     sidebarCollapsed, 
@@ -17,6 +19,17 @@ export default function DashboardPage() {
     toggleMobileSidebar, 
     setMobileSidebarOpen 
   } = useSidebarState()
+
+  // 根据URL路径设置activeTab
+  useEffect(() => {
+    if (pathname.includes('/tips')) {
+      setActiveTab('tips')
+    } else if (pathname.includes('/references')) {
+      setActiveTab('references')
+    } else {
+      setActiveTab('visibility')
+    }
+  }, [pathname])
 
   return (
     <AuthGuard>

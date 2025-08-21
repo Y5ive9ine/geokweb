@@ -6,20 +6,78 @@ import Image from 'next/image'
 export function ConversationsContent() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [selectedPlatform, setSelectedPlatform] = useState('平台筛选')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isSearchFocused, setIsSearchFocused] = useState(false)
+  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([])
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const searchRef = useRef<HTMLDivElement>(null)
   
   const platforms = ['DeepSeek', '豆包', '文心一言', 'ChatGPT', 'Claude']
+  
+  // 硬编码的搜索建议数据
+  const searchSuggestions = [
+    '预算5000-8000装机，哪个CPU性价比高',
+    '预算6000-8000，想要一台整机有什么配置推荐',
+    '玩游戏CPU高性价比推荐',
+    '双十一5000元学生装机最高性价比CPU',
+    '双十一5000-6000元AI创作整机配置推荐',
+    '5000元以下学生装机性价比CPU',
+    '学生装机最高性价比CPU',
+    '双十一学生装机最高性价比CPU',
+    'AI主机配置推荐',
+    '双十一AI主机推荐配置'
+  ]
   
   const handlePlatformSelect = (platform: string) => {
     setSelectedPlatform(platform)
     setIsDropdownOpen(false)
   }
 
+  // 处理搜索输入变化
+  const handleSearchInputChange = (value: string) => {
+    setSearchQuery(value)
+    
+    if (value.trim()) {
+      // 过滤匹配的建议
+      const filtered = searchSuggestions.filter(suggestion =>
+        suggestion.toLowerCase().includes(value.toLowerCase())
+      )
+      setFilteredSuggestions(filtered)
+    } else {
+      // 显示所有建议
+      setFilteredSuggestions(searchSuggestions)
+    }
+  }
+
+  // 处理选择建议
+  const handleSuggestionSelect = (suggestion: string) => {
+    setSearchQuery(suggestion)
+    setIsSearchFocused(false)
+    setFilteredSuggestions([])
+  }
+
+  // 初始化过滤建议
+  useEffect(() => {
+    if (isSearchFocused) {
+      if (searchQuery.trim()) {
+        const filtered = searchSuggestions.filter(suggestion =>
+          suggestion.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        setFilteredSuggestions(filtered)
+      } else {
+        setFilteredSuggestions(searchSuggestions)
+      }
+    }
+  }, [isSearchFocused])
+
   // 点击外部关闭下拉框
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false)
+      }
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsSearchFocused(false)
       }
     }
 
@@ -49,10 +107,13 @@ export function ConversationsContent() {
           <div className="w-full max-w-2xl">
             <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
               {/* 主搜索框 */}
-              <div className="relative w-full sm:w-auto sm:flex-1 max-w-md">
+              <div className="relative w-full sm:w-auto sm:flex-1 max-w-md" ref={searchRef}>
                 <input 
                   type="text"
-                  placeholder="interCPU发售"
+                  value={searchQuery}
+                  onChange={(e) => handleSearchInputChange(e.target.value)}
+                  onFocus={() => setIsSearchFocused(true)}
+                  placeholder="intelCPU发售"
                   className="w-full h-12 px-4 pr-12 text-sm text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <button className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 hover:bg-gray-100 rounded-full transition-colors">
@@ -61,6 +122,27 @@ export function ConversationsContent() {
                     <path d="M27.1807 27.7113C26.9434 27.7113 26.7257 27.617 26.5337 27.431L20.2532 21.3504C19.9688 21.0749 19.8859 20.7186 20.0257 20.3729C20.1848 19.9797 20.5897 19.6944 20.9884 19.6944C21.2257 19.6944 21.4433 19.7888 21.6355 19.9749L27.9157 26.0555C28.2002 26.3309 28.2832 26.6873 28.1434 27.0332C27.9844 27.4262 27.5794 27.7113 27.1807 27.7113ZM10.6496 11.3405C9.86391 11.3405 9.22461 10.7012 9.22461 9.91548C9.22461 9.12978 9.86391 8.49048 10.6496 8.49048C11.4353 8.49048 12.0746 9.12978 12.0746 9.91548C12.0746 10.7012 11.4353 11.3405 10.6496 11.3405Z" fill="currentColor"/>
                   </svg>
                 </button>
+
+                {/* 搜索建议下拉列表 */}
+                {isSearchFocused && filteredSuggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-64 overflow-y-auto">
+                    {filteredSuggestions.map((suggestion, index) => (
+                      <div
+                        key={index}
+                        className={`px-4 py-3 text-sm cursor-pointer hover:bg-gray-50 transition-colors ${
+                          index < filteredSuggestions.length - 1 ? 'border-b border-gray-100' : ''
+                        } ${
+                          index === 0 ? 'rounded-t-lg' : ''
+                        } ${
+                          index === filteredSuggestions.length - 1 ? 'rounded-b-lg' : ''
+                        }`}
+                        onClick={() => handleSuggestionSelect(suggestion)}
+                      >
+                        <div className="text-gray-700">{suggestion}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* 平台筛选下拉框 */}
