@@ -110,11 +110,11 @@ export function SettingsContent({
       setLoading(true);
       try {
         await authApi.logout();
-        router.push('/auth/login');
+        router.push("/auth/login");
       } catch (error) {
         console.error("Logout error:", error);
         // 即使出错也跳转到登录页面
-        router.push('/auth/login');
+        router.push("/auth/login");
       } finally {
         setLoading(false);
       }
@@ -317,7 +317,7 @@ export function SettingsContent({
     try {
       const response = await brandApi.list({
         page: page,
-        page_size: 3, // 每页显示3个品牌
+        page_size: 10, // 每页显示3个品牌
       });
       if (response.success && response.data) {
         let brands: any[] = [];
@@ -627,7 +627,7 @@ export function SettingsContent({
                         取消
                       </button>
                     </div>
-                    
+
                     {/* 退出登录按钮 */}
                     <div className="sm:ml-auto">
                       <button
