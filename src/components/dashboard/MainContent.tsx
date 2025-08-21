@@ -8,7 +8,7 @@ import { BrandRecommendationCard } from './BrandRecommendationCard'
 import { BrandMarketShareCard } from './BrandMarketShareCard'
 import { VisibilityContent } from './VisibilityContent'
 import { TipsContent } from './TipsContent'
-import { ReferencesContent } from './ReferencesContent'
+
 
 interface MainContentProps {
   activeTab: string
@@ -22,8 +22,7 @@ export function MainContent({ activeTab }: MainContentProps) {
         return <VisibilityContent />
       case 'tips':
         return <TipsContent />
-      case 'references':
-        return <ReferencesContent />
+
       default:
         // 默认显示可见性页面
         return <VisibilityContent />

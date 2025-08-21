@@ -98,7 +98,13 @@ export const apiRequest = async <T = any>(
     const contentType = response.headers.get("Content-Type");
 
     if (contentType && contentType.includes("application/json")) {
-      data = await response.json();
+      try {
+        const text = await response.text();
+        data = text ? JSON.parse(text) : null;
+      } catch (parseError) {
+        console.error("JSON Parse Error:", parseError);
+        data = null;
+      }
     } else {
       data = await response.text();
     }

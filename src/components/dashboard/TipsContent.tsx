@@ -119,12 +119,7 @@ export function TipsContent() {
         <h1 className="text-2xl font-bold">提示词管理</h1>
         <div className="flex items-center gap-4">
           <BrandSelector value={currentBrandId} onChange={setCurrentBrandId} />
-          <Button
-            onClick={handleCreatePrompt}
-            className="bg-blue-600 text-white hover:bg-blue-700"
-          >
-            创建新提示词
-          </Button>
+          
         </div>
       </div>
 

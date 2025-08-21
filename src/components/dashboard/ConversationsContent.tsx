@@ -2,15 +2,17 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
+import { authUtils } from '@/services/auth'
+import { brandApi } from '@/services/brand'
+import { Brand } from '@/lib/types'
 
 export function ConversationsContent() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [selectedPlatform, setSelectedPlatform] = useState('平台筛选')
   const [searchQuery, setSearchQuery] = useState('')
-  const [isSearchFocused, setIsSearchFocused] = useState(false)
-  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([])
+  const [currentBrand, setCurrentBrand] = useState<Brand | null>(null)
+  const [isIntelBrand, setIsIntelBrand] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const searchRef = useRef<HTMLDivElement>(null)
   
   const platforms = ['DeepSeek', '豆包', '文心一言', 'ChatGPT', 'Claude']
   
@@ -33,51 +35,63 @@ export function ConversationsContent() {
     setIsDropdownOpen(false)
   }
 
+  // 获取当前品牌信息
+  useEffect(() => {
+    const fetchBrandInfo = async () => {
+      const userInfo = authUtils.getUserInfo()
+      if (userInfo?.current_brand_id) {
+        try {
+          const response = await brandApi.list({
+            page: 1,
+            page_size: 10,
+          })
+          
+          if (response.success && response.data) {
+            let brands: Brand[] = []
+            
+            if (Array.isArray(response.data)) {
+              brands = response.data
+            } else if (response.data.data && Array.isArray(response.data.data)) {
+              brands = response.data.data
+            }
+            
+            const currentBrandInfo = brands.find(
+              (brand) => brand.id === userInfo.current_brand_id
+            )
+            
+            if (currentBrandInfo) {
+              setCurrentBrand(currentBrandInfo)
+              // 检查品牌名称是否为 Intel (不区分大小写)
+              const brandName = currentBrandInfo.name?.toLowerCase()
+              setIsIntelBrand(brandName === 'intel')
+            }
+          }
+        } catch (error) {
+          console.error('获取品牌信息失败:', error)
+        }
+      }
+    }
+    
+    fetchBrandInfo()
+  }, [])
+
   // 处理搜索输入变化
   const handleSearchInputChange = (value: string) => {
     setSearchQuery(value)
-    
-    if (value.trim()) {
-      // 过滤匹配的建议
-      const filtered = searchSuggestions.filter(suggestion =>
-        suggestion.toLowerCase().includes(value.toLowerCase())
-      )
-      setFilteredSuggestions(filtered)
-    } else {
-      // 显示所有建议
-      setFilteredSuggestions(searchSuggestions)
-    }
   }
 
   // 处理选择建议
   const handleSuggestionSelect = (suggestion: string) => {
     setSearchQuery(suggestion)
-    setIsSearchFocused(false)
-    setFilteredSuggestions([])
   }
 
-  // 初始化过滤建议
-  useEffect(() => {
-    if (isSearchFocused) {
-      if (searchQuery.trim()) {
-        const filtered = searchSuggestions.filter(suggestion =>
-          suggestion.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        setFilteredSuggestions(filtered)
-      } else {
-        setFilteredSuggestions(searchSuggestions)
-      }
-    }
-  }, [isSearchFocused])
 
-  // 点击外部关闭下拉框
+
+  // 点击外部关闭平台下拉框
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false)
-      }
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setIsSearchFocused(false)
       }
     }
 
@@ -107,12 +121,11 @@ export function ConversationsContent() {
           <div className="w-full max-w-2xl">
             <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
               {/* 主搜索框 */}
-              <div className="relative w-full sm:w-auto sm:flex-1 max-w-md" ref={searchRef}>
+              <div className="relative w-full sm:w-auto sm:flex-1 max-w-md">
                 <input 
                   type="text"
                   value={searchQuery}
                   onChange={(e) => handleSearchInputChange(e.target.value)}
-                  onFocus={() => setIsSearchFocused(true)}
                   placeholder="intelCPU发售"
                   className="w-full h-12 px-4 pr-12 text-sm text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
@@ -123,26 +136,6 @@ export function ConversationsContent() {
                   </svg>
                 </button>
 
-                {/* 搜索建议下拉列表 */}
-                {isSearchFocused && filteredSuggestions.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-64 overflow-y-auto">
-                    {filteredSuggestions.map((suggestion, index) => (
-                      <div
-                        key={index}
-                        className={`px-4 py-3 text-sm cursor-pointer hover:bg-gray-50 transition-colors ${
-                          index < filteredSuggestions.length - 1 ? 'border-b border-gray-100' : ''
-                        } ${
-                          index === 0 ? 'rounded-t-lg' : ''
-                        } ${
-                          index === filteredSuggestions.length - 1 ? 'rounded-b-lg' : ''
-                        }`}
-                        onClick={() => handleSuggestionSelect(suggestion)}
-                      >
-                        <div className="text-gray-700">{suggestion}</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
 
               {/* 平台筛选下拉框 */}
@@ -194,6 +187,40 @@ export function ConversationsContent() {
               </div>
             </div>
           </div>
+
+          {/* 搜索建议卡片列表 - 仅当品牌为 Intel 时显示 */}
+          {isIntelBrand && (
+            <div className="suggestion-cards-container mt-8 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+                <h3 className="text-sm font-semibold text-gray-700 mb-4">热门搜索建议</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {searchSuggestions.map((suggestion, index) => (
+                    <div
+                      key={index}
+                      className="bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg p-4 cursor-pointer transition-all duration-200 hover:shadow-md"
+                      onClick={() => handleSuggestionSelect(suggestion)}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                          <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                          </svg>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm text-gray-700 leading-relaxed">{suggestion}</p>
+                        </div>
+                        <div className="flex-shrink-0">
+                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

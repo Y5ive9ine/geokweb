@@ -84,8 +84,13 @@ export function TopNavigation({
     : homeTabs;
 
   const handleTabClick = (tab: { id: string; href: string }) => {
-    setActiveTab(tab.id);
-    router.push(tab.href);
+    // 对于引用页面，直接跳转而不更新 activeTab，避免页面抽动
+    if (tab.id === "references") {
+      router.push(tab.href);
+    } else {
+      setActiveTab(tab.id);
+      router.push(tab.href);
+    }
   };
 
   return (
