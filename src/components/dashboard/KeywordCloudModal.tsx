@@ -50,10 +50,8 @@ export function KeywordCloudModal({ isOpen, onClose, prompt }: KeywordCloudModal
 
   // 格式化数字显示
   const formatCount = (count: number) => {
-    if (count >= 10000) {
-      return `${(count / 10000).toFixed(1)}万+`
-    }
-    return count.toString()
+    // 所有数字统一加上"万+"
+    return `${count}万+`
   }
 
   return (
@@ -152,13 +150,14 @@ export function KeywordCloudModal({ isOpen, onClose, prompt }: KeywordCloudModal
             <h3 className="text-lg font-bold text-gray-900 mb-4 h-6">主要关键词</h3>
             <div className="bg-white rounded-lg border border-gray-200 p-4 flex-1 overflow-y-auto">
               {sortedKeywords.map((item, index) => (
-                <div key={item.word} className="flex items-center h-10 mb-2 last:mb-0">
-                  {/* 序号 */}
-                  <span className="text-base text-gray-500 w-6 flex-shrink-0">{index + 1}</span>
-                  {/* 关键词 */}
-                  <span className="ml-3 text-base text-gray-900 flex-1">{item.word}</span>
-                  {/* 频率 */}
-                  <span className="text-base text-blue-600">{formatCount(item.count)}</span>
+                <div key={item.word} className="flex items-center justify-between h-10 mb-2 last:mb-0">
+                  {/* 序号和关键词 */}
+                  <div className="flex items-center flex-1">
+                    <span className="text-base text-gray-700">{index + 1}.</span>
+                    <span className="ml-2 text-base text-gray-900">{item.word}</span>
+                  </div>
+                  {/* 数量 */}
+                  <span className="text-base text-gray-600 ml-4">{formatCount(item.count)}</span>
                 </div>
               ))}
             </div>

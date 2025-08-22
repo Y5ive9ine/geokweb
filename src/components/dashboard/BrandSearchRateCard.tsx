@@ -106,10 +106,9 @@ export function BrandSearchRateCard({ data, loading, error }: BrandSearchRateCar
       };
     });
 
-    // 计算主搜索率：第7天搜索率 / 第1天搜索率 * 100%
-    const day1SearchRate = dailyData[0]?.value || 1;
+    // 主搜索率：直接显示第7天的搜索率
     const day7SearchRate = dailyData[6]?.value || 0;
-    const searchRate = day1SearchRate > 0 ? ((day7SearchRate / day1SearchRate) * 100) : 0;
+    const searchRate = day7SearchRate;
     
     // 计算总搜索数（所有天数的总数之和）
     const totalSearches = dailyData.reduce((sum, day) => sum + (day.totalValue || 0), 0);
@@ -118,6 +117,7 @@ export function BrandSearchRateCard({ data, loading, error }: BrandSearchRateCar
       currentRate: `${searchRate.toFixed(1)}%`,
       totalSearches: totalSearches
     };
+    
 
     return {
       searchData: searchResult,
